@@ -9,6 +9,7 @@ import 'package:the_local_agora/design/jf_dial_selector.dart';
 import 'package:the_local_agora/design/jf_machine_identity_panel.dart';
 import 'package:the_local_agora/design/jf_oled_toast.dart';
 import 'package:the_local_agora/design/jf_signal_coil.dart';
+import 'package:the_local_agora/design/jf_waiting_scan_prompt.dart';
 import 'package:the_local_agora/design/junkfeathers_theme.dart';
 import 'package:the_local_agora/design/junkfeathers_tokens.dart';
 import 'package:the_local_agora/features/scan_control/scan_control_state.dart';
@@ -64,9 +65,8 @@ void main() {
     await _pumpScanControl(tester);
     expect(find.text('THE LOCAL AGORA'), findsOneWidget);
     expect(find.text('WHAT IS HAPPENING HERE?'), findsNothing);
-    expect(find.textContaining('AGORA MK-I'), findsWidgets);
-    expect(find.textContaining('V0.1.0'), findsWidgets);
-    expect(find.textContaining('FREE'), findsWidgets);
+    expect(find.textContaining('AGORA MK-I // V0.1.0 // FREE // KERYX'),
+        findsOneWidget);
     expect(find.byType(JfRetroDateDisplay), findsOneWidget);
     expect(
       find.text('JUNKFEATHERS TECH // CIVIC RECEIVER 01'),
@@ -74,13 +74,48 @@ void main() {
     );
   });
 
-  testWidgets('monitor is CRT assembly without product title', (tester) async {
+  testWidgets('panel 01 is compact identity plate', (tester) async {
+    await _pumpScanControl(tester);
+    final panel = find.byType(JfMachineIdentityPanel);
+    expect(panel, findsOneWidget);
+    final size = tester.getSize(panel);
+    expect(size.height, lessThan(100));
+    expect(size.height, lessThanOrEqualTo(JfMachineIdentityPanel.compactTargetHeight + 28));
+  });
+
+  testWidgets('monitor is CRT assembly with waiting prompt', (tester) async {
     await _pumpScanControl(tester);
     expect(find.byType(JfCrtMonitor), findsOneWidget);
+    expect(find.byType(JfWaitingScanPrompt), findsOneWidget);
+    expect(find.textContaining('WAITING FOR SCAN'), findsOneWidget);
     expect(find.textContaining('AWAITING LOCATION INPUT'), findsOneWidget);
     expect(find.textContaining('ENGINE LINK // NOT CONNECTED'), findsOneWidget);
+    final monitor = tester.widget<JfCrtMonitor>(find.byType(JfCrtMonitor));
+    expect(monitor.height, 180);
     final clip = tester.widgetList<ClipRRect>(find.byType(ClipRRect));
     expect(clip.any((c) => c.borderRadius != BorderRadius.zero), isTrue);
+  });
+
+  testWidgets('reduced motion waiting prompt is static', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: const Scaffold(
+          body: JfWaitingScanPrompt(forceStatic: true),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.textContaining('WAITING FOR SCAN'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('panel 02 is taller than panel 03', (tester) async {
+    await _pumpScanControl(tester);
+    final monitor = tester.widget<JfCrtMonitor>(find.byType(JfCrtMonitor));
+    final coil = tester.widget<JfSignalCoil>(find.byType(JfSignalCoil));
+    expect(monitor.height, greaterThan(coil.height));
+    expect(coil.height, 60);
   });
 
   testWidgets('monitor scrollbar hides thumb when content fits', (tester) async {
@@ -91,11 +126,12 @@ void main() {
           body: JfCrtMonitor(
             lines: ['ONE', 'TWO'],
             height: 160,
+            forceStaticPrompt: true,
           ),
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
     expect(find.byType(JfMachineScrollbar), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -106,23 +142,33 @@ void main() {
       MaterialApp(
         theme: buildJunkfeathersTheme(),
         home: Scaffold(
-          body: JfCrtMonitor(lines: lines, height: 120),
+          body: JfCrtMonitor(
+            lines: lines,
+            height: 120,
+            forceStaticPrompt: true,
+          ),
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
     expect(find.byType(JfMachineScrollbar), findsOneWidget);
     expect(find.text('LINE // 0'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -400));
-    await tester.pumpAndSettle();
+    await tester.pump();
     expect(find.textContaining('LINE //'), findsWidgets);
   });
 
-  testWidgets('triple-ring coil renders compact', (tester) async {
+  testWidgets('triple-ring coil renders compact with three rings',
+      (tester) async {
     await _pumpScanControl(tester);
     final coil = tester.widget<JfSignalCoil>(find.byType(JfSignalCoil));
-    expect(coil.height, lessThanOrEqualTo(80));
+    expect(coil.height, 60);
+    expect(JfSignalCoil.ringCount, 3);
     expect(find.byType(JfSignalCoil), findsOneWidget);
+    final coilSrc = File('lib/design/jf_signal_coil.dart').readAsStringSync();
+    expect(coilSrc.contains('Side tick'), isTrue);
+    expect(coilSrc.contains('scan line'), isTrue);
+    expect(coilSrc.contains('ClipRect'), isTrue);
   });
 
   testWidgets('reduced-motion coil is static', (tester) async {
@@ -130,7 +176,7 @@ void main() {
       MaterialApp(
         theme: buildJunkfeathersTheme(),
         home: const Scaffold(
-          body: JfSignalCoil(forceStatic: true, height: 72),
+          body: JfSignalCoil(forceStatic: true, height: 60),
         ),
       ),
     );
@@ -234,21 +280,43 @@ void main() {
     expect(source.contains('kDebugMode'), isTrue);
   });
 
-  test('scan performs no network call', () {
+  test('scan performs no network or Firebase callable call', () {
     final source = File(
       'lib/features/scan_control/scan_control_screen.dart',
     ).readAsStringSync();
     expect(source.contains('http'), isFalse);
-    expect(source.toLowerCase().contains('firebase'), isFalse);
+    expect(source.contains('probeStatus'), isFalse);
+    expect(source.contains('FirebaseFunctions'), isFalse);
+    expect(source.contains('httpsCallable'), isFalse);
   });
 
-  test('no forbidden dependencies in pubspec', () {
-    final pubspec = File('pubspec.yaml').readAsStringSync().toLowerCase();
-    expect(pubspec.contains('firebase'), isFalse);
+  test('only approved Flutter Firebase packages are present', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    expect(pubspec.contains('firebase_core:'), isTrue);
+    expect(pubspec.contains('cloud_functions:'), isTrue);
+    expect(pubspec.contains('firebase_auth'), isFalse);
+    expect(pubspec.contains('cloud_firestore'), isFalse);
+    expect(pubspec.contains('firebase_storage'), isFalse);
+    expect(pubspec.contains('firebase_analytics'), isFalse);
+    expect(pubspec.contains('firebase_app_check'), isFalse);
     expect(pubspec.contains('google_maps'), isFalse);
     expect(pubspec.contains('google_fonts'), isFalse);
     expect(pubspec.contains('carousel'), isFalse);
-    expect(pubspec.contains('animations:'), isFalse);
+    expect(pubspec.contains('google_generative_ai'), isFalse);
+  });
+
+  test('no Gemini key appears in repository sources', () {
+    final files = [
+      'lib/main.dart',
+      'lib/firebase_options.dart',
+      'functions/src/index.ts',
+      'pubspec.yaml',
+    ];
+    for (final path in files) {
+      final text = File(path).readAsStringSync();
+      expect(text.contains('GEMINI_API_KEY='), isFalse);
+      expect(text.contains('BEGIN PRIVATE KEY'), isFalse);
+    }
   });
 
   test('portrait orientation configuration remains', () {

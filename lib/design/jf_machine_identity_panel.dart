@@ -18,13 +18,21 @@ abstract final class AgoraMachineIdentity {
     final d = date.day.toString().padLeft(2, '0');
     return '$y.$m.$d';
   }
+
+  static String compactSpecLine({bool includeDev = false}) {
+    final base =
+        '$model // $versionLabel // $accessTier // $engine';
+    if (includeDev) return '$base // DEV';
+    return base;
+  }
 }
 
-/// Compact retro numeric date window (calculator / early digital clock).
+/// Compact retro numeric date window.
 class JfRetroDateDisplay extends StatelessWidget {
-  const JfRetroDateDisplay({super.key, this.now});
+  const JfRetroDateDisplay({super.key, this.now, this.compact = true});
 
   final DateTime? now;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -38,32 +46,17 @@ class JfRetroDateDisplay extends StatelessWidget {
           borderRadius: JfBorders.square,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: JfSpacing.sm,
-            vertical: JfSpacing.sm,
+            vertical: compact ? JfSpacing.xs : JfSpacing.sm,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                'LOCAL DATE',
-                style: JfTypography.micro.copyWith(
-                  color: JfColors.white54,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
-              ),
-              const SizedBox(height: JfSpacing.xs),
-              Text(
-                date,
-                style: JfTypography.numericDisplay.copyWith(
-                  fontSize: 16,
-                  letterSpacing: 1.5,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ],
+          child: Text(
+            date,
+            style: JfTypography.numericDisplay.copyWith(
+              fontSize: compact ? 13 : 16,
+              letterSpacing: 1.2,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
         ),
       ),
@@ -71,7 +64,7 @@ class JfRetroDateDisplay extends StatelessWidget {
   }
 }
 
-/// 01 — identity and technical specification module.
+/// 01 — compact identity plate: title + date on top, specs on bottom.
 class JfMachineIdentityPanel extends StatelessWidget {
   const JfMachineIdentityPanel({
     super.key,
@@ -82,17 +75,13 @@ class JfMachineIdentityPanel extends StatelessWidget {
   final DateTime? now;
   final bool? forceDevIndicator;
 
+  /// Approximate content height target for compactness tests.
+  static const double compactTargetHeight = 72;
+
   @override
   Widget build(BuildContext context) {
     final showDev = forceDevIndicator ?? kDebugMode;
-    final specs = <String>[
-      'MODEL // ${AgoraMachineIdentity.model}',
-      'VERSION // ${AgoraMachineIdentity.versionLabel}',
-      'ACCESS // ${AgoraMachineIdentity.accessTier}',
-      'MODE // ${AgoraMachineIdentity.mode}',
-      'ENGINE // ${AgoraMachineIdentity.engine}',
-      if (showDev) 'STATE // DEV',
-    ];
+    final specs = AgoraMachineIdentity.compactSpecLine(includeDev: showDev);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -101,55 +90,38 @@ class JfMachineIdentityPanel extends StatelessWidget {
         borderRadius: JfBorders.square,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(JfSpacing.md),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final narrow = constraints.maxWidth < 340;
-            final identity = Column(
+        padding: const EdgeInsets.symmetric(
+          horizontal: JfSpacing.sm,
+          vertical: JfSpacing.sm,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  AgoraMachineIdentity.productTitle,
-                  style: JfTypography.deviceTitle.copyWith(fontSize: 16),
+                Expanded(
+                  child: Text(
+                    AgoraMachineIdentity.productTitle,
+                    style: JfTypography.deviceTitle.copyWith(fontSize: 15),
+                  ),
                 ),
-                const SizedBox(height: JfSpacing.sm),
-                for (final line in specs) ...[
-                  Text(
-                    line,
-                    style: JfTypography.micro.copyWith(
-                      color: JfColors.white70,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 9,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                ],
-              ],
-            );
-
-            if (narrow) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  identity,
-                  const SizedBox(height: JfSpacing.sm),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: JfRetroDateDisplay(now: now),
-                  ),
-                ],
-              );
-            }
-
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: identity),
                 const SizedBox(width: JfSpacing.sm),
                 JfRetroDateDisplay(now: now),
               ],
-            );
-          },
+            ),
+            const SizedBox(height: JfSpacing.sm),
+            Text(
+              specs,
+              style: JfTypography.micro.copyWith(
+                color: JfColors.white70,
+                fontWeight: FontWeight.bold,
+                fontSize: 9,
+                letterSpacing: 0.4,
+              ),
+            ),
+          ],
         ),
       ),
     );

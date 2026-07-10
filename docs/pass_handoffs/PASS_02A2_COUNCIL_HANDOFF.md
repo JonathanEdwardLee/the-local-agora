@@ -131,3 +131,36 @@ After Jonathan’s physical approval of Pass 02A.2:
 **Smallest next pass:** Pass 02B — Wire Scan Control to live Keryx (Firebase/FlutterFire callable only).
 
 Do not begin Pass 02B until 02A.2 physical approval is recorded.
+
+---
+
+## 21. Physical Test 02A.2 (Jonathan)
+
+**Date recorded:** 2026-07-10  
+**Tester:** Jonathan  
+**Result:** `FUNCTIONALITY APPROVED — FINAL GEOMETRY REFINEMENTS REQUESTED`
+
+### Functional results — all PASS
+- No external numbered section headers
+- Panel 01 identity information works
+- Panel 02 CRT monitor and scrollbar work
+- Panel 03 triple-ring animation works
+- Panel 04 controls work
+- WHEN dial works
+- WHAT dial works
+- Monitor selection updates work
+- Empty-location validation works
+- Top warning toast works
+- Top informational toast works
+- Keyboard behavior works
+- Portrait lock works
+- Force-close and reopen work
+
+### Final visual refinements requested
+- **Panel 01:** Reduce total height; `THE LOCAL AGORA` upper-left; retro date upper-right; machine details in one compact bottom row; avoid unused vertical space
+- **Panel 02:** Keep CRT + scrollbar; increase height as primary surface; add honest blinking `WAITING FOR SCAN...` prompt
+- **Panel 03:** Reduce height slightly more; preserve three rings; restore marker/tick lines; restore horizontal scan line moving vertically; keep all art inside the rectangle
+- **Panel 04:** Leave unchanged unless overflow requires a minimal fix
+
+### Authority note
+Functionality is approved. Geometry refinements are owned by Pass 02B.1 before live Keryx activation.

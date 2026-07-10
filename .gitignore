@@ -56,7 +56,8 @@ functions/.secret.local
 functions/.env
 functions/.env.*
 !functions/.env.example
-**/google-services.json
+# Android google-services.json is FlutterFire client config (not a server secret).
+# iOS plist remains ignored until Apple registration.
 **/GoogleService-Info.plist
 
 # Node / Functions

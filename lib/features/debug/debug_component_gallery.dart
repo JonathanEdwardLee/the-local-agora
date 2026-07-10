@@ -12,11 +12,20 @@ import '../../design/jf_section_label.dart';
 import '../../design/jf_signal_coil.dart';
 import '../../design/jf_status_line.dart';
 import '../../design/junkfeathers_tokens.dart';
+import '../../services/keryx/keryx_link_result.dart';
+import '../../services/keryx/keryx_link_service.dart';
 import '../scan_control/scan_control_state.dart';
 
 /// Debug-only visual review surface. Not linked from release builds.
 class DebugComponentGallery extends StatefulWidget {
-  const DebugComponentGallery({super.key});
+  const DebugComponentGallery({
+    super.key,
+    this.firebaseReady = false,
+    this.keryxLinkService,
+  });
+
+  final bool firebaseReady;
+  final KeryxLinkService? keryxLinkService;
 
   @override
   State<DebugComponentGallery> createState() => _DebugComponentGalleryState();
@@ -27,6 +36,8 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
   TimeWindow _when = TimeWindow.tonight;
   EventCategory _what = EventCategory.allSignals;
   bool _selected = true;
+  KeryxLinkResult _linkResult = KeryxLinkResult.untested;
+  bool _linkBusy = false;
 
   @override
   void dispose() {
@@ -34,9 +45,32 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
     super.dispose();
   }
 
+  Future<void> _testKeryxLink() async {
+    final service = widget.keryxLinkService;
+    if (service == null || _linkBusy) return;
+    setState(() {
+      _linkBusy = true;
+      _linkResult = KeryxLinkResult.connecting;
+    });
+    showJfOledToast(context, 'CONNECTING TO KERYX...');
+    final result = await service.probeStatus();
+    if (!mounted) return;
+    setState(() {
+      _linkResult = result;
+      _linkBusy = false;
+    });
+    showJfOledToast(
+      context,
+      result.machineTitle,
+      detail: result.supportText,
+      warning: result.state != KeryxLinkState.ready,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final canTest = widget.firebaseReady && widget.keryxLinkService != null;
 
     return Scaffold(
       backgroundColor: JfColors.black,
@@ -58,18 +92,38 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 ),
                 const SizedBox(height: JfSpacing.xs),
                 const Text(
-                  'Pass 02A.2 integrated machine panels. Debug only.',
+                  'Pass 02B.1 geometry + Firebase link probe. Debug only.',
                   style: JfTypography.supporting,
                 ),
+                const SizedBox(height: JfSpacing.lg),
+                const JfSectionLabel('FIREBASE LINK'),
+                const SizedBox(height: JfSpacing.sm),
+                Text(
+                  _linkResult.machineTitle,
+                  style: JfTypography.controlLabel,
+                ),
+                const SizedBox(height: JfSpacing.xs),
+                Text(
+                  _linkResult.supportText,
+                  style: JfTypography.supporting,
+                ),
+                const SizedBox(height: JfSpacing.sm),
+                JfDeviceButton(
+                  label: 'TEST KERYX LINK',
+                  semanticLabel: 'Test Keryx Firebase link',
+                  onPressed: canTest && !_linkBusy ? _testKeryxLink : null,
+                ),
+                if (!canTest) ...[
+                  const SizedBox(height: JfSpacing.xs),
+                  const Text(
+                    'Firebase is not initialized in this session.',
+                    style: JfTypography.warning,
+                  ),
+                ],
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 01 IDENTITY'),
                 const SizedBox(height: JfSpacing.sm),
                 const JfMachineIdentityPanel(),
-                const SizedBox(height: JfSpacing.sm),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: JfRetroDateDisplay(),
-                ),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 02 CRT MONITOR'),
                 const SizedBox(height: JfSpacing.sm),
@@ -86,16 +140,24 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                     'LINE // SCROLL SAMPLE 05',
                     'LINE // SCROLL SAMPLE 06',
                   ],
-                  height: 140,
+                  height: 180,
+                ),
+                const SizedBox(height: JfSpacing.sm),
+                const Text('STATIC WAITING PROMPT', style: JfTypography.micro),
+                const SizedBox(height: JfSpacing.xs),
+                const JfCrtMonitor(
+                  lines: ['ENGINE LINK // NOT CONNECTED'],
+                  height: 100,
+                  forceStaticPrompt: true,
                 ),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 03 TRIPLE RING'),
                 const SizedBox(height: JfSpacing.sm),
-                const JfSignalCoil(height: 72),
+                const JfSignalCoil(height: 60),
                 const SizedBox(height: JfSpacing.sm),
                 const Text('REDUCED MOTION / STATIC', style: JfTypography.micro),
                 const SizedBox(height: JfSpacing.xs),
-                const JfSignalCoil(height: 72, forceStatic: true),
+                const JfSignalCoil(height: 60, forceStatic: true),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 04 DIALS + FIELD'),
                 const SizedBox(height: JfSpacing.sm),
@@ -146,8 +208,6 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 ),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('LEGACY STATES'),
-                const SizedBox(height: JfSpacing.sm),
-                const Text('THE LOCAL AGORA', style: JfTypography.deviceTitle),
                 const SizedBox(height: JfSpacing.sm),
                 const JfNumericDisplay('12', label: 'SIGNALS'),
                 const SizedBox(height: JfSpacing.sm),

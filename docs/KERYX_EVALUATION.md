@@ -331,8 +331,23 @@ Without inventing prices:
 
 ## 20. Smallest recommended next technical step
 
-**Pass 02 — Scan Control + sourced City Index (cached public scan UI)**  
-Still no flyer upload, billing, maps, or accounts. Wire Flutter to a protected callable only after App Check/auth staging plan is agreed.
+**Pass 02B.2 — Secure Live Keryx Scan Activation** (after physical approval of 02B.1 link)  
+Still no flyer upload, billing, maps, or accounts. Store `GEMINI_API_KEY` via Secret Manager, enable one protected scan callable, then connect `SCAN THE AGORA`.
+
+---
+
+## 21. Pass 02B.1 transport note (July 10, 2026)
+
+Firebase callable transport is configured for project `gen-lang-client-0718451481`:
+
+- Flutter: `firebase_core` + `cloud_functions` (Android + web)
+- Deployed Gen2 callable: `keryxStatus` (`us-central1`, Node 22)
+- Response is status-only (`scanEnabled: false`); no Gemini invocation
+- Debug-only client probe: `TEST KERYX LINK`
+- **Physical remote status invocation on device:** pending Jonathan’s Android test
+- **Feasibility verdict unchanged:** `KERYX FEASIBLE WITH CHANGES`
+
+A successful status call proves transport only. It does **not** prove grounded discovery, Gemini quality, citations, normalization, event accuracy, or cost per scan.
 
 ---
 
@@ -342,6 +357,8 @@ Still no flyer upload, billing, maps, or accounts. Wire Flutter to a protected c
 |---|---|
 | Bounded retry | `functions/src/keryx/retry.ts` |
 | Interactions + generateContent fallback | `functions/src/keryx/gemini_keryx_engine.ts` |
+| Status callable (no Gemini) | `functions/src/index.ts` → `keryxStatus` |
+| Flutter link service | `lib/services/keryx/` |
 | Smoke test | `functions/scripts/smoke_grounded_search.ts` (`npm run keryx:smoke`) |
 | Sequential spike | `functions/scripts/run_keryx_spike.ts` |
 | Local eval artifacts (gitignored) | `functions/.eval-cache/` |

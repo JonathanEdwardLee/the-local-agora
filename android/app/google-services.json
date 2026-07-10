@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913778015345",
+    "project_id": "gen-lang-client-0718451481",
+    "storage_bucket": "gen-lang-client-0718451481.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913778015345:android:a4af7a75000a992b1aafd0",
+        "android_client_info": {
+          "package_name": "com.junkfeathers.localagora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxqYEVJmoB_L8Mxem6dfoAO_SZweOM4ow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

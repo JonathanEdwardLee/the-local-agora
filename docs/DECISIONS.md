@@ -157,3 +157,17 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 **Status:** Accepted  
 **Decision:** The monitor’s inner CRT surface may use rounded corners as an approved machine metaphor. Outer frames, controls, fields, toasts, and dials remain square.  
 **Consequence:** Do not generalize rounded Material cards elsewhere.
+
+## ADR-025 — Pass 02B.1 Firebase link foundation uses status-only callable
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** Bind Flutter (Android + web) to Firebase project `gen-lang-client-0718451481` with `firebase_core` and `cloud_functions` only. Prove transport via deployed Gen2 callable `keryxStatus` in `us-central1` (Node 22, `minInstances: 0`, `maxInstances: 1`). Live scan, Gemini secret, Auth, Firestore, Storage, App Check, and Analytics packages remain deferred. Debug-only `TEST KERYX LINK` may call status; main `SCAN THE AGORA` stays local readiness.  
+**Consequence:** A successful status call proves callable transport only — not Keryx discovery feasibility, Gemini quality, or cost per scan.
+
+## ADR-026 — Final machine geometry after Physical Test 02A.2
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** Panel 01 is a compact identity plate (title upper-left, retro date upper-right, one bottom spec row). Panel 02 is the primary CRT surface (taller; honest `WAITING FOR SCAN...` prompt with slow blink / static under reduced motion). Panel 03 is shorter with three rings, side ticks, and a contained vertical-moving scan line. Panel 04 controls remain as approved in 02A.2.  
+**Consequence:** Geometry refinements do not authorize live scanning.

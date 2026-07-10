@@ -11,22 +11,20 @@ enum JfSignalCoilMode {
   warning,
 }
 
-/// 03 — compact triple-ring signal visual (Stage 1 refinement).
-///
-/// Three concentric rings stay fully inside the art box. No network implication.
+/// 03 — compact triple-ring signal visual with ticks and scan line.
 class JfSignalCoil extends StatefulWidget {
   const JfSignalCoil({
     super.key,
     this.mode = JfSignalCoilMode.idle,
-    this.height = 72,
+    this.height = 60,
     this.forceStatic,
   });
 
   final JfSignalCoilMode mode;
   final double height;
-
-  /// When true, always static. When null, follows reduced-motion settings.
   final bool? forceStatic;
+
+  static const int ringCount = 3;
 
   @override
   State<JfSignalCoil> createState() => _JfSignalCoilState();
@@ -43,7 +41,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
     WidgetsBinding.instance.addObserver(this);
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3600),
+      duration: const Duration(milliseconds: 4200),
     );
   }
 
@@ -80,7 +78,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
       }
     } else {
       _controller.stop();
-      _controller.value = 0.22;
+      _controller.value = 0.35;
     }
   }
 
@@ -156,34 +154,56 @@ class _TripleRingPainter extends CustomPainter {
 
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final phase = staticFrame ? 0.22 : progress;
+    final phase = staticFrame ? 0.35 : progress;
 
-    // Padding so outer ring never touches the border.
-    const pad = 10.0;
+    const pad = 8.0;
     final maxR = math.min(size.width, size.height) / 2 - pad;
     final radii = <double>[maxR * 0.34, maxR * 0.62, maxR * 0.92];
 
-    // Center node
-    final coreBoost = mode == JfSignalCoilMode.focused ? 1.5 : 0.0;
-    canvas.drawCircle(Offset(cx, cy), 3.5 + coreBoost, ink);
+    // Side tick / marker lines
+    for (var i = 0; i < 7; i++) {
+      final y = pad + (size.height - pad * 2) * (i / 6);
+      canvas.drawLine(Offset(4, y), Offset(9, y), dim);
+      canvas.drawLine(
+        Offset(size.width - 9, y),
+        Offset(size.width - 4, y),
+        dim,
+      );
+    }
 
-    for (var i = 0; i < 3; i++) {
-      // Phased pulse: inner first, then middle, then outer.
+    // Center node
+    final coreBoost = mode == JfSignalCoilMode.focused ? 1.2 : 0.0;
+    canvas.drawCircle(Offset(cx, cy), 3.0 + coreBoost, ink);
+
+    for (var i = 0; i < JfSignalCoil.ringCount; i++) {
       final local = (phase + (1 - i) * 0.18) % 1.0;
-      final pulse = 0.85 + 0.15 * math.sin(local * math.pi * 2);
-      final r = radii[i] * pulse;
-      // Hard clamp inside pad.
-      final safeR = math.min(r, maxR);
+      final pulse = 0.88 + 0.12 * math.sin(local * math.pi * 2);
+      final safeR = math.min(radii[i] * pulse, maxR);
       canvas.drawCircle(Offset(cx, cy), safeR, i == 2 ? dim : ink);
 
-      // Subtle nodes on each ring
       final nodeCount = 4 + i;
       for (var n = 0; n < nodeCount; n++) {
-        final a = (n / nodeCount) * math.pi * 2 + phase * math.pi * 2 * 0.25;
+        final a = (n / nodeCount) * math.pi * 2 + phase * math.pi * 2 * 0.2;
         final p = Offset(cx + math.cos(a) * safeR, cy + math.sin(a) * safeR);
-        canvas.drawCircle(p, 1.2, ink);
+        canvas.drawCircle(p, 1.1, ink);
       }
     }
+
+    // Horizontal scan line moving vertically (triangle wave).
+    final scanPaint = Paint()
+      ..color = mode == JfSignalCoilMode.warning
+          ? JfColors.amber
+          : JfColors.white70
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final t = staticFrame ? 0.45 : phase;
+    final tri = t < 0.5 ? (t * 2) : (2 - t * 2);
+    final scanY = pad + (size.height - pad * 2) * tri;
+    canvas.drawLine(
+      Offset(pad + 2, scanY),
+      Offset(size.width - pad - 2, scanY),
+      scanPaint,
+    );
   }
 
   @override

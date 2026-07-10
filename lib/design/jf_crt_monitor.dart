@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'junkfeathers_tokens.dart';
+import 'jf_waiting_scan_prompt.dart';
 
 /// Custom machine scrollbar tied to a real [ScrollController].
 class JfMachineScrollbar extends StatelessWidget {
@@ -121,15 +122,18 @@ class JfCrtMonitor extends StatefulWidget {
   const JfCrtMonitor({
     super.key,
     required this.lines,
-    this.height = 132,
+    this.height = 180,
     this.warning = false,
+    this.showWaitingPrompt = true,
+    this.forceStaticPrompt,
   });
 
   final List<String> lines;
   final double height;
   final bool warning;
+  final bool showWaitingPrompt;
+  final bool? forceStaticPrompt;
 
-  /// Approved CRT inner corner radius (monitor surface only).
   static const double innerRadius = 14;
 
   @override
@@ -155,6 +159,7 @@ class _JfCrtMonitorState extends State<JfCrtMonitor> {
   Widget build(BuildContext context) {
     final borderColor = widget.warning ? JfColors.amber : JfColors.white;
     final screenHeight = widget.height - 20;
+    final itemCount = widget.lines.length + (widget.showWaitingPrompt ? 1 : 0);
 
     return Semantics(
       label: 'Machine monitor',
@@ -192,12 +197,23 @@ class _JfCrtMonitorState extends State<JfCrtMonitor> {
                         child: ListView.builder(
                           controller: _controller,
                           padding: const EdgeInsets.all(JfSpacing.sm),
-                          itemCount: widget.lines.length,
+                          itemCount: itemCount,
                           itemBuilder: (context, index) {
+                            if (widget.showWaitingPrompt && index == 0) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: JfWaitingScanPrompt(
+                                  warning: widget.warning,
+                                  forceStatic: widget.forceStaticPrompt,
+                                ),
+                              );
+                            }
+                            final lineIndex =
+                                widget.showWaitingPrompt ? index - 1 : index;
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
-                                widget.lines[index],
+                                widget.lines[lineIndex],
                                 style: JfTypography.supporting.copyWith(
                                   color: widget.warning
                                       ? JfColors.amber

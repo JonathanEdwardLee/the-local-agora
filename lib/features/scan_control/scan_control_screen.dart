@@ -10,13 +10,21 @@ import '../../design/jf_oled_toast.dart';
 import '../../design/jf_panel.dart';
 import '../../design/jf_signal_coil.dart';
 import '../../design/junkfeathers_tokens.dart';
+import '../../services/keryx/keryx_link_service.dart';
 import '../debug/debug_component_gallery.dart';
 import 'scan_control_state.dart';
 
 /// SCREEN 1 — SCAN CONTROL
-/// Integrated four-panel machine face. No live Keryx in Pass 02A.2.
+/// Integrated four-panel machine face. Live Keryx not enabled in Pass 02B.1.
 class ScanControlScreen extends StatefulWidget {
-  const ScanControlScreen({super.key});
+  const ScanControlScreen({
+    super.key,
+    this.firebaseReady = false,
+    this.keryxLinkService,
+  });
+
+  final bool firebaseReady;
+  final KeryxLinkService? keryxLinkService;
 
   @override
   State<ScanControlScreen> createState() => _ScanControlScreenState();
@@ -152,12 +160,13 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                     // 02 — CRT monitor only
                     JfCrtMonitor(
                       lines: _monitorLines,
+                      height: 180,
                       warning: _state.locationError != null,
                     ),
                     const SizedBox(height: JfSpacing.sm),
 
                     // 03 — Compact triple-ring art
-                    JfSignalCoil(mode: _coilMode, height: 72),
+                    JfSignalCoil(mode: _coilMode, height: 60),
                     const SizedBox(height: JfSpacing.sm),
 
                     // 04 — Integrated control chassis
@@ -233,8 +242,11 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                                 onPressed: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute<void>(
-                                      builder: (_) =>
-                                          const DebugComponentGallery(),
+                                      builder: (_) => DebugComponentGallery(
+                                        firebaseReady: widget.firebaseReady,
+                                        keryxLinkService:
+                                            widget.keryxLinkService,
+                                      ),
                                     ),
                                   );
                                 },
