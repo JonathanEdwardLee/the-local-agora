@@ -6,6 +6,25 @@
 
 ---
 
+## Pass 02A visual readiness (July 10, 2026)
+
+| Item | Status |
+|---|---|
+| Pass 02A visual foundation + Scan Control | **COMPLETE** (awaiting physical Android visual review) |
+| Branch | `pass-02a-visual-foundation` |
+| Handoff | `docs/pass_handoffs/PASS_02A_COUNCIL_HANDOFF.md` |
+| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` (~152.98 MB) — **required for physical visual review** |
+| Package | `com.junkfeathers.localagora` `0.1.0+1` |
+| Live Keryx in APK | No |
+| Internet / Firebase required for 02A UI | No |
+| Node 22 | **Still pending** (founder action; local Node remains 24) |
+| Firebase CLI / FlutterFire CLI | **Still deferred** |
+| GitHub remote | **Still pending** (none configured) |
+
+Physical test: use the Pass 02A APK and the numbered script in the Pass 02A council handoff (not the Pass 01 APK).
+
+---
+
 ## Environment
 
 | Item | Value |
