@@ -5,7 +5,7 @@
 - Objective: Complete live two-pass Keryx feasibility on Springfield / 65806 for July 10–16, 2026
 - Status: COMPLETE (Outcome A — smoke + Tests A/B/C succeeded)
 - Branch: `pass-01-keryx-foundation`
-- Final commit: see branch tip `pass-01-keryx-foundation` (`git rev-parse HEAD`)
+- Final commit: `3db7fa5b8e17de4124550f4d5cc9edb386ccd121`
 - App version: `0.1.0`
 - Build number: `1`
 - New APK: NO (Flutter unchanged in 01B)
