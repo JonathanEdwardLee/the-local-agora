@@ -130,6 +130,7 @@ class _JfDeviceButtonState extends State<JfDeviceButton> {
       enabled: widget.enabled || widget.locked,
       selected: widget.selected,
       label: widget.semanticLabel ?? widget.label,
+      excludeSemantics: true,
       child: Material(
         color: Colors.transparent,
         child: InkWell(

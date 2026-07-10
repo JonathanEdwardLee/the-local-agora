@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +9,27 @@ import 'package:the_local_agora/design/junkfeathers_tokens.dart';
 import 'package:the_local_agora/features/scan_control/scan_control_screen.dart';
 import 'package:the_local_agora/features/scan_control/scan_control_state.dart';
 import 'package:the_local_agora/main.dart';
+
+Future<void> _pumpScanControl(WidgetTester tester) async {
+  // Tall surface so Scan Control controls remain hittable without scroll races.
+  tester.view.physicalSize = const Size(400, 1200);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+  await tester.pumpWidget(const TheLocalAgoraApp());
+  await tester.pump();
+}
+
+Future<void> _tapControl(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pump();
+  await tester.tap(finder);
+  // JfDeviceButton awaits press feedback before invoking onPressed.
+  await tester.pump(JfMotion.press);
+  await tester.pump();
+}
 
 void main() {
   test('company theme uses monospace baseline', () {
@@ -35,7 +58,7 @@ void main() {
   });
 
   testWidgets('Scan Control shows required machine labels', (tester) async {
-    await tester.pumpWidget(const TheLocalAgoraApp());
+    await _pumpScanControl(tester);
     expect(find.text('JUNKFEATHERS TECH // CIVIC RECEIVER 01'), findsOneWidget);
     expect(find.text('THE LOCAL AGORA'), findsOneWidget);
     expect(find.text('WHAT IS HAPPENING HERE?'), findsOneWidget);
@@ -46,40 +69,40 @@ void main() {
   });
 
   testWidgets('primary action has semantic label', (tester) async {
-    await tester.pumpWidget(const TheLocalAgoraApp());
-    expect(
-      find.bySemanticsLabel('Scan the Agora'),
-      findsOneWidget,
-    );
+    await _pumpScanControl(tester);
+    expect(find.bySemanticsLabel('Scan the Agora'), findsOneWidget);
   });
 
   testWidgets('empty location blocks readiness notice', (tester) async {
-    await tester.pumpWidget(const TheLocalAgoraApp());
-    await tester.tap(find.text('SCAN THE AGORA'));
-    await tester.pump();
+    await _pumpScanControl(tester);
+    await _tapControl(tester, find.text('SCAN THE AGORA'));
     expect(find.textContaining('LOCATION REQUIRED'), findsWidgets);
     expect(find.text('SCAN CONTROL READY'), findsNothing);
   });
 
   testWidgets('valid location shows honest readiness dialog', (tester) async {
-    await tester.pumpWidget(const TheLocalAgoraApp());
+    await _pumpScanControl(tester);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
-    await tester.tap(find.text('SCAN THE AGORA'));
+    await tester.pump();
+    await _tapControl(tester, find.text('SCAN THE AGORA'));
     await tester.pumpAndSettle();
     expect(find.text('SCAN CONTROL READY'), findsOneWidget);
     expect(
-      find.textContaining('Live Keryx connection arrives in the next governed pass.'),
+      find.textContaining(
+        'Live Keryx connection arrives in the next governed pass.',
+      ),
       findsOneWidget,
     );
-    expect(find.textContaining('No network search was performed.'), findsOneWidget);
+    expect(
+      find.textContaining('No network search was performed.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('only one time window can be selected', (tester) async {
-    await tester.pumpWidget(const TheLocalAgoraApp());
-    await tester.tap(find.text('TONIGHT'));
-    await tester.pump();
-    await tester.tap(find.text('TOMORROW'));
-    await tester.pump();
+    await _pumpScanControl(tester);
+    await _tapControl(tester, find.text('TONIGHT'));
+    await _tapControl(tester, find.text('TOMORROW'));
 
     final tonight = tester.widget<JfDeviceButton>(
       find.widgetWithText(JfDeviceButton, 'TONIGHT'),
@@ -92,11 +115,9 @@ void main() {
   });
 
   testWidgets('only one category can be selected', (tester) async {
-    await tester.pumpWidget(const TheLocalAgoraApp());
-    await tester.tap(find.text('MUSIC'));
-    await tester.pump();
-    await tester.tap(find.text('COMEDY'));
-    await tester.pump();
+    await _pumpScanControl(tester);
+    await _tapControl(tester, find.text('MUSIC'));
+    await _tapControl(tester, find.text('COMEDY'));
 
     final music = tester.widget<JfDeviceButton>(
       find.widgetWithText(JfDeviceButton, 'MUSIC'),
@@ -138,18 +159,34 @@ void main() {
     });
 
     await tester.pumpWidget(const TheLocalAgoraApp());
+    await tester.pump();
     expect(tester.takeException(), isNull);
     expect(find.text('THE LOCAL AGORA'), findsOneWidget);
   });
 
+  testWidgets('debug gallery control is present in debug builds', (tester) async {
+    await _pumpScanControl(tester);
+    if (kDebugMode) {
+      expect(find.text('DEBUG // COMPONENTS'), findsOneWidget);
+    } else {
+      expect(find.text('DEBUG // COMPONENTS'), findsNothing);
+    }
+  });
+
   test('debug gallery route is debug-gated in Scan Control source contract', () {
-    // Release builds omit kDebugMode UI; gallery file exists for debug review only.
-    expect(kDebugMode || !kDebugMode, isTrue);
     expect(ScanControlScreen, isNotNull);
+    final source = File(
+      'lib/features/scan_control/scan_control_screen.dart',
+    ).readAsStringSync();
+    expect(source.contains('kDebugMode'), isTrue);
+    expect(source.contains('DebugComponentGallery'), isTrue);
   });
 
   test('no map dependency is declared in pubspec identity', () {
-    // Guardrail: package remains Flutter-only without map packages in this pass.
-    expect(true, isTrue);
+    final pubspec = File('pubspec.yaml').readAsStringSync().toLowerCase();
+    expect(pubspec.contains('google_maps'), isFalse);
+    expect(pubspec.contains('mapbox'), isFalse);
+    expect(pubspec.contains('flutter_map'), isFalse);
+    expect(pubspec.contains('google_fonts'), isFalse);
   });
 }
