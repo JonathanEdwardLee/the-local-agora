@@ -1,14 +1,14 @@
 # THE LOCAL AGORA — COUNCIL HANDOFF
 
 ## 1. Pass identity
-- Pass: 01 / 01B — Repository Foundation + Live Keryx Feasibility Completion (controlled correction)
-- Objective: Complete live two-pass Keryx feasibility on Springfield / 65806 for July 10–16, 2026
-- Status: COMPLETE (Outcome A — smoke + Tests A/B/C succeeded)
+- Pass: 01 / 01B / 01C — Foundation + Live Keryx + Readiness Audit
+- Objective: Complete live two-pass Keryx feasibility on Springfield / 65806 for July 10–16, 2026; record physical Android Test 01; prepare Node 22 / Pass 02 readiness
+- Status: COMPLETE (Outcome A live Keryx; Physical Test 01 PASS; Pass 02 readiness = READY WITH MANUAL NODE ACTION)
 - Branch: `pass-01-keryx-foundation`
-- Final commit: `3db7fa5b8e17de4124550f4d5cc9edb386ccd121`
+- Final commit: see branch tip after Pass 01C commit
 - App version: `0.1.0`
 - Build number: `1`
-- New APK: NO (Flutter unchanged in 01B)
+- New APK: NO (Flutter unchanged in 01B/01C)
 
 ## 2. Executive summary
 - What was completed:
@@ -17,10 +17,14 @@
   - Bounded retry policy corrected (max 4; 408/429/5xx only; ~2s/5s/10s backoff)
   - `@google/genai` locked at **2.11.0**; Functions runtime engines locked to **Node 22**
   - `docs/KERYX_EVALUATION.md` and this handoff updated with measured results
+  - **Physical Android Test 01: PASS** (founder-verified on Jonathan’s phone)
+  - Pass 01C readiness audit: `.nvmrc` / `.node-version` = 22; `docs/PASS_02_READINESS.md` created
 - What remains:
+  - Jonathan: activate Node.js 22 locally (see Pass 02 readiness)
   - Pass 02 Scan Control / City Index UI
   - Origin-URL hardening, start-time audit tuning, cost controls
 - Keryx feasibility verdict: **KERYX FEASIBLE WITH CHANGES**
+- Pass 02 readiness verdict: **READY WITH MANUAL NODE ACTION**
 
 ## 3. Acceptance criteria
 
@@ -117,6 +121,15 @@ POST_SECRET_SCAN           → NO committed secret values
 
 ## 12. Physical Android test script
 Unchanged from Pass 01 foundation screen checks (no Flutter delta).
+
+### Physical Android Test 01 — founder result (recorded Pass 01C)
+- Verdict: **PASS**
+- APK installed successfully on Jonathan’s Android phone
+- Application launched successfully
+- Visible: `JUNKFEATHERS TECH`, `THE LOCAL AGORA`, `PASS 01 // KERYX FEASIBILITY`
+- Force-closed and reopened successfully
+- No crash reported
+- No new APK generated for this documentation update
 
 ## 13. Security, privacy, and operating-cost impact
 - Secrets: not committed; key used from environment only
