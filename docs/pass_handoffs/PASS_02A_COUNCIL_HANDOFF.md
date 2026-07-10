@@ -4,7 +4,7 @@
 - Objective: Establish the permanent Junkfeathers visual foundation and replace the Pass 01 engineering shell with the first real Scan Control screen, plus a debug-only component gallery.
 - Status: COMPLETE — awaiting Jonathan’s physical Android visual review
 - Branch: `pass-02a-visual-foundation`
-- Commit: f7f2fd380e844924d60c8ffaa12de0aeccaa57b5
+- Commit: 1ef75c347a8371f669c627534332259cea9502b7 (branch tip at Pass 02A close)
 - App version: `0.1.0`
 - Build number: `1`
 
