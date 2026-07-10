@@ -7,7 +7,7 @@ Applies to: Cursor, Antigravity, and any coding AI working in this repository
 Project AI system: Keryx Engine  
 Current priority: DEV Passion Challenge Version 0.1  
 Permanent product rule: No embedded map in any version  
-Last revised: July 10, 2026 — company design-system integration
+Last revised: July 10, 2026 — Pass 02A phone-test refinements integrated
 
 # 1\. PURPOSE
 
@@ -25,8 +25,9 @@ Before planning or changing code, read these project documents in full:
 2\. `docs/MASTER_BLUEPRINT.md` — permanent product rules and future roadmap  
 3\. `docs/DECISIONS.md` — approved architecture and product decisions  
 4\. `docs/JUNKFEATHERS_DESIGN_SYSTEM.md` — company typography, geometry, controls, spacing, motion, and visual approval rules  
-5\. `AI_CODING_INSTRUCTIONS.md` — engineering, testing, and handoff rules  
-6\. `DO_NOT_UPLOAD_SECRETS.md` — repository security and secret-handling rules
+5\. `docs/FOUNDER_TOOL_ACCESS.md` — Jonathan's current paid AI tools, cross-tool workflow, cost boundaries, and founder-only actions  
+6\. `AI_CODING_INSTRUCTIONS.md` — engineering, testing, and handoff rules  
+7\. `DO_NOT_UPLOAD_SECRETS.md` — repository security and secret-handling rules
 
 Use this authority order when instructions appear to conflict:
 
@@ -37,7 +38,8 @@ Use this authority order when instructions appear to conflict:
 5\. `docs/JUNKFEATHERS_DESIGN_SYSTEM.md` for company visual identity  
 6\. This AI Coding Instructions document  
 7\. `DO_NOT_UPLOAD_SECRETS.md` for security and public-repository handling  
-8\. Existing implementation details
+8\. `docs/FOUNDER_TOOL_ACCESS.md` for operational capability and tool routing only  
+9\. Existing implementation details
 
 Existing code does not overrule an approved blueprint. However, do not destroy working code merely to match a preference. Identify the conflict, choose the smallest safe correction, and preserve user data and working behavior.
 
@@ -49,7 +51,45 @@ At the beginning of every substantial work session:
 • Separate what must be built now from what belongs to a future version.  
 • Do not begin unrelated features.
 
-After every major feature, architecture, or visible-interface change, check the implementation against all six governing Markdown files again.
+After every major feature, architecture, or visible-interface change, check the implementation against all six governing Markdown files and the founder tool-access profile again.
+
+# 2A. FOUNDER PAID-TOOL ROUTING
+
+Jonathan currently pays for Google AI Pro, ChatGPT Plus, and Cursor Pro as Junkfeathers Tech business infrastructure.
+
+For The Local Agora:
+
+- ChatGPT council defines passes, contest strategy, business decisions, risk reviews, Drive documentation, and acceptance.
+- Cursor Pro is the primary active repository executor for Flutter, TypeScript, tests, builds, Git, APKs, and handoffs.
+- Google AI Studio supports Keryx feasibility and model/API experiments.
+- Gemini, Deep Research, and NotebookLM may provide independent research or source-grounded review.
+- Jules or Antigravity may be assigned only a bounded secondary task on an isolated branch or file set.
+- Do not let Cursor and a secondary coding agent modify the same files simultaneously.
+- Do not rerun paid Keryx calls merely to use another subscribed tool.
+- Google AI Pro does not eliminate the need to track Gemini API and cloud-project billing separately.
+- ChatGPT Plus does not include OpenAI API usage.
+- Cursor usage-based overage, Bugbot billing, and Cloud Agent spending require explicit founder approval.
+- Read `docs/FOUNDER_TOOL_ACCESS.md` for the complete current capability and cost-control profile.
+
+The subscriptions should reduce Jonathan's workload and increase quality; they must not create duplicate work, branch conflicts, or uncontrolled spending.
+
+# 2B. POST-PASS-02A VISUAL AND INTERACTION LOCKS
+
+Jonathan approved the Pass 02A visual foundation on a physical Android phone with these permanent refinements:
+
+- The shared splash may display **Junkfeathers Tech**, but the in-app machine should use a product/model identity such as `AGORA MK-I` rather than `JUNKFEATHERS TECH // ...`.
+- Local Agora is **portrait-only** unless Jonathan explicitly changes the rule.
+- The keyboard-open behavior from Pass 02A is the preferred Local Agora standard. Preserve the inset-aware, scrollable pattern that keeps the field and primary action reachable.
+- Default OLED toast and transient status messages appear near the **top** of the machine.
+- The visual direction is a **cyberpunk civic control center**, not a generic form page.
+- Future interface passes should evolve the machine around:
+  1. `01` — status/spec strip
+  2. `02` — main display
+  3. `03` — animated art visual
+  4. `04` — controls
+- The animated art visual is a permanent design intention. It should eventually provide the same kind of characteristic machine life that the reel animation provides in Orpheus Deck.
+
+The foundational theme passed. Future passes may refine spacing, proportions, density, and art while preserving the approved Junkfeathers family identity.
 
 # 3\. PRODUCT MISSION
 

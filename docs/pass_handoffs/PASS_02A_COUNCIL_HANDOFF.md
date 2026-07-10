@@ -219,3 +219,36 @@ After Jonathan’s visual approval of Scan Control on the physical Android phone
 **Pass 02B — Wire Scan Control to live Keryx (Firebase/FlutterFire callable connection only)**
 
 Do not begin Pass 02B until visual approval is recorded. Do not expand into flyer upload, billing, City Index persistence, or contest packaging in that pass unless separately governed.
+
+---
+
+## Physical Android Test 02A
+
+**Verdict:** `PASS WITH APPROVED REFINEMENTS`
+
+Recorded after Jonathan’s physical Android review of the Pass 02A Scan Control APK:
+
+- New Scan Control opened successfully
+- Font approved
+- Square geometry approved
+- Border system approved
+- Time-window selection passed
+- Category selection passed
+- Pressed-state behavior passed
+- Empty-location validation passed
+- Valid-location readiness notice passed
+- Debug component gallery passed
+- Rotation technically worked, but rotation is no longer desired
+- Large-text behavior passed
+- Keyboard-open behavior passed and is preferred over the current Orpheus Deck pattern
+- Force-close and reopen passed
+- Overall visual foundation passed
+- Refinements requested (executed in Pass 02A.1):
+  - remove Junkfeathers Tech name from in-app machine chrome
+  - use `AGORA MK-I`
+  - portrait-only orientation
+  - top-position OLED toasts
+  - preserve keyboard behavior
+  - begin cyberpunk four-level machine-shell direction
+
+Pass 02A technical evidence above remains intact. Follow-on implementation: `docs/pass_handoffs/PASS_02A1_COUNCIL_HANDOFF.md`.

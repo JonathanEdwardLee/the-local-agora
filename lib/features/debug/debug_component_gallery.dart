@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../design/jf_device_button.dart';
 import '../../design/jf_machine_field.dart';
+import '../../design/jf_machine_status_strip.dart';
 import '../../design/jf_numeric_display.dart';
 import '../../design/jf_oled_dialog.dart';
 import '../../design/jf_oled_toast.dart';
 import '../../design/jf_panel.dart';
 import '../../design/jf_section_label.dart';
+import '../../design/jf_signal_coil.dart';
 import '../../design/jf_status_line.dart';
 import '../../design/junkfeathers_tokens.dart';
 
@@ -30,6 +32,8 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return Scaffold(
       backgroundColor: JfColors.black,
       body: SafeArea(
@@ -37,7 +41,12 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560),
             child: ListView(
-              padding: const EdgeInsets.all(JfSpacing.lg),
+              padding: EdgeInsets.fromLTRB(
+                JfSpacing.lg,
+                JfSpacing.lg,
+                JfSpacing.lg,
+                JfSpacing.lg + bottomInset,
+              ),
               children: [
                 Text(
                   'DEBUG // COMPONENT GALLERY',
@@ -47,6 +56,32 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const Text(
                   'Temporary visual-approval surface. Not part of production navigation.',
                   style: JfTypography.supporting,
+                ),
+                const SizedBox(height: JfSpacing.lg),
+                const JfSectionLabel('MACHINE IDENTITY'),
+                const SizedBox(height: JfSpacing.sm),
+                const Text(
+                  AgoraMachineIdentity.model,
+                  style: JfTypography.controlLabel,
+                ),
+                const SizedBox(height: JfSpacing.sm),
+                const JfMachineStatusStrip(),
+                const SizedBox(height: JfSpacing.xs),
+                const Text(
+                  'Portrait-only on Android/iOS. Web has no phone orientation lock.',
+                  style: JfTypography.supporting,
+                ),
+                const SizedBox(height: JfSpacing.lg),
+                const JfSectionLabel('SIGNAL COIL'),
+                const SizedBox(height: JfSpacing.sm),
+                const JfSignalCoil(mode: JfSignalCoilMode.idle, height: 100),
+                const SizedBox(height: JfSpacing.sm),
+                const Text('STATIC / REDUCED MOTION', style: JfTypography.micro),
+                const SizedBox(height: JfSpacing.xs),
+                const JfSignalCoil(
+                  mode: JfSignalCoilMode.idle,
+                  height: 100,
+                  forceStatic: true,
                 ),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('TYPOGRAPHY'),
@@ -64,25 +99,37 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const SizedBox(height: JfSpacing.sm),
                 const JfPanel(
                   weight: JfPanelWeight.major,
-                  child: Text('3 PX MAJOR FRAME', style: JfTypography.controlLabel),
+                  child: Text(
+                    '3 PX MAJOR FRAME',
+                    style: JfTypography.controlLabel,
+                  ),
                 ),
                 const SizedBox(height: JfSpacing.sm),
                 const JfPanel(
                   weight: JfPanelWeight.primary,
-                  child: Text('2 PX PRIMARY PANEL', style: JfTypography.controlLabel),
+                  child: Text(
+                    '2 PX PRIMARY PANEL',
+                    style: JfTypography.controlLabel,
+                  ),
                 ),
                 const SizedBox(height: JfSpacing.sm),
                 const JfPanel(
                   weight: JfPanelWeight.secondary,
                   borderColor: JfColors.white54,
-                  child: Text('1 PX SECONDARY FRAME', style: JfTypography.controlLabel),
+                  child: Text(
+                    '1 PX SECONDARY FRAME',
+                    style: JfTypography.controlLabel,
+                  ),
                 ),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('BUTTONS'),
                 const SizedBox(height: JfSpacing.sm),
                 JfDeviceButton(
                   label: 'PRIMARY FULL-WIDTH',
-                  onPressed: () => showJfOledToast(context, 'PRIMARY PRESSED'),
+                  onPressed: () => showJfOledToast(
+                    context,
+                    'PRIMARY PRESSED',
+                  ),
                 ),
                 const SizedBox(height: JfSpacing.sm),
                 Wrap(
@@ -118,7 +165,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   ],
                 ),
                 const SizedBox(height: JfSpacing.lg),
-                const JfSectionLabel('FIELD'),
+                const JfSectionLabel('KEYBOARD-SAFE FIELD'),
                 const SizedBox(height: JfSpacing.sm),
                 JfMachineField(
                   label: 'CITY OR ZIP CODE',
@@ -126,7 +173,29 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   hintText: 'Enter location',
                 ),
                 const SizedBox(height: JfSpacing.lg),
-                const JfSectionLabel('DIALOG / TOAST'),
+                const JfSectionLabel('TOP OLED TOASTS'),
+                const SizedBox(height: JfSpacing.sm),
+                JfDeviceButton(
+                  label: 'TOP INFO TOAST',
+                  variant: JfButtonVariant.compact,
+                  onPressed: () => showJfOledToast(
+                    context,
+                    'SCAN CONTROL READY',
+                    detail:
+                        'Live Keryx connection arrives in the next governed pass.',
+                  ),
+                ),
+                const SizedBox(height: JfSpacing.sm),
+                JfDeviceButton(
+                  label: 'TOP WARNING TOAST',
+                  variant: JfButtonVariant.compact,
+                  onPressed: () => showJfOledToast(
+                    context,
+                    'LOCATION REQUIRED',
+                    detail: 'Enter a city or ZIP code.',
+                    warning: true,
+                  ),
+                ),
                 const SizedBox(height: JfSpacing.sm),
                 JfDeviceButton(
                   label: 'SHOW SQUARE DIALOG',
@@ -136,13 +205,6 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                     title: 'SQUARE DIALOG',
                     body: '2 px white frame. Monospace body. No rounded card.',
                   ),
-                ),
-                const SizedBox(height: JfSpacing.sm),
-                JfDeviceButton(
-                  label: 'SHOW OLED TOAST',
-                  variant: JfButtonVariant.compact,
-                  onPressed: () =>
-                      showJfOledToast(context, 'OLED NOTICE // ACKNOWLEDGED'),
                 ),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('STATUS LINES'),

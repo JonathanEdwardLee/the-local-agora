@@ -92,6 +92,22 @@ Do not describe the project as:
 
 # THE MACHINE EXPERIENCE
 
+## POST-PASS-02A VISUAL APPROVALS
+
+Jonathan's physical Android review approved the foundational theme and locked these refinements:
+
+- The splash carries the Junkfeathers Tech name; the in-app machine uses a Local Agora model identity such as `AGORA MK-I`.
+- Local Agora is **portrait-only**.
+- Default OLED toast/status messages appear near the **top** of the machine.
+- Preserve the current keyboard-open behavior.
+- Continue evolving the interface toward a **cyberpunk civic control center** with four conceptual levels:
+  - `01` status/spec strip
+  - `02` main display
+  - `03` animated art visual
+  - `04` controls
+
+Future contest passes should move toward this machine structure without delaying the proven Keryx loop or creating decorative scope sprawl.
+
 The Local Agora should feel like a myth-magic-fueled civic receiver displayed through a retro OLED machine.
 
 On the surface, follow `docs/JUNKFEATHERS_DESIGN_SYSTEM.md`:
@@ -155,7 +171,7 @@ Every mythic term must have clear supporting language. The user should feel the 
 ## SCREEN 1 — SCAN CONTROL
 
 Header:  
-JUNKFEATHERS TECH // CIVIC RECEIVER 01
+AGORA MK-I
 
 Title:  
 THE LOCAL AGORA

@@ -8,7 +8,7 @@ Current build target: DEV Passion Challenge Version 0.1
 AI system: Keryx Engine  
 Product principle: Retro OLED myth-machine outside; current adaptable technology inside  
 Permanent interface rule: No embedded map in any version  
-Last revised: July 10, 2026 — company design-system integration
+Last revised: July 10, 2026 — Pass 02A phone-test machine refinements
 
 # 1\. ZEUS DECISION
 
@@ -184,6 +184,25 @@ DESIGN FOUNDATION GATE
 Before broad feature UI is approved, the Flutter client must establish centralized Junkfeathers tokens and reusable components for typography, palette, spacing, border widths, motion, control sizes, device buttons, panels, dialogs, toasts, labels, and numeric/status displays. Cursor must demonstrate idle, active, pressed, locked, disabled, loading, empty, error, and offline states in a component gallery or representative screen, build a fresh APK, and provide a numbered phone test. Jonathan approves the font, square geometry, density, state inversion, readability, and device metaphor before the real Scan Control and City Index expand.
 
 The correct sequence is: prove uncertain engine capability, establish the shared machine surface, then wire broad feature UI. Design polish such as texture and decorative motion may wait; company typography, geometry, line weights, and control behavior may not.
+
+## CURRENT MACHINE-FACE DIRECTION
+
+The Local Agora should evolve toward a **cyberpunk civic control center**.
+
+Approved physical-phone review rules:
+
+- The shared opening splash carries the Junkfeathers Tech company identity.
+- Inside the machine, use the product and model identity, such as `AGORA MK-I`, rather than repeating `JUNKFEATHERS TECH` in routine headers.
+- The mobile app is **portrait-only**.
+- Default OLED toast and transient machine notices appear near the **top**.
+- Preserve the Pass 02A keyboard behavior: inset-aware, scrollable interaction that keeps the active field and primary action reachable.
+- Organize the machine conceptually into:
+  - `01` — status/spec strip: model, version, FREE/PRO state, current date, and compact technical indicators
+  - `02` — main display: Keryx state, results, records, uncertainty, and useful information
+  - `03` — animated art visual: a rectangular signal-machine animation or pixel-art receiver visual
+  - `04` — controls: tactile buttons, selectors, sliders or step controls, and visible selection state
+
+The art panel does not need to control the engine in its earliest implementation, but it should eventually become a characteristic Local Agora machine visual.
 
 # 6\. VERSION ROADMAP
 

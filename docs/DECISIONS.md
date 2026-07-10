@@ -108,3 +108,34 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 **Decision:** Live Tests A, B, and C completed through the preferred Interactions path. The council verdict is `KERYX FEASIBLE WITH CHANGES`. The next product work addresses citation URL quality, missing start times, caching, cost controls, and the approved visual foundation before broad public scan UI.  
 **Consequence:** The project proceeds from engine feasibility into the real app rather than restarting as a disposable contest prototype.
 
+
+
+## ADR-017 — In-app machine branding uses product/model identity
+
+**Status:** Accepted  
+**Decision:** The shared Junkfeathers Tech name appears on the common startup splash. Inside the Local Agora machine, routine headers and chrome use the product name and approved model identity, such as `AGORA MK-I`.  
+**Consequence:** Replace in-app company-brand headers with the approved product/model pattern unless Jonathan later approves a specific exception.
+
+## ADR-018 — Local Agora is portrait-only
+
+**Status:** Accepted  
+**Decision:** Local Agora supports portrait orientation only unless Jonathan explicitly approves a future exception.  
+**Consequence:** Android and future iOS configuration should lock portrait orientation, and UI passes should not optimize landscape behavior.
+
+## ADR-019 — OLED toast placement is top-edge by default
+
+**Status:** Accepted  
+**Decision:** Transient OLED toast and short-lived status messages appear near the top of the machine by default.  
+**Consequence:** Bottom toasts require a specific interaction justification.
+
+## ADR-020 — Pass 02A keyboard behavior is the Local Agora input standard
+
+**Status:** Accepted  
+**Decision:** Preserve the Pass 02A keyboard-open behavior. Input surfaces remain inset-aware and scrollable so the active field and primary action remain reachable.  
+**Consequence:** Do not regress to cramped dialogs or keyboard-obscured actions.
+
+## ADR-021 — Local Agora machine shell follows a four-layer direction
+
+**Status:** Accepted  
+**Decision:** The Local Agora machine evolves around `01` status/spec strip, `02` main display, `03` animated art visual, and `04` controls.  
+**Consequence:** Future visual passes should build a cyberpunk civic control-center identity and eventually add a characteristic animated signal-machine panel.

@@ -9,17 +9,21 @@ class JfMachineField extends StatelessWidget {
     super.key,
     required this.label,
     required this.controller,
+    this.focusNode,
     this.hintText,
     this.errorText,
     this.onChanged,
+    this.onFocusChange,
     this.textInputAction,
   });
 
   final String label;
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final String? hintText;
   final String? errorText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<bool>? onFocusChange;
   final TextInputAction? textInputAction;
 
   @override
@@ -29,16 +33,20 @@ class JfMachineField extends StatelessWidget {
       children: [
         JfSectionLabel(label),
         const SizedBox(height: JfSpacing.xs),
-        TextField(
-          controller: controller,
-          onChanged: onChanged,
-          style: JfTypography.fieldInput,
-          cursorColor: JfColors.white,
-          textInputAction: textInputAction ?? TextInputAction.done,
-          decoration: InputDecoration(
-            hintText: hintText,
-            errorText: errorText,
-            errorStyle: JfTypography.warning.copyWith(fontSize: 10),
+        Focus(
+          onFocusChange: onFocusChange,
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            onChanged: onChanged,
+            style: JfTypography.fieldInput,
+            cursorColor: JfColors.white,
+            textInputAction: textInputAction ?? TextInputAction.done,
+            decoration: InputDecoration(
+              hintText: hintText,
+              errorText: errorText,
+              errorStyle: JfTypography.warning.copyWith(fontSize: 10),
+            ),
           ),
         ),
       ],

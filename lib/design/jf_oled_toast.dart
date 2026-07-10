@@ -1,45 +1,117 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'junkfeathers_tokens.dart';
 
-/// Short OLED-style toast / notice panel.
+/// Top-edge OLED toast / transient machine notice.
+///
+/// Appears below the safe-area inset. Not a bottom SnackBar.
+OverlayEntry? _activeToast;
+Timer? _activeToastTimer;
+
 void showJfOledToast(
   BuildContext context,
   String message, {
+  String? detail,
   bool warning = false,
+  Duration? duration,
 }) {
-  final messenger = ScaffoldMessenger.of(context);
-  messenger.hideCurrentSnackBar();
-  messenger.showSnackBar(
-    SnackBar(
-      duration: JfMotion.toast,
-      backgroundColor: JfColors.black,
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(JfSpacing.lg),
-      elevation: 0,
-      shape: Border.all(
-        color: warning ? JfColors.amber : JfColors.white,
-        width: 2,
-      ),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 440),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 10,
-          ),
-          child: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: JfTypography.controlLabel.copyWith(
-              color: warning ? JfColors.amber : JfColors.white,
-              fontSize: 11,
-              letterSpacing: 0.6,
-              height: 1.25,
+  final overlay = Overlay.maybeOf(context);
+  if (overlay == null) return;
+
+  dismissJfOledToastForTest();
+
+  late final OverlayEntry entry;
+  entry = OverlayEntry(
+    builder: (ctx) {
+      final top = MediaQuery.paddingOf(ctx).top + JfSpacing.sm;
+      final borderColor = warning ? JfColors.amber : JfColors.white;
+      final textColor = warning ? JfColors.amber : JfColors.white;
+
+      return Positioned(
+        top: top,
+        left: JfSpacing.lg,
+        right: JfSpacing.lg,
+        child: Semantics(
+          liveRegion: true,
+          label: detail == null ? message : '$message. $detail',
+          child: Material(
+            color: Colors.transparent,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: JfColors.black,
+                    border: Border.all(
+                      color: borderColor,
+                      width: JfBorders.primary,
+                    ),
+                    borderRadius: JfBorders.square,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: JfSpacing.md,
+                      vertical: JfSpacing.sm + 2,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          message,
+                          textAlign: TextAlign.center,
+                          style: JfTypography.controlLabel.copyWith(
+                            color: textColor,
+                            fontSize: 11,
+                            letterSpacing: 0.6,
+                            height: 1.25,
+                          ),
+                        ),
+                        if (detail != null) ...[
+                          const SizedBox(height: JfSpacing.xs),
+                          Text(
+                            detail,
+                            textAlign: TextAlign.center,
+                            style: JfTypography.supporting.copyWith(
+                              color: warning ? JfColors.amber : JfColors.white70,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
-      ),
-    ),
+      );
+    },
   );
+
+  _activeToast = entry;
+  overlay.insert(entry);
+
+  final hold = duration ?? JfMotion.toast;
+  _activeToastTimer = Timer(hold, () {
+    if (_activeToast == entry) {
+      entry.remove();
+      _activeToast = null;
+      _activeToastTimer = null;
+    }
+  });
+}
+
+/// Dismiss any active top toast and cancel its timer.
+@visibleForTesting
+void dismissJfOledToastForTest() {
+  _activeToastTimer?.cancel();
+  _activeToastTimer = null;
+  _activeToast?.remove();
+  _activeToast = null;
 }

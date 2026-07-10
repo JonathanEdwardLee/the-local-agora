@@ -1,11 +1,10 @@
 # Junkfeathers Tech — Device Interface Design System
 
 **Status:** Active company-wide visual standard  
-**Version:** 1.0  
-**Last revised:** July 10, 2026  
+**Version:** 1.1  
+**Last revised:** July 10, 2026 — portrait lock, top-toast rule, machine shell pattern, and in-app brand-placement rule added  
 **Reference implementation:** Orpheus Deck Android interface  
 **Applies to:** Every user-facing Junkfeathers Tech Flutter app unless Jonathan approves a documented product-specific exception
-**Local Agora adoption:** Governing copy for `the-local-agora`; store at `docs/JUNKFEATHERS_DESIGN_SYSTEM.md`  
 
 > Junkfeathers Tech apps should feel like related physical machines made by the same strange workshop. They do not need identical layouts, but they share the same typography, geometry, border logic, control behavior, startup identity, and visual restraint.
 
@@ -33,6 +32,19 @@ Authority for visual questions:
 An app may deviate when its device metaphor genuinely requires it, but the deviation must be named, justified, and approved. Cursor may not invent a new font, corner style, color system, card language, or interaction treatment merely because a Flutter component defaults to it.
 
 ---
+
+## 1A. Brand Presence Rule
+
+The **Junkfeathers Tech** brand name belongs primarily to the shared startup splash.
+
+Inside the application machine itself:
+
+- Use the **product name** as the main identity.
+- Use a **model name or machine designation** when helpful.
+- Do **not** repeat `JUNKFEATHERS TECH` across the main machine header, chrome, or routine screen furniture unless Jonathan explicitly approves a product-specific exception.
+- Example: a Local Agora machine header may say `AGORA MK-I` or another approved model identifier rather than `JUNKFEATHERS TECH // ...`.
+
+The goal is for the splash to establish the workshop brand, while the machine face establishes the specific device.
 
 ## 2. What Was Extracted From Orpheus Deck
 
@@ -208,6 +220,24 @@ Orpheus-derived defaults:
 - Standard row padding: approximately 12 px horizontal / 8 px vertical
 
 Responsive layouts may change dimensions, but should preserve the same density and hierarchy.
+
+### Portrait orientation rule
+
+Junkfeathers Tech mobile applications are **portrait-only by default**.
+
+- Do not support device rotation unless Jonathan explicitly approves a named landscape use case.
+- A temporary debug convenience does not change this standard.
+- If a product later earns landscape support, document it in that product blueprint and decisions file.
+
+### Keyboard behavior rule
+
+Input flows should behave like the improved Local Agora Pass 02A pattern:
+
+- Use **keyboard-inset-aware**, scrollable, full-screen layouts for text entry and small-form interaction.
+- Keep the active field, supporting guidance, and primary action reachable when the keyboard opens.
+- Prefer this pattern over cramped dialogs or layouts where the keyboard hides the action the user needs next.
+- When a product still needs a full-screen input route, preserve the same keyboard-safe behavior.
+
 
 ---
 
@@ -392,6 +422,8 @@ AlertDialog(
 - Preserve readable margins on small Android devices
 
 ### OLED toast/status panel
+
+**Placement rule:** Default OLED toast and transient status notices appear near the **top** of the machine, not the bottom, unless a product-specific interaction clearly needs another position.
 
 Reusable reference:
 
