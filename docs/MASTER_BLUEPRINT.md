@@ -8,7 +8,7 @@ Current build target: DEV Passion Challenge Version 0.1
 AI system: Keryx Engine  
 Product principle: Retro OLED myth-machine outside; current adaptable technology inside  
 Permanent interface rule: No embedded map in any version  
-Last revised: July 10, 2026 — pre-code architecture lock
+Last revised: July 10, 2026 — company design-system integration
 
 # 1\. ZEUS DECISION
 
@@ -101,16 +101,26 @@ Version 0.1 proves discovery and contribution before asking anyone to create an 
 
 Junkfeathers Tech builds myth-magic-fueled machines that appear through retro OLED interfaces while using current, highly capable technology underneath. Flutter and Dart are the permanent user-facing application foundation for Junkfeathers Tech software so Android, iOS, and web can evolve from one consistent codebase and design system.
 
+VISUAL SOURCE OF TRUTH
+
+The repository must contain the current company standard at `docs/JUNKFEATHERS_DESIGN_SYSTEM.md`. The Local Agora adopts that system unless Jonathan approves a documented exception. The Pass 01 foundation screen is a temporary engineering shell and must not become the visual reference for the real Scan Control or City Index.
+
 THE SURFACE
 
-• Near-black OLED field  
-• Bone-white text and line work  
-• Restrained amber for warnings and uncertainty  
-• Monospaced operational language  
-• Minimal classical title treatment  
+• Near-black OLED field with black device panels  
+• White or bone-white operational text and line work  
+• Canonical Flutter family token: `fontFamily: 'monospace'`  
+• No app-specific font substitution or `google_fonts` dependency without founder approval  
+• Square ordinary controls, fields, dialogs, records, and toasts using `BorderRadius.zero` or no radius  
+• 3 px major shell, 2 px primary control/dialog, and 1 px field/separator border hierarchy  
+• Black/white state inversion for active or pressed controls  
+• Restrained amber only for warnings, uncertainty, missing information, and review states  
+• Compact spacing rhythm: 4 / 8 / 12 / 16 / 24 / 48 px  
+• Approximately 44×44 semantic tap targets where practical, even when visible hardware faces are smaller  
+• Minimal classical title treatment inside the shared monospace system  
 • Thin hardware-panel dividers  
 • Deliberate scan and indexing states  
-• No rounded social cards  
+• No rounded social cards, shadows, elevation, glassmorphism, glossy surfaces, or floating pills  
 • No map, pins, or geographical graphics  
 • Flyers hidden until deliberately opened
 
@@ -168,6 +178,12 @@ AI processing → KERYX INDEXING
 Stored recent search → CACHED SIGNALS
 
 Every unusual term must have plain supporting copy. Brand language should create atmosphere without creating confusion.
+
+DESIGN FOUNDATION GATE
+
+Before broad feature UI is approved, the Flutter client must establish centralized Junkfeathers tokens and reusable components for typography, palette, spacing, border widths, motion, control sizes, device buttons, panels, dialogs, toasts, labels, and numeric/status displays. Cursor must demonstrate idle, active, pressed, locked, disabled, loading, empty, error, and offline states in a component gallery or representative screen, build a fresh APK, and provide a numbered phone test. Jonathan approves the font, square geometry, density, state inversion, readability, and device metaphor before the real Scan Control and City Index expand.
+
+The correct sequence is: prove uncertain engine capability, establish the shared machine surface, then wire broad feature UI. Design polish such as texture and decorative motion may wait; company typography, geometry, line weights, and control behavior may not.
 
 # 6\. VERSION ROADMAP
 
@@ -888,6 +904,11 @@ OVERBUILDING
 Response:  
 Version 0.1 remains scan, store, display, contribute, and verify. Everything else waits.
 
+VISUAL DRIFT
+
+Response:  
+Use the company design-system file, centralized Flutter tokens, square controls, shared monospace typography, and a founder-approved physical-phone component test before broad feature UI. Temporary engineering screens are not accepted as style references.
+
 MONETIZATION DAMAGE
 
 Response:  
@@ -896,6 +917,8 @@ Keep discovery useful, label paid promotion, and charge for professional value r
 # 21\. BUILD AND RELEASE GATES
 
 VERSION 0.1 GATE
+
+Before this gate is approved, the app has passed the Junkfeathers visual foundation test on Jonathan’s physical Android phone: shared monospace typography, square geometry, 3/2/1 px border hierarchy, readable density, visible state inversion, and accessible tap targets.
 
 A visitor can:  
 • Enter a city or ZIP code  

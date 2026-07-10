@@ -7,7 +7,8 @@ Project status: Approved contest direction
 Build method: Cursor-assisted Flutter and Dart development; Antigravity may contribute when actually used and will be credited honestly  
 Primary prize category: Best Use of Google AI  
 Contest deadline: Monday, July 13, 2026 at 1:59 AM Central Daylight Time  
-Internal finish line: Sunday, July 12, 2026 at 9:00 PM Central Daylight Time
+Internal finish line: Sunday, July 12, 2026 at 9:00 PM Central Daylight Time  
+Last revised: July 10, 2026 — company design-system integration
 
 # ZEUS DECISION
 
@@ -93,17 +94,25 @@ Do not describe the project as:
 
 The Local Agora should feel like a myth-magic-fueled civic receiver displayed through a retro OLED machine.
 
-On the surface:  
-• Near-black OLED field  
-• Bone-white text and line work  
-• Restrained amber warnings  
-• Monospaced status language  
-• Minimal classical title treatment  
-• Thin hardware-panel dividers  
+On the surface, follow `docs/JUNKFEATHERS_DESIGN_SYSTEM.md`:
+
+• Near-black OLED field with black device panels  
+• White or bone-white text and line work  
+• Canonical `fontFamily: 'monospace'` throughout visible UI  
+• Square ordinary controls, fields, dialogs, records, and toasts  
+• 3 px major shell, 2 px primary control/dialog, and 1 px field/separator borders  
+• Black/white inversion for active and pressed controls  
+• Compact 4 / 8 / 12 / 16 / 24 / 48 px spacing rhythm  
+• Accessible semantic tap targets around 44×44 px where practical  
+• Restrained amber only for warnings, uncertainty, missing information, and review states  
+• Minimal classical title treatment inside the shared monospace family  
 • Deliberate scan and indexing states  
+• No rounded Material cards, shadows, elevation, glassmorphism, or floating pills  
 • No conventional social-media cards  
 • No map, pins, or visual geography  
 • No flyer image in the primary event list
+
+The Pass 01 foundation screen was an engineering proof only. Do not use its typography or generic temporary widgets as the reference for the contest interface.
 
 Under the surface:  
 • Current Google AI capabilities  
@@ -701,7 +710,7 @@ Risk: The contest scope grows into the full future platform.
 Response: Finish public scan, stored index, flyer contribution, and source trust before adding anything else.
 
 Risk: The retro styling delays the working product.  
-Response: Build the complete black-and-bone workflow first. Add texture and machine animation only after the loop works.
+Response: Establish the minimal shared Junkfeathers typography, square geometry, border hierarchy, and reusable controls before broad feature UI. Defer texture, decorative interference, and nonessential animation until the loop works; do not defer the company visual DNA itself.
 
 # BUILD ORDER
 
@@ -717,15 +726,23 @@ Response: Build the complete black-and-bone workflow first. Add texture and mach
 • Prove the normalizer does not add unsupported facts.  
 • Produce `KERYX_EVALUATION.md` from actual results before beginning the full interface.
 
-## PHASE 2 — BUILD THE INDEX
+## PHASE 2 — VISUAL FOUNDATION
 
-• Create the location and time controls.  
+• Add `docs/JUNKFEATHERS_DESIGN_SYSTEM.md` to the repository and treat it as governing.  
+• Establish centralized theme/tokens and reusable Junkfeathers controls.  
+• Replace the Pass 01 temporary typography and generic widgets.  
+• Demonstrate device title, inputs, primary action, compact controls, panel hierarchy, dialogs, toasts, and all major states.  
+• Build a fresh APK and obtain Jonathan’s physical-phone approval for font, square geometry, spacing, line weights, state inversion, readability, and touch targets.
+
+## PHASE 3 — BUILD THE INDEX
+
+• Create the location and time controls from the approved components.  
 • Implement cached public scan.  
 • Store normalized records.  
 • Render the chronological text feed.  
 • Build event detail and origin display.
 
-## PHASE 3 — ADD THE COMMUNITY CHANNEL
+## PHASE 4 — ADD THE COMMUNITY CHANNEL
 
 • Build flyer upload.  
 • Add Gemini image extraction.  
@@ -733,14 +750,14 @@ Response: Build the complete black-and-bone workflow first. Add texture and mach
 • Add location privacy choices.  
 • Store and merge the confirmed event.
 
-## PHASE 4 — MACHINE FINISH
+## PHASE 5 — MACHINE FINISH
 
-• Apply Junkfeathers OLED styling.  
 • Add indexing states and reduced motion.  
 • Add the optional flyer viewer.  
+• Add only restrained texture or machine animation that does not harm the task.  
 • Test mobile layout and error handling.
 
-## PHASE 5 — PROVE AND SUBMIT
+## PHASE 6 — PROVE AND SUBMIT
 
 • Test Springfield and one additional location.  
 • Record the demonstration.  
@@ -749,6 +766,8 @@ Response: Build the complete black-and-bone workflow first. Add texture and mach
 • Submit before the internal deadline.
 
 # FINAL ACCEPTANCE TEST
+
+Before the final visitor test, Jonathan must approve the shared Junkfeathers visual foundation on a physical Android phone.
 
 A new visitor must be able to:  
 1\. Understand the machine within ten seconds.  

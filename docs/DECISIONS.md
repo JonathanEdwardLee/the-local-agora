@@ -2,7 +2,7 @@
 
 **Status:** Active architecture decision record  
 **Owner:** Jonathan / Junkfeathers Tech Business Council  
-**Last revised:** July 10, 2026  
+**Last revised:** July 10, 2026 — company design-system integration  
 **Rule:** Cursor may document approved decisions here. It may not silently create or reverse a major decision.
 
 ## How to use this file
@@ -83,3 +83,28 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 
 **Status:** Accepted  
 **Decision:** Pass 01 creates the repository foundation and proves Keryx on a real Springfield, Missouri query before the full interface is built. It must inspect citation quality, dates, duplicates, missing fields, geographic relevance, and unsupported-fact behavior.
+
+## ADR-013 — Local Agora adopts the Junkfeathers Tech device design system
+
+**Status:** Accepted  
+**Decision:** The repository contains the current company standard at `docs/JUNKFEATHERS_DESIGN_SYSTEM.md`. Visible Local Agora UI uses the shared `fontFamily: 'monospace'`, black/white monochrome baseline, square ordinary controls, 3/2/1 px border hierarchy, compact 4/8/12/16/24/48 spacing rhythm, black/white active-state inversion, and accessible semantic tap targets. Amber is restrained to warning, uncertainty, missing-information, or review roles.  
+**Consequence:** Cursor may not independently select another font, rounded card system, Material-demo appearance, shadow/elevation language, glassmorphism, or decorative color system. Product-specific exceptions require Jonathan’s explicit approval and documentation.
+
+## ADR-014 — Visual foundation approval precedes broad feature UI
+
+**Status:** Accepted  
+**Decision:** The Pass 01 foundation screen is a temporary engineering shell, not the reference design. Before the full Scan Control and City Index are built, Cursor establishes centralized Junkfeathers tokens and reusable components, demonstrates the main control and state language, builds a fresh APK, and provides a numbered physical-phone visual test. Jonathan approves typography, square geometry, density, line weights, state inversion, readability, and touch targets before broad interface expansion.  
+**Consequence:** Technical feasibility may be proven before visual work, but feature screens may not expand on generic temporary styling.
+
+## ADR-015 — Keryx provider calls use bounded, observable failure handling
+
+**Status:** Accepted  
+**Decision:** Paid or rate-limited Keryx operations begin with a minimal smoke test, run sequentially when parallelism is unnecessary, and retry only transient 408, 429, and 5xx failures with bounded exponential backoff and jitter. Automated model cycling is prohibited. Approved compatibility fallbacks remain behind the Keryx provider interface and are reported.  
+**Current verified implementation:** `@google/genai` 2.11.0 successfully completed the Interactions smoke test and Tests A/B/C on `gemini-3.5-flash`; the Functions deployment target is Node.js 22. Reverify versions against official support before future upgrades or deployment.
+
+## ADR-016 — Pass 01 established Keryx feasibility
+
+**Status:** Accepted  
+**Decision:** Live Tests A, B, and C completed through the preferred Interactions path. The council verdict is `KERYX FEASIBLE WITH CHANGES`. The next product work addresses citation URL quality, missing start times, caching, cost controls, and the approved visual foundation before broad public scan UI.  
+**Consequence:** The project proceeds from engine feasibility into the real app rather than restarting as a disposable contest prototype.
+

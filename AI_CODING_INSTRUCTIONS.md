@@ -7,7 +7,7 @@ Applies to: Cursor, Antigravity, and any coding AI working in this repository
 Project AI system: Keryx Engine  
 Current priority: DEV Passion Challenge Version 0.1  
 Permanent product rule: No embedded map in any version  
-Last revised: July 10, 2026 — pre-code architecture lock
+Last revised: July 10, 2026 — company design-system integration
 
 # 1\. PURPOSE
 
@@ -24,8 +24,9 @@ Before planning or changing code, read these project documents in full:
 1\. `docs/DEV_CONTEST_V0.1_BLUEPRINT.md` — current contest scope and delivery priorities  
 2\. `docs/MASTER_BLUEPRINT.md` — permanent product rules and future roadmap  
 3\. `docs/DECISIONS.md` — approved architecture and product decisions  
-4\. `AI_CODING_INSTRUCTIONS.md` — engineering, testing, and handoff rules  
-5\. `DO_NOT_UPLOAD_SECRETS.md` — repository security and secret-handling rules
+4\. `docs/JUNKFEATHERS_DESIGN_SYSTEM.md` — company typography, geometry, controls, spacing, motion, and visual approval rules  
+5\. `AI_CODING_INSTRUCTIONS.md` — engineering, testing, and handoff rules  
+6\. `DO_NOT_UPLOAD_SECRETS.md` — repository security and secret-handling rules
 
 Use this authority order when instructions appear to conflict:
 
@@ -33,9 +34,10 @@ Use this authority order when instructions appear to conflict:
 2\. The current DEV Passion Challenge V0.1 Build Blueprint  
 3\. The Master Blueprint  
 4\. Approved entries in `docs/DECISIONS.md`  
-5\. This AI Coding Instructions document  
-6\. `DO_NOT_UPLOAD_SECRETS.md` for security and public-repository handling  
-7\. Existing implementation details
+5\. `docs/JUNKFEATHERS_DESIGN_SYSTEM.md` for company visual identity  
+6\. This AI Coding Instructions document  
+7\. `DO_NOT_UPLOAD_SECRETS.md` for security and public-repository handling  
+8\. Existing implementation details
 
 Existing code does not overrule an approved blueprint. However, do not destroy working code merely to match a preference. Identify the conflict, choose the smallest safe correction, and preserve user data and working behavior.
 
@@ -47,7 +49,7 @@ At the beginning of every substantial work session:
 • Separate what must be built now from what belongs to a future version.  
 • Do not begin unrelated features.
 
-After every major feature or architecture change, check the implementation against all five governing Markdown files again.
+After every major feature, architecture, or visible-interface change, check the implementation against all six governing Markdown files again.
 
 # 3\. PRODUCT MISSION
 
@@ -176,40 +178,107 @@ The splash implementation may be scheduled after the core Version 0.1 Keryx loop
 
 # 6\. JUNKFEATHERS TECH DESIGN SYSTEM
 
+`docs/JUNKFEATHERS_DESIGN_SYSTEM.md` is the company visual source of truth. The Local Agora may express a civic-receiver metaphor, but it must look like a machine built by the same workshop as Orpheus Deck. The current Pass 01 foundation screen is a temporary engineering shell and is **not** an approved visual reference for Pass 02 or later screens.
+
 ## CORE FEEL
 
 Junkfeathers Tech builds myth-magic-fueled machines that appear recovered from another age while using modern technology underneath. Flutter and Dart are the permanent application foundation across Junkfeathers Tech software.
 
-The Local Agora should feel like a civic signal receiver, not a conventional event website.
+The Local Agora should feel like a civic signal receiver, not a conventional event website, generic Flutter sample, or collection of rounded Material cards.
 
-## APPROVED SURFACE LANGUAGE
+## TYPOGRAPHY — LOCKED COMPANY BASELINE
+
+• Use the centralized family token `fontFamily: 'monospace'` for visible product UI.  
+• Do not introduce a different custom font, `google_fonts`, or ordinary proportional Material typography without Jonathan’s explicit approval.  
+• Device titles, controls, machine states, numeric displays, supporting copy, dialogs, and temporary visible screens must use the shared type system.  
+• ALL CAPS is appropriate for short operational labels; longer explanations should use readable sentence case.  
+• Use deliberate letter spacing and tabular figures for times, counts, prices, and aligned readings where supported.
+
+## GEOMETRY AND BORDER HIERARCHY
+
+• Ordinary buttons, panels, fields, dialogs, records, and toasts use square geometry: `BorderRadius.zero` or no radius.  
+• Rounded shapes are reserved for a genuine physical metaphor such as a reel, dial, knob, LED, or meter.  
+• 3 px borders identify the major device shell or hero module.  
+• 2 px borders identify primary controls, dialogs, and main content frames.  
+• 1 px borders identify fields, compact controls, separators, and secondary structure.  
+• No shadows, fake elevation, glassmorphism, glossy cards, floating pills, or decorative web-card chrome.
+
+## COLOR AND CONTROL STATES
+
+• Black is the default scaffold, panel, and control fill.  
+• White or bone-white is the default operational text, outline, and active signal.  
+• `white70`, `white54`, `white38`, `white24`, and `white12` provide secondary, inactive, locked, disabled, and structural hierarchy.  
+• Restrained amber may communicate warnings, uncertainty, missing information, or review states; it must never become a general decorative accent.  
+• Idle control: black fill, white outline, white label.  
+• Active or pressed control: white fill, black label or icon, with immediate inversion and an approximately 50 ms response where animation is appropriate.  
+• Locked or disabled controls remain understandable and explain why they are unavailable.  
+• Essential state may not rely on color alone.
+
+## SPACING, DENSITY, AND TOUCH
+
+Use the shared compact rhythm: `4 / 8 / 12 / 16 / 24 / 48` px. Dense device screens generally begin near 8 px outer padding; landing screens near 24 px; major panels near 12 px internal padding. Visible hardware faces may be compact, but their semantic tap areas should be approximately 44×44 px wherever layout permits. Do not turn compact controls into generic pills merely to enlarge the hit target.
+
+## REQUIRED REUSABLE DESIGN LAYER
+
+Before broad Pass 02 interface work, establish and reuse a design layer such as:
+
+```text
+lib/design/
+├── junkfeathers_theme.dart
+├── junkfeathers_tokens.dart
+├── jf_device_button.dart
+├── jf_panel.dart
+├── jf_oled_dialog.dart
+├── jf_oled_toast.dart
+├── jf_section_label.dart
+└── jf_numeric_display.dart
+```
+
+Use centralized groups such as `JfColors`, `JfTypography`, `JfSpacing`, `JfBorders`, `JfMotion`, and `JfControlSizes`. Do not scatter raw visual constants through feature widgets.
+
+## LOCAL AGORA SURFACE LANGUAGE
 
 • Near-black OLED field  
 • Bone-white text and line work  
-• Restrained amber only for warnings, uncertainty, missing information, and review states  
-• Monospaced operational labels  
-• Minimal classical title treatment  
+• Restrained amber warnings and uncertainty  
+• Minimal classical title treatment inside the shared monospace system  
 • Thin hardware-panel dividers  
-• Staged scanning and indexing states  
+• Deliberate scan and indexing states  
 • Text-first event records  
 • Flyers hidden until deliberately opened  
-• Responsive mobile-first layout
+• Responsive mobile-first layout  
+• No conventional social-media cards  
+• No map, pins, or visual geography
+
+## VISUAL FOUNDATION APPROVAL GATE
+
+Before the full Scan Control and City Index are wired, Cursor must demonstrate the shared style through a small component gallery or representative screen containing:
+
+• Device title and numeric/status display  
+• Full-width primary action  
+• Compact and transport-scale controls  
+• Input field  
+• Square dialog and OLED-style toast  
+• Idle, active, pressed, locked, disabled, loading, empty, error, and offline states  
+• 3/2/1 px border hierarchy  
+• Scalable text and semantic tap targets
+
+Build a fresh APK and provide a numbered physical-phone visual test. Jonathan must approve typography, square geometry, density, state inversion, readability, and device metaphor before broad UI expansion.
 
 ## AVOID
 
 • Purple or rainbow AI gradients  
 • Glassmorphism  
 • Generic sparkle icons  
-• Rounded social-media cards  
+• Rounded social-media cards or floating chips  
 • Infinite-feed engagement design  
 • Popularity counters  
 • Excessive Greek ornament  
 • Fake parchment  
 • Cartoon mythology  
-• Constant glitching  
-• Flashing effects  
+• Constant glitching or flashing effects  
 • Dense analytics dashboards  
-• Fake terminal text that harms comprehension  
+• Fake terminal clutter that harms comprehension  
 • Emojis as primary interface icons
 
 The interface may use mythic vocabulary, but every unusual term must include clear plain-language support.
@@ -491,7 +560,12 @@ At minimum, maintain tests or repeatable fixtures for:
 • Malformed source URL  
 • Upload too large or unsupported  
 • Rate-limit response  
-• Mobile keyboard and focus flow
+• Mobile keyboard and focus flow  
+• Shared monospace typography is applied consistently  
+• Square-corner geometry and 3/2/1 px border hierarchy  
+• Idle, pressed, active, locked, disabled, loading, empty, error, and offline visual states  
+• Approximately 44×44 semantic tap targets where practical  
+• Component-gallery or representative-screen visual approval on a physical Android phone
 
 For AI behavior, keep a small evaluation set of real or controlled event examples. Verify factual preservation, missing-field behavior, citation retention, and duplicate handling after prompt or model changes.
 
@@ -511,8 +585,8 @@ Do not report a check as passed unless it actually ran and passed.
 
 ## BEFORE CHANGING CODE
 
-1\. Read the relevant governing Markdown sections, including current decisions and security rules.  
-2\. Inspect existing files, scripts, dependencies, and repository status.  
+1\. Read the relevant governing Markdown sections, including `docs/JUNKFEATHERS_DESIGN_SYSTEM.md`, current decisions, and security rules.  
+2\. Inspect existing files, scripts, dependencies, design tokens, and repository status.  
 3\. Identify the smallest complete vertical slice.  
 4\. State what will not be changed.  
 5\. Check current official documentation before using unfamiliar or fast-changing APIs.
@@ -521,7 +595,7 @@ Do not report a check as passed unless it actually ran and passed.
 
 • Make small, scoped changes.  
 • Do not rewrite unrelated working code.  
-• Preserve established naming and design tokens.  
+• Preserve established naming and design tokens; visible temporary screens are not exempt from the company font, square geometry, palette, or control-state rules.  
 • Keep commits or checkpoints logically separated.  
 • Prefer a working vertical slice over many unfinished abstractions.  
 • Surface a discovered blocker or serious risk immediately.  
@@ -728,7 +802,9 @@ A pass is complete when:
 • Applicable checks pass.  
 • Documentation and environment setup are current.  
 • No unrelated regressions are known.  
-• Remaining limitations are stated honestly.
+• Remaining limitations are stated honestly.  
+• Visible UI uses the approved shared typography, square geometry, border hierarchy, spacing rhythm, and control-state language.  
+• A fresh physical-phone visual test has passed whenever a pass creates or materially changes the interface.
 
 # 20\. FINAL DIRECTIVE TO EVERY CODING AI
 
