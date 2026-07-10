@@ -6,19 +6,41 @@
 
 ---
 
+## Pass 02A.2 integrated machine panel (July 10, 2026)
+
+| Item | Status |
+|---|---|
+| Pass 02A.1 physical test | **FUNCTIONALITY PASS — VISUAL REFINEMENT REQUESTED** |
+| Pass 02A.2 refinements | **COMPLETE** (awaiting physical review of refined APK) |
+| Branch | `pass-02a2-integrated-machine-panel` |
+| Handoff | `docs/pass_handoffs/PASS_02A2_COUNCIL_HANDOFF.md` |
+| External numbered headers | Removed |
+| Panel 01 identity + retro date | Implemented |
+| Panel 02 CRT monitor + real scrollbar | Implemented |
+| Panel 03 compact triple rings | Implemented |
+| Panel 04 chassis + WHEN/WHAT dials | Implemented |
+| Keyboard / top toasts / portrait | Preserved |
+| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
+| Node 22 | **Still pending** |
+| Firebase CLI / FlutterFire CLI | **Still deferred** |
+| GitHub remote | **Still pending** |
+| Firebase / live Keryx | **Still deferred** |
+
+---
+
 ## Pass 02A.1 machine-shell refinement (July 10, 2026)
 
 | Item | Status |
 |---|---|
 | Pass 02A physical Android Test 02A | **PASS WITH APPROVED REFINEMENTS** |
-| Pass 02A.1 refinements | **COMPLETE** (awaiting physical review of refined APK) |
+| Pass 02A.1 refinements | **COMPLETE** — physical: **FUNCTIONALITY PASS — VISUAL REFINEMENT REQUESTED** |
 | Branch | `pass-02a1-machine-shell-refinement` |
 | Handoff | `docs/pass_handoffs/PASS_02A1_COUNCIL_HANDOFF.md` |
 | Portrait lock | Implemented (`portraitUp` + Android/iOS config) |
 | Top OLED toast | Implemented (replaces bottom SnackBar pattern) |
 | Keyboard regression | Preserved (inset-aware scroll); automated test added |
 | Machine-shell Stage 1 | Implemented (01–04 + `JfSignalCoil`) |
-| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for refined physical review** |
+| New debug APK | Superseded for review by Pass 02A.2 APK |
 | Node 22 | **Still pending** |
 | Firebase CLI / FlutterFire CLI | **Still deferred** |
 | GitHub remote | **Still pending** |

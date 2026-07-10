@@ -11,14 +11,14 @@ enum JfSignalCoilMode {
   warning,
 }
 
-/// 03 — restrained procedural SIGNAL COIL visual (Stage 1).
+/// 03 — compact triple-ring signal visual (Stage 1 refinement).
 ///
-/// No network, no fake scan progress. Reacts only to truthful local mode.
+/// Three concentric rings stay fully inside the art box. No network implication.
 class JfSignalCoil extends StatefulWidget {
   const JfSignalCoil({
     super.key,
     this.mode = JfSignalCoilMode.idle,
-    this.height = 120,
+    this.height = 72,
     this.forceStatic,
   });
 
@@ -43,7 +43,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
     WidgetsBinding.instance.addObserver(this);
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 4800),
+      duration: const Duration(milliseconds: 3600),
     );
   }
 
@@ -80,7 +80,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
       }
     } else {
       _controller.stop();
-      _controller.value = 0.18;
+      _controller.value = 0.22;
     }
   }
 
@@ -94,7 +94,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Signal coil display, ${widget.mode.name} mode',
+      label: 'Signal coil display, ${widget.mode.name} mode, three rings',
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: JfColors.black,
@@ -109,17 +109,19 @@ class _JfSignalCoilState extends State<JfSignalCoil>
         child: SizedBox(
           height: widget.height,
           width: double.infinity,
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) {
-              return CustomPaint(
-                painter: _SignalCoilPainter(
-                  progress: _controller.value,
-                  mode: widget.mode,
-                  staticFrame: _reduceMotion || !_controller.isAnimating,
-                ),
-              );
-            },
+          child: ClipRect(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                return CustomPaint(
+                  painter: _TripleRingPainter(
+                    progress: _controller.value,
+                    mode: widget.mode,
+                    staticFrame: _reduceMotion || !_controller.isAnimating,
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -127,8 +129,8 @@ class _JfSignalCoilState extends State<JfSignalCoil>
   }
 }
 
-class _SignalCoilPainter extends CustomPainter {
-  _SignalCoilPainter({
+class _TripleRingPainter extends CustomPainter {
+  _TripleRingPainter({
     required this.progress,
     required this.mode,
     required this.staticFrame,
@@ -145,7 +147,7 @@ class _SignalCoilPainter extends CustomPainter {
           ? JfColors.amber
           : JfColors.white70
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
+      ..strokeWidth = 1.2;
 
     final dim = Paint()
       ..color = JfColors.white24
@@ -154,51 +156,38 @@ class _SignalCoilPainter extends CustomPainter {
 
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final phase = staticFrame ? 0.18 : progress;
+    final phase = staticFrame ? 0.22 : progress;
 
-    // Outer frame ticks
-    for (var i = 0; i < 12; i++) {
-      final x = 8.0 + (size.width - 16) * (i / 11);
-      canvas.drawLine(Offset(x, 6), Offset(x, 10), dim);
-      canvas.drawLine(
-        Offset(x, size.height - 6),
-        Offset(x, size.height - 10),
-        dim,
-      );
+    // Padding so outer ring never touches the border.
+    const pad = 10.0;
+    final maxR = math.min(size.width, size.height) / 2 - pad;
+    final radii = <double>[maxR * 0.34, maxR * 0.62, maxR * 0.92];
+
+    // Center node
+    final coreBoost = mode == JfSignalCoilMode.focused ? 1.5 : 0.0;
+    canvas.drawCircle(Offset(cx, cy), 3.5 + coreBoost, ink);
+
+    for (var i = 0; i < 3; i++) {
+      // Phased pulse: inner first, then middle, then outer.
+      final local = (phase + (1 - i) * 0.18) % 1.0;
+      final pulse = 0.85 + 0.15 * math.sin(local * math.pi * 2);
+      final r = radii[i] * pulse;
+      // Hard clamp inside pad.
+      final safeR = math.min(r, maxR);
+      canvas.drawCircle(Offset(cx, cy), safeR, i == 2 ? dim : ink);
+
+      // Subtle nodes on each ring
+      final nodeCount = 4 + i;
+      for (var n = 0; n < nodeCount; n++) {
+        final a = (n / nodeCount) * math.pi * 2 + phase * math.pi * 2 * 0.25;
+        final p = Offset(cx + math.cos(a) * safeR, cy + math.sin(a) * safeR);
+        canvas.drawCircle(p, 1.2, ink);
+      }
     }
-
-    // Central coil / transmitter
-    final coreR = 10.0 + (mode == JfSignalCoilMode.focused ? 2 : 0);
-    canvas.drawCircle(Offset(cx, cy), coreR, ink);
-    canvas.drawCircle(Offset(cx, cy), coreR * 0.45, ink);
-    canvas.drawLine(Offset(cx, cy - coreR - 8), Offset(cx, cy - coreR), ink);
-    canvas.drawLine(Offset(cx, cy + coreR), Offset(cx, cy + coreR + 8), ink);
-
-    // Symmetrical signal arcs
-    final arcCount = mode == JfSignalCoilMode.ready ? 4 : 3;
-    for (var i = 1; i <= arcCount; i++) {
-      final r = coreR + 14.0 * i + 6 * math.sin(phase * math.pi * 2 + i);
-      final rect = Rect.fromCircle(center: Offset(cx, cy), radius: r);
-      canvas.drawArc(rect, -math.pi * 0.75, math.pi * 0.5, false, ink);
-      canvas.drawArc(rect, math.pi * 0.25, math.pi * 0.5, false, ink);
-    }
-
-    // Sweep marks / nodes
-    final sweep = phase * math.pi * 2;
-    for (var i = 0; i < 6; i++) {
-      final a = sweep + (i * math.pi / 3);
-      final r = coreR + 38;
-      final p = Offset(cx + math.cos(a) * r, cy + math.sin(a) * r);
-      canvas.drawCircle(p, 1.6, ink);
-    }
-
-    // Horizontal pulse lines
-    final pulseY = cy + 36 * math.sin(phase * math.pi * 2);
-    canvas.drawLine(Offset(12, pulseY), Offset(size.width - 12, pulseY), dim);
   }
 
   @override
-  bool shouldRepaint(covariant _SignalCoilPainter oldDelegate) {
+  bool shouldRepaint(covariant _TripleRingPainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.mode != mode ||
         oldDelegate.staticFrame != staticFrame;

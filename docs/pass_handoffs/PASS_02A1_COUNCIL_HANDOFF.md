@@ -191,3 +191,28 @@ After Jonathan’s physical approval of Pass 02A.1:
 **Smallest next pass:** Pass 02B — Wire Scan Control to live Keryx (Firebase/FlutterFire callable only), still without flyer/billing/City Index expansion unless separately governed.
 
 Do not begin Pass 02B until 02A.1 physical approval is recorded.
+
+---
+
+## Physical Android Test 02A.1
+
+**Pass result:** `FUNCTIONALITY PASS — VISUAL REFINEMENT REQUESTED`
+
+- All functionality passed
+- Portrait lock passed
+- Top toast behavior passed
+- Keyboard behavior passed
+- Selection behavior passed
+- Signal animation function passed
+- Force-close and reopen passed
+- Visual layout requires another refinement pass
+
+Requested visual refinements (executed in Pass 02A.2):
+- Remove all external numbered-section headers
+- Redesign panel 01 as the Local Agora identity/specification module
+- Redesign panel 02 as only a retro monitor
+- Reduce panel 03 height and contain three concentric animated rings
+- Consolidate all controls into one panel 04 chassis
+- Replace multi-button WHEN and WHAT options with dial-like single-value selector windows
+
+Earlier Pass 02A.1 technical evidence above remains intact. Follow-on: `docs/pass_handoffs/PASS_02A2_COUNCIL_HANDOFF.md`.

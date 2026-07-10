@@ -139,3 +139,21 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 **Status:** Accepted  
 **Decision:** The Local Agora machine evolves around `01` status/spec strip, `02` main display, `03` animated art visual, and `04` controls.  
 **Consequence:** Future visual passes should build a cyberpunk civic control-center identity and eventually add a characteristic animated signal-machine panel.
+
+## ADR-022 — Integrated machine panels without external section headers
+
+**Status:** Accepted  
+**Decision:** Scan Control presents one assembled machine face. Numbered layers remain conceptual; external webpage-style headers such as `01 // STATUS` are not shown. Panel 01 holds product identity/specs and a retro local-date module; panel 02 is a CRT monitor only (square outer frame, rounded inner screen); panel 03 is a compact triple-ring signal window; panel 04 is one control chassis.  
+**Consequence:** Do not reintroduce titled section stacks that break the single-device composition.
+
+## ADR-023 — WHEN/WHAT use dial-like single-value selectors
+
+**Status:** Accepted  
+**Decision:** Time window and event category are chosen through dial-like selectors that show one snapped value at a time (swipe/drag, edge controls, keyboard arrows). Do not present all options as simultaneous button rows or generic dropdowns.  
+**Consequence:** Monitor readouts update immediately from the typed selection state.
+
+## ADR-024 — CRT inner screen may use rounded geometry
+
+**Status:** Accepted  
+**Decision:** The monitor’s inner CRT surface may use rounded corners as an approved machine metaphor. Outer frames, controls, fields, toasts, and dials remain square.  
+**Consequence:** Do not generalize rounded Material cards elsewhere.
