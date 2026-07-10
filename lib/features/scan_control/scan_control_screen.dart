@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../design/jf_crt_monitor.dart';
 import '../../design/jf_device_button.dart';
 import '../../design/jf_dial_selector.dart';
 import '../../design/jf_machine_field.dart';
 import '../../design/jf_machine_identity_panel.dart';
+import '../../design/jf_monitor_module.dart';
 import '../../design/jf_oled_toast.dart';
 import '../../design/jf_panel.dart';
 import '../../design/jf_signal_coil.dart';
@@ -14,8 +14,10 @@ import '../../services/keryx/keryx_link_service.dart';
 import '../debug/debug_component_gallery.dart';
 import 'scan_control_state.dart';
 
+enum _SelectorReveal { none, when, what }
+
 /// SCREEN 1 — SCAN CONTROL
-/// Integrated four-panel machine face. Live Keryx not enabled in Pass 02B.1.
+/// Integrated machine face. Live Keryx not enabled in Pass 02B.1B.
 class ScanControlScreen extends StatefulWidget {
   const ScanControlScreen({
     super.key,
@@ -36,6 +38,7 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   ScanControlState _state = const ScanControlState();
   bool _fieldFocused = false;
   bool _readinessShown = false;
+  _SelectorReveal _reveal = _SelectorReveal.none;
 
   @override
   void initState() {
@@ -87,12 +90,24 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
     });
   }
 
+  void _toggleReveal(_SelectorReveal target) {
+    setState(() {
+      _reveal = _reveal == target ? _SelectorReveal.none : target;
+    });
+  }
+
   void _selectTime(TimeWindow window) {
-    setState(() => _state = _state.copyWith(timeWindow: window));
+    setState(() {
+      _state = _state.copyWith(timeWindow: window);
+      _reveal = _SelectorReveal.none;
+    });
   }
 
   void _selectCategory(EventCategory category) {
-    setState(() => _state = _state.copyWith(category: category));
+    setState(() {
+      _state = _state.copyWith(category: category);
+      _reveal = _SelectorReveal.none;
+    });
   }
 
   void _onScanPressed() {
@@ -153,23 +168,16 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 01 — Identity / specification (no external header)
                     const JfMachineIdentityPanel(),
                     const SizedBox(height: JfSpacing.sm),
-
-                    // 02 — CRT monitor only
-                    JfCrtMonitor(
+                    JfMonitorModule(
                       lines: _monitorLines,
-                      height: 180,
+                      monitorHeight: JfMonitorModule.defaultMonitorHeight,
+                      bandHeight: JfMonitorModule.defaultBandHeight,
                       warning: _state.locationError != null,
+                      coilMode: _coilMode,
                     ),
                     const SizedBox(height: JfSpacing.sm),
-
-                    // 03 — Compact triple-ring art
-                    JfSignalCoil(mode: _coilMode, height: 60),
-                    const SizedBox(height: JfSpacing.sm),
-
-                    // 04 — Integrated control chassis
                     DecoratedBox(
                       decoration: BoxDecoration(
                         color: JfColors.black,
@@ -202,23 +210,64 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                               textInputAction: TextInputAction.done,
                             ),
                             const SizedBox(height: JfSpacing.md),
-                            JfDialSelector<TimeWindow>(
-                              label: 'WHEN',
-                              values: TimeWindow.values,
-                              value: _state.timeWindow,
-                              labelOf: (v) => v.label,
-                              onChanged: _selectTime,
-                              semanticPrefix: 'When',
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: JfDeviceButton(
+                                    key: const ValueKey('jf-when-toggle'),
+                                    label:
+                                        'WHEN // ${_state.timeWindow.label}',
+                                    variant: JfButtonVariant.selectable,
+                                    selected:
+                                        _reveal == _SelectorReveal.when,
+                                    expanded: true,
+                                    semanticLabel:
+                                        'When ${_state.timeWindow.label}',
+                                    onPressed: () =>
+                                        _toggleReveal(_SelectorReveal.when),
+                                  ),
+                                ),
+                                const SizedBox(width: JfSpacing.sm),
+                                Expanded(
+                                  child: JfDeviceButton(
+                                    key: const ValueKey('jf-what-toggle'),
+                                    label: 'WHAT // ${_state.category.label}',
+                                    variant: JfButtonVariant.selectable,
+                                    selected:
+                                        _reveal == _SelectorReveal.what,
+                                    expanded: true,
+                                    semanticLabel:
+                                        'What ${_state.category.label}',
+                                    onPressed: () =>
+                                        _toggleReveal(_SelectorReveal.what),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: JfSpacing.md),
-                            JfDialSelector<EventCategory>(
-                              label: 'WHAT',
-                              values: EventCategory.values,
-                              value: _state.category,
-                              labelOf: (v) => v.label,
-                              onChanged: _selectCategory,
-                              semanticPrefix: 'What',
-                            ),
+                            if (_reveal == _SelectorReveal.when) ...[
+                              const SizedBox(height: JfSpacing.md),
+                              JfDialSelector<TimeWindow>(
+                                key: const ValueKey('jf-when-dial'),
+                                label: 'WHEN',
+                                values: TimeWindow.values,
+                                value: _state.timeWindow,
+                                labelOf: (v) => v.label,
+                                onChanged: _selectTime,
+                                semanticPrefix: 'When',
+                              ),
+                            ],
+                            if (_reveal == _SelectorReveal.what) ...[
+                              const SizedBox(height: JfSpacing.md),
+                              JfDialSelector<EventCategory>(
+                                key: const ValueKey('jf-what-dial'),
+                                label: 'WHAT',
+                                values: EventCategory.values,
+                                value: _state.category,
+                                labelOf: (v) => v.label,
+                                onChanged: _selectCategory,
+                                semanticPrefix: 'What',
+                              ),
+                            ],
                             const SizedBox(height: JfSpacing.lg),
                             JfDeviceButton(
                               label: 'SCAN THE AGORA',

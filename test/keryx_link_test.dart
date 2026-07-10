@@ -112,9 +112,17 @@ void main() {
       TheLocalAgoraApp(firebaseReady: true, keryxLinkService: fake),
     );
     await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('jf-when-toggle')));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
     await tester.tap(find.byKey(const ValueKey('jf-dial-next-WHEN')));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('jf-what-toggle')));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('jf-dial-next-WHAT')));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();
     expect(fake.probeCount, 0);
   });

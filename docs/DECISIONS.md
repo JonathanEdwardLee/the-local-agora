@@ -235,3 +235,10 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 **Date:** 2026-07-10  
 **Decision:** During an active coding pass, the local Git repository is the technical source of truth. Google Drive is the council-readable mirror and planning archive. Drive copies must never blindly overwrite newer repository files. Council-approved Drive changes must be merged against the current repository version. After each substantial pass, Cursor identifies every governing Markdown file changed and records `DRIVE SYNC STATUS` in the council handoff. Cursor prepares sync files; Jonathan uploads the sync ZIP to the business-council chat; the council updates Drive and confirms completion.  
 **Consequence:** No pass may silently assume Drive is current. Blind Drive→repo overwrites are prohibited.
+
+## ADR-035 — Combined monitor module with conditional WHEN/WHAT reveal
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** After Physical Test 02B.1, Scan Control uses one combined Panel 02 monitor module (taller CRT + lower band with square triple-ring art and a non-interactive decorative indicator board). There is no separate primary Panel 03. Panel 04 keeps the location field and exposes WHEN/WHAT through side-by-side machine buttons that reveal one dial at a time and collapse after selection.  
+**Consequence:** Do not restore a separate main-screen Panel 03 box. Do not keep both dials permanently expanded.

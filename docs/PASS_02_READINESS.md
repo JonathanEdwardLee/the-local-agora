@@ -1,8 +1,24 @@
 # THE LOCAL AGORA — PASS 02 READINESS
 
-**Pass:** 02B.1 — Firebase Link Foundation and Final Machine Geometry  
+**Pass:** 02B.1B — Approved UI Refinement After Keryx Link Success  
 **Date:** July 10, 2026  
-**Branch:** `pass-02b1-firebase-link-foundation`
+**Branch:** `pass-02b1b-monitor-control-refinement`
+
+---
+
+## Pass 02B.1B monitor-control refinement (July 10, 2026)
+
+| Item | Status |
+|---|---|
+| Pass 02B.1 physical test | **FUNCTIONALITY APPROVED — UI REFINEMENT REQUESTED** |
+| Pass 02B.1B UI refinements | **COMPLETE** (awaiting physical review) |
+| Branch | `pass-02b1b-monitor-control-refinement` |
+| Handoff | `docs/pass_handoffs/PASS_02B1B_COUNCIL_HANDOFF.md` |
+| Combined Panel 02 | CRT + lower square coil + indicator board |
+| Panel 04 WHEN/WHAT reveal | Side-by-side toggles; exclusive dial; auto-collapse |
+| Firebase / backend | **Unchanged** — no deploy |
+| Live Keryx / Gemini | **NO** |
+| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
 
 ---
 
@@ -11,25 +27,15 @@
 | Item | Status |
 |---|---|
 | Pass 02A.2 physical test | **FUNCTIONALITY APPROVED — FINAL GEOMETRY REFINEMENTS REQUESTED** |
-| Pass 02B.1 geometry refinements | **COMPLETE** (awaiting physical review) |
-| Pass 02B.1 Firebase link | **CONFIGURED + `keryxStatus` DEPLOYED** (physical link test pending) |
+| Pass 02B.1 geometry + Firebase link | **COMPLETE** — physical: **FUNCTIONALITY APPROVED — UI REFINEMENT REQUESTED** |
 | Branch | `pass-02b1-firebase-link-foundation` |
 | Handoff | `docs/pass_handoffs/PASS_02B1_COUNCIL_HANDOFF.md` |
-| Firebase project | `gen-lang-client-0718451481` (The Local Agora Dev) |
-| FlutterFire platforms | Android + web |
-| Flutter packages | `firebase_core`, `cloud_functions` only |
-| Deployed function | `keryxStatus` (us-central1, Node 22) |
+| Firebase project | `gen-lang-client-0718451481` |
+| Deployed function | `keryxStatus` only |
 | Live Keryx / Gemini | **NO** |
-| Gemini secret | **Intentionally not configured** |
-| App Check | **Deferred** |
-| Node 22 | **Complete** (`v22.23.1`) |
-| Firebase CLI | **Complete** (`15.23.0`) |
-| FlutterFire CLI | **Complete** (`1.4.0`) |
-| Budget alert | **Complete** (founder) |
-| GitHub remote | **Still pending** |
-| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
+| GitHub remote | **Connected** (`origin` → JonathanEdwardLee/the-local-agora) |
 
-Physical test: use the **Pass 02B.1** APK and the numbered script in the Pass 02B.1 council handoff.
+Physical test: use the **Pass 02B.1B** APK and the numbered script in the Pass 02B.1B council handoff.
 
 ---
 

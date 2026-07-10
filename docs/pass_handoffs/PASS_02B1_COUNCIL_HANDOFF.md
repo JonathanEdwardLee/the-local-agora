@@ -305,3 +305,27 @@ FILES REQUIRING DRIVE SYNC:
 
 Branch: `pass-02b1-firebase-link-foundation`  
 Package: `build/drive_sync/PASS_02B1_DRIVE_SYNC.zip` (not committed; Jonathan uploads to council chat)
+
+---
+
+## 25. Physical Test 02B.1 (Jonathan)
+
+**Date recorded:** 2026-07-10  
+**Tester:** Jonathan  
+**Result:** `FUNCTIONALITY APPROVED — UI REFINEMENT REQUESTED`
+
+### Functional results — PASS
+- Keryx link test passed (`TEST KERYX LINK` → ready)
+- Firebase callable transport works
+- Ordinary `SCAN THE AGORA` remained local-only
+- Panel 01 approved
+- Monitor approved
+- Keyboard, top toasts, and portrait lock remain approved
+
+### UI refinements requested
+- Combine former panels 02 and 03 into one integrated monitor module
+- Lower monitor-control band with square signal art + decorative indicators
+- Panel 04: WHEN/WHAT revealed only when requested (side-by-side buttons; exclusive dial reveal; collapse after selection)
+
+### Authority note
+Functionality is approved. UI refinements are owned by Pass 02B.1B. Live Keryx activation remains deferred.

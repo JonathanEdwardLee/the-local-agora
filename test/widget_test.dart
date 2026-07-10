@@ -6,7 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:the_local_agora/brand/junkfeathers_splash_spec.dart';
 import 'package:the_local_agora/design/jf_crt_monitor.dart';
 import 'package:the_local_agora/design/jf_dial_selector.dart';
+import 'package:the_local_agora/design/jf_indicator_board.dart';
 import 'package:the_local_agora/design/jf_machine_identity_panel.dart';
+import 'package:the_local_agora/design/jf_monitor_module.dart';
 import 'package:the_local_agora/design/jf_oled_toast.dart';
 import 'package:the_local_agora/design/jf_signal_coil.dart';
 import 'package:the_local_agora/design/jf_waiting_scan_prompt.dart';
@@ -85,13 +87,14 @@ void main() {
 
   testWidgets('monitor is CRT assembly with waiting prompt', (tester) async {
     await _pumpScanControl(tester);
+    expect(find.byType(JfMonitorModule), findsOneWidget);
     expect(find.byType(JfCrtMonitor), findsOneWidget);
     expect(find.byType(JfWaitingScanPrompt), findsOneWidget);
     expect(find.textContaining('WAITING FOR SCAN'), findsOneWidget);
     expect(find.textContaining('AWAITING LOCATION INPUT'), findsOneWidget);
     expect(find.textContaining('ENGINE LINK // NOT CONNECTED'), findsOneWidget);
     final monitor = tester.widget<JfCrtMonitor>(find.byType(JfCrtMonitor));
-    expect(monitor.height, 180);
+    expect(monitor.height, JfMonitorModule.defaultMonitorHeight);
     final clip = tester.widgetList<ClipRRect>(find.byType(ClipRRect));
     expect(clip.any((c) => c.borderRadius != BorderRadius.zero), isTrue);
   });
@@ -110,12 +113,25 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('panel 02 is taller than panel 03', (tester) async {
+  testWidgets('combined panel 02 has taller monitor than lower band',
+      (tester) async {
     await _pumpScanControl(tester);
-    final monitor = tester.widget<JfCrtMonitor>(find.byType(JfCrtMonitor));
+    final module =
+        tester.widget<JfMonitorModule>(find.byType(JfMonitorModule));
+    expect(module.monitorHeight, greaterThan(module.bandHeight));
+    expect(module.monitorHeight, greaterThan(180));
+    expect(find.byType(JfSignalCoil), findsOneWidget);
+    expect(find.byType(JfIndicatorBoard), findsOneWidget);
+  });
+
+  testWidgets('no separate primary panel 03 coil outside monitor module',
+      (tester) async {
+    await _pumpScanControl(tester);
+    expect(find.byType(JfMonitorModule), findsOneWidget);
+    expect(find.byType(JfSignalCoil), findsOneWidget);
     final coil = tester.widget<JfSignalCoil>(find.byType(JfSignalCoil));
-    expect(monitor.height, greaterThan(coil.height));
-    expect(coil.height, 60);
+    expect(coil.square, isTrue);
+    expect(coil.height, JfMonitorModule.defaultBandHeight);
   });
 
   testWidgets('monitor scrollbar hides thumb when content fits', (tester) async {
@@ -158,17 +174,20 @@ void main() {
     expect(find.textContaining('LINE //'), findsWidgets);
   });
 
-  testWidgets('triple-ring coil renders compact with three rings',
-      (tester) async {
+  testWidgets('triple-ring coil renders square in lower band', (tester) async {
     await _pumpScanControl(tester);
     final coil = tester.widget<JfSignalCoil>(find.byType(JfSignalCoil));
-    expect(coil.height, 60);
+    expect(coil.height, JfMonitorModule.defaultBandHeight);
+    expect(coil.square, isTrue);
     expect(JfSignalCoil.ringCount, 3);
-    expect(find.byType(JfSignalCoil), findsOneWidget);
-    final coilSrc = File('lib/design/jf_signal_coil.dart').readAsStringSync();
-    expect(coilSrc.contains('Side tick'), isTrue);
-    expect(coilSrc.contains('scan line'), isTrue);
-    expect(coilSrc.contains('ClipRect'), isTrue);
+    final size = tester.getSize(find.byType(JfSignalCoil));
+    expect((size.width - size.height).abs(), lessThan(1.0));
+  });
+
+  testWidgets('decorative indicator board is non-interactive', (tester) async {
+    await _pumpScanControl(tester);
+    expect(find.byType(JfIndicatorBoard), findsOneWidget);
+    expect(find.byType(IgnorePointer), findsWidgets);
   });
 
   testWidgets('reduced-motion coil is static', (tester) async {
@@ -184,22 +203,58 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('WHEN dial shows one value and advances', (tester) async {
+  testWidgets('reduced-motion indicator board is static', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: const Scaffold(
+          body: JfIndicatorBoard(forceStatic: true),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('WHEN reveal opens dial and collapses after choice',
+      (tester) async {
     await _pumpScanControl(tester);
-    expect(find.text('THIS WEEKEND'), findsWidgets);
-    expect(find.text('TONIGHT'), findsNothing);
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-when-toggle')));
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
     await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
-    expect(find.text('NEXT 7 DAYS'), findsWidgets);
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
     expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
   });
 
-  testWidgets('WHAT dial shows one value and advances', (tester) async {
+  testWidgets('WHAT reveal opens dial and collapses after choice',
+      (tester) async {
     await _pumpScanControl(tester);
-    expect(find.text('ALL SIGNALS'), findsWidgets);
-    expect(find.text('MUSIC'), findsNothing);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-what-toggle')));
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
     await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
-    expect(find.text('MUSIC'), findsWidgets);
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
     expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
+  });
+
+  testWidgets('only one selector reveal is open at a time', (tester) async {
+    await _pumpScanControl(tester);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-when-toggle')));
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-what-toggle')));
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
+  });
+
+  testWidgets('WHEN and WHAT toggle buttons appear side by side',
+      (tester) async {
+    await _pumpScanControl(tester);
+    final when = tester.getRect(find.byKey(const ValueKey('jf-when-toggle')));
+    final what = tester.getRect(find.byKey(const ValueKey('jf-what-toggle')));
+    expect(what.left, greaterThan(when.right - 1));
+    expect((when.center.dy - what.center.dy).abs(), lessThan(40));
   });
 
   testWidgets('dial advances one snap at a time', (tester) async {
@@ -325,6 +380,16 @@ void main() {
     final manifest =
         File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
     expect(manifest.contains('android:screenOrientation="portrait"'), isTrue);
+  });
+
+  test('firebase config files unchanged in this UI pass', () {
+    final options = File('lib/firebase_options.dart').readAsStringSync();
+    expect(options.contains('gen-lang-client-0718451481'), isTrue);
+    final scan = File(
+      'lib/features/scan_control/scan_control_screen.dart',
+    ).readAsStringSync();
+    expect(scan.contains('FirebaseFunctions'), isFalse);
+    expect(scan.contains('probeStatus'), isFalse);
   });
 
   test('exclusive enums remain exclusive', () {

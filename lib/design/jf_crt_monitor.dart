@@ -126,6 +126,7 @@ class JfCrtMonitor extends StatefulWidget {
     this.warning = false,
     this.showWaitingPrompt = true,
     this.forceStaticPrompt,
+    this.framed = true,
   });
 
   final List<String> lines;
@@ -133,6 +134,9 @@ class JfCrtMonitor extends StatefulWidget {
   final bool warning;
   final bool showWaitingPrompt;
   final bool? forceStaticPrompt;
+
+  /// When false, omits the outer machine frame (for embedding in [JfMonitorModule]).
+  final bool framed;
 
   static const double innerRadius = 14;
 
@@ -158,86 +162,90 @@ class _JfCrtMonitorState extends State<JfCrtMonitor> {
   @override
   Widget build(BuildContext context) {
     final borderColor = widget.warning ? JfColors.amber : JfColors.white;
-    final screenHeight = widget.height - 20;
+    final screenHeight = widget.framed ? widget.height - 20 : widget.height;
     final itemCount = widget.lines.length + (widget.showWaitingPrompt ? 1 : 0);
+
+    final screen = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: screenHeight,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: JfColors.black,
+                border: Border.all(
+                  color: JfColors.white54,
+                  width: JfBorders.secondary,
+                ),
+                borderRadius: BorderRadius.circular(JfCrtMonitor.innerRadius),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(
+                  JfCrtMonitor.innerRadius - 1,
+                ),
+                child: ListView.builder(
+                  controller: _controller,
+                  padding: const EdgeInsets.all(JfSpacing.sm),
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    if (widget.showWaitingPrompt && index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: JfWaitingScanPrompt(
+                          warning: widget.warning,
+                          forceStatic: widget.forceStaticPrompt,
+                        ),
+                      );
+                    }
+                    final lineIndex =
+                        widget.showWaitingPrompt ? index - 1 : index;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        widget.lines[lineIndex],
+                        style: JfTypography.supporting.copyWith(
+                          color: widget.warning
+                              ? JfColors.amber
+                              : JfColors.white70,
+                          fontSize: 11,
+                          height: 1.3,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: JfSpacing.sm),
+        JfMachineScrollbar(
+          controller: _controller,
+          trackHeight: screenHeight,
+        ),
+      ],
+    );
 
     return Semantics(
       label: 'Machine monitor',
       child: SizedBox(
         height: widget.height,
         width: double.infinity,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: JfColors.black,
-            border: Border.all(color: borderColor, width: JfBorders.primary),
-            borderRadius: JfBorders.square,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(JfSpacing.sm),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: screenHeight,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: JfColors.black,
-                        border: Border.all(
-                          color: JfColors.white54,
-                          width: JfBorders.secondary,
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(JfCrtMonitor.innerRadius),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          JfCrtMonitor.innerRadius - 1,
-                        ),
-                        child: ListView.builder(
-                          controller: _controller,
-                          padding: const EdgeInsets.all(JfSpacing.sm),
-                          itemCount: itemCount,
-                          itemBuilder: (context, index) {
-                            if (widget.showWaitingPrompt && index == 0) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: JfWaitingScanPrompt(
-                                  warning: widget.warning,
-                                  forceStatic: widget.forceStaticPrompt,
-                                ),
-                              );
-                            }
-                            final lineIndex =
-                                widget.showWaitingPrompt ? index - 1 : index;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                widget.lines[lineIndex],
-                                style: JfTypography.supporting.copyWith(
-                                  color: widget.warning
-                                      ? JfColors.amber
-                                      : JfColors.white70,
-                                  fontSize: 11,
-                                  height: 1.3,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
+        child: widget.framed
+            ? DecoratedBox(
+                decoration: BoxDecoration(
+                  color: JfColors.black,
+                  border:
+                      Border.all(color: borderColor, width: JfBorders.primary),
+                  borderRadius: JfBorders.square,
                 ),
-                const SizedBox(width: JfSpacing.sm),
-                JfMachineScrollbar(
-                  controller: _controller,
-                  trackHeight: screenHeight,
+                child: Padding(
+                  padding: const EdgeInsets.all(JfSpacing.sm),
+                  child: screen,
                 ),
-              ],
-            ),
-          ),
-        ),
+              )
+            : screen,
       ),
     );
   }

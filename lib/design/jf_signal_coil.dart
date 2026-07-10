@@ -11,18 +11,22 @@ enum JfSignalCoilMode {
   warning,
 }
 
-/// 03 — compact triple-ring signal visual with ticks and scan line.
+/// Compact triple-ring signal visual with ticks and scan line.
 class JfSignalCoil extends StatefulWidget {
   const JfSignalCoil({
     super.key,
     this.mode = JfSignalCoilMode.idle,
     this.height = 60,
     this.forceStatic,
+    this.square = false,
   });
 
   final JfSignalCoilMode mode;
   final double height;
   final bool? forceStatic;
+
+  /// When true, art fills a square viewport (for monitor lower band).
+  final bool square;
 
   static const int ringCount = 3;
 
@@ -106,7 +110,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
         ),
         child: SizedBox(
           height: widget.height,
-          width: double.infinity,
+          width: widget.square ? widget.height : double.infinity,
           child: ClipRect(
             child: AnimatedBuilder(
               animation: _controller,
