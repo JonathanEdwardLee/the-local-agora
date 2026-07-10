@@ -5,7 +5,7 @@
 - Objective: Establish a clean Flutter + TypeScript Functions repository and prove two-pass Keryx on real Springfield / 65806 queries for July 10–16, 2026
 - Status: PARTIAL / BLOCKED (foundation complete; live grounded feasibility blocked without `GEMINI_API_KEY`)
 - Branch: `pass-01-keryx-foundation`
-- Final commit: `4980c8afbf6595e36a39de702b6a4703dd6e08ae`
+- Final commit: `2e4525d3e4aaf3801770d4bada4ee72fec7a2de9` (branch tip at handoff freeze)
 - App version: `0.1.0`
 - Build number: `1`
 
