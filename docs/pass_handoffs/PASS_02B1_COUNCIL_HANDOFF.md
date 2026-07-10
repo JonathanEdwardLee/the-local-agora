@@ -282,3 +282,26 @@ That later pass may:
 - and present sourced results.
 
 Do **not** perform those actions now.
+
+---
+
+## Drive sync status (Pass 02B.1A)
+
+```text
+DRIVE SYNC STATUS: REQUIRED
+```
+
+```text
+FILES REQUIRING DRIVE SYNC:
+- AI_CODING_INSTRUCTIONS.md — updated — shared-platform rules + repository–Drive sync protocol
+- docs/MASTER_BLUEPRINT.md — updated — post-contest shared platform roadmap
+- docs/DEV_CONTEST_V0.1_BLUEPRINT.md — updated — post-contest continuity rule
+- docs/DECISIONS.md — updated — restored ADRs 022–026; roadmap ADRs 027–033; Drive sync ADR-034
+- docs/KERYX_EVALUATION.md — updated — Pass 02B.1 transport note
+- docs/PASS_02_READINESS.md — updated — Pass 02B.1 readiness
+- docs/pass_handoffs/PASS_02A2_COUNCIL_HANDOFF.md — updated — Physical Test 02A.2 record
+- docs/pass_handoffs/PASS_02B1_COUNCIL_HANDOFF.md — created — Pass 02B.1 council handoff
+```
+
+Branch: `pass-02b1-firebase-link-foundation`  
+Package: `build/drive_sync/PASS_02B1_DRIVE_SYNC.zip` (not committed; Jonathan uploads to council chat)

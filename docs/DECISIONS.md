@@ -2,7 +2,7 @@
 
 **Status:** Active architecture decision record  
 **Owner:** Jonathan / Junkfeathers Tech Business Council  
-**Last revised:** July 10, 2026 — company design-system integration  
+**Last revised:** July 10, 2026 — Pass 02B.1A reconciliation: restored ADRs 022–026 after Drive overwrite; integrated shared-platform roadmap ADRs; added repository–Drive sync protocol  
 **Rule:** Cursor may document approved decisions here. It may not silently create or reverse a major decision.
 
 ## How to use this file
@@ -171,3 +171,67 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 **Date:** 2026-07-10  
 **Decision:** Panel 01 is a compact identity plate (title upper-left, retro date upper-right, one bottom spec row). Panel 02 is the primary CRT surface (taller; honest `WAITING FOR SCAN...` prompt with slow blink / static under reduced motion). Panel 03 is shorter with three rings, side ticks, and a contained vertical-moving scan line. Panel 04 controls remain as approved in 02A.2.  
 **Consequence:** Geometry refinements do not authorize live scanning.
+
+## ADR-027 — Local Agora is one shared platform across Android, web, and future iOS
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** Android, the public Flutter web machine, and a future native iPhone release use the same Flutter product codebase, protected backend contracts, and shared event index. The WordPress website provides marketing, support, privacy, and discovery pages rather than becoming a second event engine.  
+**Consequence:** Do not fork event data or core product logic into a separate web-only database, WordPress directory, or independent iOS implementation.  
+**Note:** Council Drive copy numbered this ADR-030; renumbered to ADR-027 to follow Git-history ADR-026 without renumbering older ADRs.
+
+## ADR-028 — Keryx uses cache-first shared event records
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** The backend checks stored current event records and freshness before invoking paid discovery or normalization. Event facts are stored once and filtered by location, time, and category rather than permanently caching every exact filter combination.  
+**Consequence:** The server controls refresh eligibility, rate limits, and rescans. Mobile and web clients may not directly trigger unrestricted paid AI work.  
+**Note:** Council Drive copy numbered this ADR-031; renumbered to ADR-028.
+
+## ADR-029 — Event data follows an expiration lifecycle
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** Event records progress through `UPCOMING`, `ACTIVE`, `RECENTLY_EXPIRED`, and `PURGED` or equivalent server states. Past events are hidden from ordinary active results. Recently expired full records are retained approximately 14–30 days under a configurable policy, then purged.  
+**Consequence:** A minimal non-public fingerprint may remain only when justified for deduplication, source history, moderation, or abuse controls. Hidden private addresses, unnecessary personal data, and bulky obsolete files are not retained merely for history.  
+**Note:** Council Drive copy numbered this ADR-032; renumbered to ADR-029.
+
+## ADR-030 — Public web access launches before visible Pro accounts
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** The useful free loop, shared cache, Android release, public Flutter web machine, support/privacy surfaces, and cost controls launch before visible Pro accounts and professional dashboards.  
+**Consequence:** Pro work must not delay public usefulness. The web machine should launch alongside or shortly after Android and use the same backend and event index.  
+**Note:** Council Drive copy numbered this ADR-033; renumbered to ADR-030.
+
+## ADR-031 — Junkfeathers.com hosts the Local Agora landing and discovery path
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** Junkfeathers.com receives a search-friendly Local Agora landing page. The preferred full-screen Flutter machine location is `agora.junkfeathers.com`, subject to final hosting and DNS verification; a maintainable subpath is acceptable if needed.  
+**Consequence:** The landing page may promote Android, immediate web access, future iPhone availability, Orpheus Deck, and Junkfeathers music. Promotion does not interrupt chronological event results.  
+**Note:** Council Drive copy numbered this ADR-034; renumbered to ADR-031.
+
+## ADR-032 — Native iPhone demand is measured before Apple distribution spending
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** The website may record a deduplicated anonymous iOS request count and an optional verified one-purpose email waitlist. A general Junkfeathers newsletter requires separate optional consent.  
+**Release trigger:** Begin the native iPhone release when at least two conditions are true: 100 verified iPhone waitlist emails; at least 25% of web usage from iPhones for two consecutive months; at least $300 in available business cash; reliable Mac and physical-iPhone access.  
+**Consequence:** The public web machine serves iPhone users while demand is measured. Do not use fake urgency or manipulated vote counters.  
+**Note:** Council Drive copy numbered this ADR-035; renumbered to ADR-032.
+
+## ADR-033 — Cross-promotion remains outside the event index
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** Orpheus Deck, Junkfeathers music, Android download, iPhone request, and other workshop promotion belong on the landing page, About, Settings, footer, or a deliberately opened discovery surface.  
+**Consequence:** Do not place company promotion between event records or alter organic chronological order.  
+**Note:** Council Drive copy numbered this ADR-036; renumbered to ADR-033.
+
+## ADR-034 — Repository is technical source of truth; Drive is council mirror
+
+**Status:** Accepted  
+**Date:** 2026-07-10  
+**Decision:** During an active coding pass, the local Git repository is the technical source of truth. Google Drive is the council-readable mirror and planning archive. Drive copies must never blindly overwrite newer repository files. Council-approved Drive changes must be merged against the current repository version. After each substantial pass, Cursor identifies every governing Markdown file changed and records `DRIVE SYNC STATUS` in the council handoff. Cursor prepares sync files; Jonathan uploads the sync ZIP to the business-council chat; the council updates Drive and confirms completion.  
+**Consequence:** No pass may silently assume Drive is current. Blind Drive→repo overwrites are prohibited.
