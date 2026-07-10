@@ -4,7 +4,7 @@
 - Objective: Apply Jonathan’s Pass 02A physical-review refinements and ship machine-shell Stage 1 (branding, portrait lock, top OLED toasts, keyboard preservation, 01–04 shell + signal coil).
 - Status: COMPLETE — awaiting physical Android review of the refined APK
 - Branch: `pass-02a1-machine-shell-refinement`
-- Commit: (branch tip at handoff close — see git log)
+- Commit: `0a896181ab0c2a40ad1789292a0a66279fca8c63`
 - App version: `0.1.0`
 - Build number: `1`
 
