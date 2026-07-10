@@ -4,7 +4,7 @@
 - Objective: Integrate Scan Control into one machine face — remove external numbered headers; redesign panels 01–04; CRT monitor with real scrollbar; compact triple rings; WHEN/WHAT dial selectors.
 - Status: COMPLETE — awaiting physical Android review of the refined APK
 - Branch: `pass-02a2-integrated-machine-panel`
-- Commit: (branch tip at close)
+- Commit: `822870229dffe1aabbcc63ea8a44b8f2fb0b8613`
 - App version: `0.1.0`
 - Build number: `1`
 
