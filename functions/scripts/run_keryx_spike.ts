@@ -1,6 +1,8 @@
 /**
- * Local Pass 01 Keryx feasibility spike.
- * Requires GEMINI_API_KEY in the environment or functions/.env (never commit).
+ * Local Pass 01B Keryx feasibility spike — sequential Tests A → B → C.
+ * Requires GEMINI_API_KEY (env or ignored functions/.env). Never commit secrets.
+ * Saves each test result before starting the next. No concurrent tests.
+ * No automatic long model-switching lists. Retries only via withBoundedRetries.
  */
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
@@ -68,11 +70,13 @@ const TESTS: Array<{ id: string; request: ScanRequest }> = [
 ];
 
 function sanitizeForDisk(value: unknown): unknown {
-  // Keep evaluation artifacts free of env secrets; truncate huge raw blobs.
   return JSON.parse(
     JSON.stringify(value, (_key, v) => {
       if (typeof v === "string" && v.length > 12000) {
         return `${v.slice(0, 12000)}…[truncated]`;
+      }
+      if (typeof v === "string") {
+        return v.replace(/AIza[0-9A-Za-z\-_]{10,}/g, "[REDACTED_KEY]");
       }
       return v;
     }),
@@ -89,6 +93,12 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
+  console.log(`Discovery model: ${config.discoveryModel}`);
+  console.log(`Normalization model: ${config.normalizationModel}`);
+  if (config.modelOverrideReason) {
+    console.log(`Model override reason: ${config.modelOverrideReason}`);
+  }
+
   const engine = new GeminiKeryxEngine(config);
   const outDir = resolve(__dirname, "..", ".eval-cache");
   mkdirSync(outDir, { recursive: true });
@@ -98,18 +108,27 @@ async function main(): Promise<void> {
     discoveryModel: config.discoveryModel,
     normalizationModel: config.normalizationModel,
     modelOverrideReason: config.modelOverrideReason ?? null,
+    sdkPackage: "@google/genai",
+    preferredApiPath: "interactions+google_search",
+    fallbackApiPath: "generateContent+googleSearch",
     tests: [] as unknown[],
   };
 
   for (const test of TESTS) {
-    console.log(`\n=== Running ${test.id} ===`);
+    console.log(`\n=== Running ${test.id} (sequential) ===`);
     try {
       const result = await runFeasibilityScan(engine, test.request);
       const compact = {
         id: test.id,
+        status: "completed",
         request: test.request,
         discoveryModel: result.discovery.model,
         normalizationModel: result.normalization.model,
+        discoveryApiPath: result.discovery.apiPath,
+        normalizationApiPath: result.normalization.apiPath,
+        discoveryAttempts: result.discovery.attempts,
+        normalizationAttempts: result.normalization.attempts,
+        usedFallback: result.discovery.usedFallback || result.normalization.usedFallback,
         searchQueries: result.discovery.searchQueries,
         citationCount: result.discovery.citations.length,
         citations: result.discovery.citations.map((c) => ({
@@ -152,19 +171,36 @@ async function main(): Promise<void> {
         JSON.stringify(sanitizeForDisk(compact), null, 2),
         "utf8",
       );
+      writeFileSync(
+        resolve(outDir, "summary.json"),
+        JSON.stringify(sanitizeForDisk(summary), null, 2),
+      );
       console.log(
-        `Accepted=${compact.acceptedCount} citations=${compact.citationCount} invalid=${compact.invalidStructuredOutputCount}`,
+        `Saved ${test.id}: Accepted=${compact.acceptedCount} citations=${compact.citationCount} api=${compact.discoveryApiPath} fallback=${compact.usedFallback}`,
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`ERROR in ${test.id}: ${message}`);
-      summary.tests.push({ id: test.id, error: message });
+      const blocked = {
+        id: test.id,
+        status: "blocked",
+        error: message.replace(/AIza[0-9A-Za-z\-_]{10,}/g, "[REDACTED_KEY]"),
+      };
+      summary.tests.push(blocked);
+      writeFileSync(
+        resolve(outDir, `${test.id}.json`),
+        JSON.stringify(sanitizeForDisk(blocked), null, 2),
+        "utf8",
+      );
+      writeFileSync(
+        resolve(outDir, "summary.json"),
+        JSON.stringify(sanitizeForDisk(summary), null, 2),
+      );
+      console.error(`BLOCKED ${test.id}: ${blocked.error}`);
+      // Continue to next test; do not restart completed ones.
     }
   }
 
-  const summaryPath = resolve(outDir, "summary.json");
-  writeFileSync(summaryPath, JSON.stringify(sanitizeForDisk(summary), null, 2));
-  console.log(`\nWrote sanitized summary to ${summaryPath}`);
+  console.log(`\nWrote sanitized summary to ${resolve(outDir, "summary.json")}`);
 }
 
 main().catch((error) => {

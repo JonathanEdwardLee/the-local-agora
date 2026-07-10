@@ -1,173 +1,142 @@
 # THE LOCAL AGORA — COUNCIL HANDOFF
 
 ## 1. Pass identity
-- Pass: 01 — Repository Foundation and Keryx Feasibility Spike
-- Objective: Establish a clean Flutter + TypeScript Functions repository and prove two-pass Keryx on real Springfield / 65806 queries for July 10–16, 2026
-- Status: PARTIAL / BLOCKED (foundation complete; live grounded feasibility blocked without `GEMINI_API_KEY`)
+- Pass: 01 / 01B — Repository Foundation + Live Keryx Feasibility Completion (controlled correction)
+- Objective: Complete live two-pass Keryx feasibility on Springfield / 65806 for July 10–16, 2026
+- Status: COMPLETE (Outcome A — smoke + Tests A/B/C succeeded)
 - Branch: `pass-01-keryx-foundation`
-- Final commit: `2e4525d3e4aaf3801770d4bada4ee72fec7a2de9` (branch tip at handoff freeze)
+- Final commit: see branch tip `pass-01-keryx-foundation` (`git rev-parse HEAD`)
 - App version: `0.1.0`
 - Build number: `1`
+- New APK: NO (Flutter unchanged in 01B)
 
 ## 2. Executive summary
 - What was completed:
-  - Canonical governing Markdown layout and Flutter project `the_local_agora`
-  - Android application ID `com.junkfeathers.localagora`, version `0.1.0+1`
-  - Minimal near-black / bone-white Pass 01 foundation screen
-  - Junkfeathers splash timing seam (990 / 1000 / 880 ms) without full animation
-  - Firebase Cloud Functions 2nd gen TypeScript workspace with Zod event schema
-  - Keryx two-pass implementation (Interactions API + Google Search, then structured normalization)
-  - Unit tests, Flutter analyze/tests, debug APK, Flutter web build
-  - `docs/KERYX_EVALUATION.md`
+  - Live Interactions smoke test succeeded (`gemini-3.5-flash`, attempt 1)
+  - Tests A, B, and C completed sequentially on Interactions (no generateContent fallback needed in final run)
+  - Bounded retry policy corrected (max 4; 408/429/5xx only; ~2s/5s/10s backoff)
+  - `@google/genai` locked at **2.11.0**; Functions runtime engines locked to **Node 22**
+  - `docs/KERYX_EVALUATION.md` and this handoff updated with measured results
 - What remains:
-  - Live Tests A/B/C against Gemini (requires local `GEMINI_API_KEY`)
-  - Evidence-backed feasibility verdict upgrade from `KERYX NOT YET PROVEN`
-  - Full Scan Control / City Index / flyer loop (explicitly out of Pass 01)
-- Keryx feasibility verdict: **KERYX NOT YET PROVEN**
+  - Pass 02 Scan Control / City Index UI
+  - Origin-URL hardening, start-time audit tuning, cost controls
+- Keryx feasibility verdict: **KERYX FEASIBLE WITH CHANGES**
 
 ## 3. Acceptance criteria
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| 1. All five governing Markdown files were read before implementation | PASS | Pre-code report; files read (then renamed to canonical paths) |
-| 2. Repository identity matches the approved values | PASS | `pubspec.yaml` name/version; Android `applicationId`; README |
-| 3. Flutter project launches successfully | PASS | App entry `lib/main.dart` + widget test pumps `TheLocalAgoraApp` |
-| 4. Android package ID is `com.junkfeathers.localagora` | PASS | `android/app/build.gradle.kts` applicationId + namespace |
-| 5. Flutter analysis passes without unresolved errors | PASS | `flutter analyze` → No issues found |
-| 6. Flutter tests pass | PASS | `flutter test` → 2/2 passed |
-| 7. A debug APK is successfully created and verified to exist | PASS | `build/app/outputs/flutter-apk/app-debug.apk` exists (146,111,780 bytes) |
-| 8. Flutter web builds successfully | PASS | `flutter build web` → `build/web` with `index.html` + `main.dart.js` |
-| 9. A strict TypeScript functions workspace exists | PASS | `functions/` with strict `tsconfig.json` |
-| 10. TypeScript lint, tests, and build pass | PASS | `npm run lint`, `npm run build`, `npm test` (8/8) |
-| 11. No production Firebase project or permanent cloud identifier was invented | PASS | No Firebase project ID recorded; status callable only |
-| 12. No secret was committed | PASS | Secret scan NO_MATCHES; no `.env` present |
-| 13. Keryx grounded discovery returns current Springfield event findings with citations | BLOCKED | `GEMINI_API_KEY` absent; spike exit code 2 |
-| 14. The broad event scan was evaluated | BLOCKED | Test A not executed live |
-| 15. The music-specific scan was evaluated | BLOCKED | Test B not executed live |
-| 16. The `65806` postal-code scan was evaluated | BLOCKED | Test C not executed live |
-| 17. Grounded discovery and normalization are separate model operations | PASS | `GeminiKeryxEngine.discoverPublicEvents` vs `normalizeGroundedFindings` |
-| 18. Normalized output passes runtime schema validation | PASS | Zod `NormalizationResultSchema` + unit tests (live path not run) |
-| 19. Accepted normalized facts are traceable to evidence | BLOCKED | No live accepted events; audit pipeline unit-tested |
-| 20. Unsupported facts in accepted records total zero | BLOCKED | No live accepted set; offline strip test leaves 0 unsupported |
-| 21. Past events are excluded from accepted active results | BLOCKED | Pipeline implements exclusion; not exercised live |
-| 22. Private or withheld addresses are not inferred | PASS | Prompt + location-mode rules; no private-address inference code |
-| 23. `docs/KERYX_EVALUATION.md` is complete | PASS | File present with all required sections; live sections marked blocked |
-| 24. Full application UI / flyer / persistence / billing not prematurely built | PASS | Only Pass 01 foundation screen + backend spike |
-| 25. A full council handoff report is produced | PASS | This document |
-| 26. The smallest recommended next pass is identified | PASS | See §16 |
+| 1. Governing Markdown read | PASS | Pass 01B re-read |
+| 2. Repository identity | PASS | Unchanged from Pass 01 |
+| 3. Flutter launches | PASS | Unchanged |
+| 4. Android package ID | PASS | `com.junkfeathers.localagora` |
+| 5. Flutter analyze | PASS | Pass 01 |
+| 6. Flutter tests | PASS | Pass 01 |
+| 7. Debug APK exists | PASS | Pass 01 artifact |
+| 8. Flutter web build | PASS | Pass 01 |
+| 9. TypeScript functions workspace | PASS | Present |
+| 10. TS lint/tests/build | PASS | Re-run after 01B correction |
+| 11. No invented Firebase project | PASS | None |
+| 12. No secret committed | PASS | Post-scan NO_MATCHES for secret values; `.env` ignored |
+| 13. Grounded Springfield findings with citations | PASS | A: 13 accepted, 157 citations |
+| 14. Broad scan evaluated | PASS | Test A completed |
+| 15. Music scan evaluated | PASS | Test B completed; 9/9 MUSIC |
+| 16. `65806` scan evaluated | PASS | Test C completed; Springfield interpretation |
+| 17. Separate discovery + normalization | PASS | Two Interactions operations per test |
+| 18. Zod validation | PASS | invalidStructuredOutputCount=0 |
+| 19. Accepted facts traceable to evidence | PASS | Audit + strip pipeline; residual unsupported=0 |
+| 20. Unsupported accepted facts = 0 | PASS | A/B/C all 0 |
+| 21. Past events excluded | PASS | A and C each excluded 1 past event |
+| 22. Private addresses not inferred | PASS | No private-address inference observed |
+| 23. `KERYX_EVALUATION.md` complete | PASS | Updated with live results |
+| 24. Full UI/flyer/billing not built | PASS | Out of scope |
+| 25. Council handoff produced | PASS | This document |
+| 26. Smallest next pass identified | PASS | Pass 02 Scan Control + City Index |
 
 ## 4. User-visible changes
-- Launching the app shows a minimal engineering foundation screen:
-  - `JUNKFEATHERS TECH`
-  - `THE LOCAL AGORA`
-  - `PASS 01 // KERYX FEASIBILITY`
-  - Flutter / backend / splash / Keryx UI status lines
-  - Statement that the full civic receiver interface arrives later
-- No live scan UI, no City Index, no event cards
+- None in the Flutter app (foundation screen unchanged).
+- Backend/docs only for 01B.
 
 ## 5. Internal implementation
-- Flutter: Pass 01 shell + splash spec seam
-- Functions: Keryx config, request builder, Gemini engine, Zod schema, evidence audit, two-pass pipeline, local spike script
-- Callable stubs: `keryxStatus`, `keryxScanNotEnabled` (scan not publicly enabled)
+- Bounded retry helper (`retry.ts`)
+- Interactions preferred + generateContent capacity fallback behind `GeminiKeryxEngine`
+- Smoke script `npm run keryx:smoke`
+- Sequential spike saves each test before the next
+- Node engines locked to `22`
 
 ## 6. Files created, changed, moved, or deleted
-- Created: Flutter app tree, `functions/**`, `docs/KERYX_EVALUATION.md`, `docs/pass_handoffs/PASS_01_COUNCIL_HANDOFF.md`, splash/Pass 01 Dart files, tests, README
-- Renamed/normalized: governing docs → `AI_CODING_INSTRUCTIONS.md`, `docs/MASTER_BLUEPRINT.md`, `docs/DEV_CONTEST_V0.1_BLUEPRINT.md`
-- Deleted: empty speculative `lib/core/`
-- Not committed: `build/`, `functions/node_modules/`, `functions/lib/`, secrets
+- Created: `functions/src/keryx/retry.ts`, `functions/scripts/smoke_grounded_search.ts`, `functions/test/retry.test.ts`
+- Modified: `gemini_keryx_engine.ts`, `keryx_engine.ts`, `run_keryx_spike.ts`, `package.json`, `package-lock.json`, tests, `docs/KERYX_EVALUATION.md`, this handoff
+- Not committed: `functions/.env`, `functions/.eval-cache/**`, secrets
 
 ## 7. Architecture and dependency decisions
-- Client: Flutter/Dart only (ADR-001)
-- Backend: Firebase Functions 2nd gen + TypeScript (ADR-004)
-- Keryx: two-pass Interactions API design (ADR-003/006)
-- Default model: `gemini-3.5-flash` in server config
-- Installed packages: `@google/genai@1.52.0`, `firebase-functions@6.6.0`, `firebase-admin@13.10.0`, `zod@4.4.3`, `typescript@5.9.3`, `vitest@3.2.7`
-- No production Firebase project binding
+- Preferred API: Interactions + `google_search`
+- Fallback API: `generateContent` + `googleSearch` (capacity only; unused in final A/B/C)
+- Default model: `gemini-3.5-flash` (unchanged in permanent docs)
+- SDK: `@google/genai@2.11.0`
+- Functions deploy runtime target: Node **22** (local machine remains Node 24 with EBADENGINE warning)
 
 ## 8. Keryx evaluation results
-- Models: configured `gemini-3.5-flash` / `gemini-3.5-flash` (not live-tested)
-- API path: Interactions API + `google_search` (Pass A); structured `response_format` (Pass B)
-- Grounded searches: 0
-- Normalization calls: 0
-- Events discovered: 0 (blocked)
-- Events accepted: 0 (blocked)
-- Events rejected: 0 (blocked)
-- Unsupported accepted facts: N/A (blocked)
-- Citation quality: N/A (blocked)
-- Broad versus music-specific result: NOT TESTED (blocked)
-- Postal-code result: NOT TESTED (blocked)
-- Duplicate observations: N/A
-- Cost observations: no live spend; Search grounding may bill per model-issued query on Gemini 3 family
+- Live feasibility verdict: **KERYX FEASIBLE WITH CHANGES**
+- Models: `gemini-3.5-flash` / `gemini-3.5-flash`
+- API path: Interactions (discovery + structured normalization)
+- Smoke: success; attempts=1; citations=16; searchCalls=3
+- Grounded searches (A+B+C discovery): 3 successful
+- Normalization calls: 3 successful
+- Events accepted: A=13, B=9, C=16 (total 38 accepted across tests; not deduped across tests)
+- Events rejected: past exclusions A=1, C=1; other rejectedTitles as recorded
+- Unsupported accepted facts: **0**
+- Citation quality: high volume; stored origins often grounding redirects (change required)
+- Broad vs music: music filter strongly improves music relevance (9/9 MUSIC)
+- Postal-code: `65806` → Springfield MO coherent
+- Duplicates within tests: 0
+- Cost: material search-query counts (B reported 22 queries in one discovery); caching required before public exposure
+- Fallback used in final run: **no**
 
 ## 9. Commands and actual results
 
 ```text
-flutter pub get          → PASS
-flutter analyze          → PASS (No issues found)
-flutter test             → PASS (2 tests)
-flutter build apk --debug→ PASS → build/app/outputs/flutter-apk/app-debug.apk
-flutter build web        → PASS → build/web
+npm list @google/genai     → @google/genai@2.11.0
+npm run lint               → PASS
+npm run build              → PASS
+npm test                   → PASS (12 tests)
+npm run keryx:smoke        → PASS (Interactions, attempt 1)
+npm run keryx:spike        → PASS (A, B, C sequential)
 
-cd functions
-npm install              → PASS (@google/genai 1.52.0 et al.)
-npm run lint             → PASS
-npm run build            → PASS (functions/lib emitted)
-npm test                 → PASS (8 tests)
-npm run keryx:spike      → BLOCKED exit 2 (GEMINI_API_KEY missing)
-```
-
-Secret scan command (PowerShell, repo-scoped pattern search over source-like files, excluding `node_modules` / `build` / `.git` / compiled `functions/lib`):
-
-```text
-Patterns: AIza…, BEGIN PRIVATE KEY, service_account, GEMINI_API_KEY=non-placeholder, private_key, .p12, keystorePassword
-Result: SECRET_SCAN_RESULT: NO_MATCHES
+PRE_SECRET_SCAN            → doc var-name mentions only (no committed keys)
+POST_SECRET_SCAN           → NO committed secret values
 ```
 
 ## 10. Automated tests
-- Flutter: splash timing lock + Pass 01 widget identity labels
-- Functions: config defaults, schema validation, request prompt context, evidence audit support/strip, URL sanitize
+- Config, schema/audit, retry policy unit tests — all passing
 
 ## 11. APK and web-build information
-- APK created: YES
-- APK path: `build/app/outputs/flutter-apk/app-debug.apk`
-- APK mode: debug
-- Package name: `com.junkfeathers.localagora`
-- Version: `0.1.0`
-- Build number: `1`
-- APK file existence verified: YES (146,111,780 bytes)
-- Flutter web build: YES (`build/web`)
-- Current runtime requirements: no network/AI key required for the foundation screen; live Keryx spike requires local `functions/.env` with `GEMINI_API_KEY`
-- Live Keryx connection in APK: **No** — foundation screen only
+- APK rebuilt in 01B: NO
+- Prior Pass 01 debug APK remains valid for foundation UI only
+- Live Keryx not connected in APK
 
 ## 12. Physical Android test script
-1. Install: `adb install -r build/app/outputs/flutter-apk/app-debug.apk` → app installs as The Local Agora / `com.junkfeathers.localagora`
-2. Launch: open the app from the launcher → OLED near-black screen appears
-3. Confirm title and Pass 01 status: visible `JUNKFEATHERS TECH`, `THE LOCAL AGORA`, `PASS 01 // KERYX FEASIBILITY`
-4. Confirm layout is readable: bone-white monospaced labels, no colorful Flutter demo counter UI
-5. Force-close and relaunch: same foundation screen; no crash
-6. Capture any crash, overflow, or rendering failure: report screenshot + device model if any issue appears
+Unchanged from Pass 01 foundation screen checks (no Flutter delta).
 
 ## 13. Security, privacy, and operating-cost impact
-- Secrets: none committed; model calls designed server-side only
-- Privacy: private-address non-inference rules encoded in prompts and location modes
-- Cost: no live Gemini spend this pass; public scan callable intentionally disabled
+- Secrets: not committed; key used from environment only
+- Privacy: no private address inference observed
+- Cost: Search query volume is non-trivial; do not expose unlimited public scan yet
 
 ## 14. Known limitations and risks
-- Live feasibility evidence missing until API key is provided
-- Full splash animation not implemented (seam only)
-- No Firestore/Hosting/Auth wiring yet (correct for Pass 01)
-- Node local runtime is v24 while Functions commonly target 22; engines field allows both
+- Start times over-stripped / missing after audit
+- Origin URLs often grounding redirects
+- Provider capacity 500s can recur; fallback exists but preferred path is Interactions
+- Local Node 24 vs Functions Node 22 — install Node 22 before emulator/deploy
 
 ## 15. Questions requiring council judgment
-1. Please provide a Gemini API key for local `functions/.env` (or confirm an approved secret store path) so Tests A/B/C can run before Pass 02 UI work.
-2. Confirm whether Pass 02 may begin only after a live `KERYX FEASIBLE` / `FEASIBLE WITH CHANGES` verdict (recommended: yes).
+1. Approve Pass 02 Scan Control + City Index given `KERYX FEASIBLE WITH CHANGES`?
+2. Should origin-URL resolution and start-time audit hardening be required gates inside Pass 02, or a quick 01C polish?
 
 ## 16. Recommended next pass
-**Smallest next step:** Pass 01b — Live Keryx feasibility completion  
-- Objective: run Tests A/B/C with a real key, finish evidence audits, revise `KERYX_EVALUATION.md` verdict  
-- Why next: council cannot approve the full build without citation-backed proof  
-- Dependencies: `GEMINI_API_KEY` in local ignored `.env`  
-- Acceptance: criteria 13–16 and 19–21 move from BLOCKED to measured PASS/FAIL  
-- New APK required: NO (unless UI changes)
-
-Only after that: Pass 02 — Scan Control + sourced City Index (still no flyer/billing/maps).
+**Pass 02 — Scan Control + sourced City Index**  
+- Objective: city/ZIP + time window + category → cached chronological text index with origins  
+- Why next: feasibility proven enough to build the receiver loop  
+- Dependencies: protected callable design, cache policy, App Check staging plan  
+- New APK: YES  
+- Do not begin flyer upload, billing, maps, or accounts in Pass 02

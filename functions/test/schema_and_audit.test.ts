@@ -57,6 +57,7 @@ function sampleEvent(overrides: Partial<AgoraEvent> = {}): AgoraEvent {
 
 const discovery: GroundedDiscoveryResult = {
   model: "gemini-3.5-flash",
+  apiPath: "interactions+google_search",
   promptId: "keryx.discovery.pass_a",
   promptVersion: "0.1.0",
   outputText:
@@ -70,6 +71,8 @@ const discovery: GroundedDiscoveryResult = {
   ],
   searchQueries: ["Springfield MO events July 10 2026"],
   rawStepTypes: ["google_search_call", "google_search_result", "model_output"],
+  attempts: 1,
+  usedFallback: false,
 };
 
 describe("AgoraEventSchema", () => {
