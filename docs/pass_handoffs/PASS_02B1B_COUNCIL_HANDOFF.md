@@ -4,7 +4,7 @@
 - Objective: Combine panels 02/03 into one monitor module; refine Panel 04 WHEN/WHAT reveal/collapse; preserve Firebase link and local-only scan behavior.
 - Status: **COMPLETE — awaiting physical Android review**
 - Branch: `pass-02b1b-monitor-control-refinement`
-- Commit: *(recorded after commit)*
+- Commit: `2aeb6857ce581d065f604825a878ef3ccbdb569d`
 - App version: `0.1.0`
 - Build number: `1`
 
