@@ -4,7 +4,7 @@
 - Objective: Apply Jonathan’s final approved machine-face geometry refinements; configure Firebase (Android + web) and prove callable transport via non-AI `keryxStatus` only.
 - Status: **COMPLETE — awaiting physical Android + Firebase link test**
 - Branch: `pass-02b1-firebase-link-foundation`
-- Commit: *(recorded after commit; see git tip on this branch)*
+- Commit: `ed1e9bcbc4332a3832944b0d8e2b1c53b884146a`
 - App version: `0.1.0`
 - Build number: `1`
 
