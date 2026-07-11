@@ -4,6 +4,7 @@ import {
   extractHttpStatus,
   isRetryableError,
   withBoundedRetries,
+  withTimeout,
 } from "../src/keryx/retry";
 
 describe("retry policy", () => {
@@ -38,5 +39,31 @@ describe("retry policy", () => {
       ),
     ).rejects.toThrow(/BLOCKED after 4/);
     expect(calls).toBe(4);
+  });
+
+  it("withTimeout rejects slow work", async () => {
+    await expect(
+      withTimeout(
+        new Promise((resolve) => setTimeout(resolve, 200)),
+        30,
+        "unit-slow",
+      ),
+    ).rejects.toThrow(/unit-slow timed out after 30ms/);
+  });
+
+  it("treats timed-out messages as retryable", () => {
+    expect(
+      isRetryableError(new Error("discovery:interactions timed out after 40000ms")),
+    ).toBe(true);
+  });
+
+  it("retries 503 high demand", () => {
+    expect(
+      isRetryableError(
+        new Error(
+          'status=503: This model is currently experiencing high demand. status: UNAVAILABLE',
+        ),
+      ),
+    ).toBe(true);
   });
 });

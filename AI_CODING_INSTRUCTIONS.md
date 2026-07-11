@@ -9,7 +9,7 @@ Applies to: Cursor, Antigravity, and any coding AI working in this repository
 Project AI system: Keryx Engine  
 Current priority: DEV Passion Challenge Version 0.1  
 Permanent product rule: No embedded map in any version  
-Last revised: July 10, 2026 — shared-platform, cache-first, web-launch, iOS-demand, and repository–Drive sync rules integrated
+Last revised: July 10, 2026 — shared-platform, cache-first, web-launch, iOS-demand, and repository–Drive sync rules integrated; July 11, 2026 — ADR-037 brand tagline and onboarding copy recorded
 
 
 # 1\. PURPOSE
@@ -125,6 +125,28 @@ The Local Agora performs one primary job:
 Tell me what is happening here and when.
 
 
+Official public brand presentation (founder-approved — ADR-037):
+
+
+THE LOCAL AGORA
+
+
+Find your scene.  
+Grow your scene.
+
+
+Approved onboarding copy (do not silently rewrite):
+
+
+WELCOME — Find your scene. Discover music, comedy, art, and creative events near you.  
+HELP IT GROW — Every event you submit helps someone discover their next favorite venue, artist, or community.  
+TOGETHER — The Local Agora belongs to everyone.
+
+
+Operational scan workflow phrase (machine instruction; not the public tagline):  
+Choose a place. Choose a time. Scan the Agora.
+
+
 The current product is a text-first local event finder. A visitor chooses a city or ZIP/postal code, a time window, and optionally an event category. The Keryx Engine searches current public signals, preserves their origins, normalizes supported findings into event records, stores useful results for later visitors, and merges community events added through flyer uploads.
 
 
@@ -134,6 +156,9 @@ The stored index helps the next visitor.
 
 
 Do not turn the application into a generic social network, map application, AI assistant personality, promotional-copy generator, ticketing platform, or engagement feed.
+
+
+Do not silently rewrite founder-approved product copy (tagline, onboarding beats, or operational scan phrase). UI placement of tagline/onboarding awaits a council-approved visible-interface pass; do not invent a large onboarding system during unrelated repair passes.
 
 
 # 4\. CURRENT VERSION 0.1 SCOPE

@@ -22,14 +22,23 @@ export interface BuiltDiscoveryPrompt {
   input: string;
 }
 
-const APPROVED_CATEGORIES =
-  "music, art, stage/theatre, comedy, poetry, markets, workshops, and other creative or community gatherings";
+const APPROVED_CATEGORIES_V01 =
+  "music, comedy, and stage/theatre (plays, musicals, live performance)";
+
+const CATEGORY_FOCUS: Record<Exclude<EventCategoryFilter, "ALL" | "ART" | "GATHERINGS">, string> = {
+  MUSIC:
+    "live music, concerts, DJ sets, open mics with music focus, and ticketed music shows",
+  COMEDY: "stand-up comedy, improv, comedy clubs, and comedy showcases",
+  STAGE: "theatre, plays, musicals, staged readings, and live stage performances",
+};
 
 export function buildDiscoveryPrompt(request: ScanRequest): BuiltDiscoveryPrompt {
   const categoryClause =
     request.category === "ALL"
-      ? `Include all approved creative and community event categories (${APPROVED_CATEGORIES}).`
-      : `Restrict findings to the category: ${request.category}. Still only report events supported by public sources.`;
+      ? `Include only Version 0.1 categories (${APPROVED_CATEGORIES_V01}). Do not expand into visual art shows, markets, workshops, or general community gatherings.`
+      : request.category === "ART" || request.category === "GATHERINGS"
+        ? `The requested category ${request.category} is deferred past Version 0.1. If anything is returned, prefer ${APPROVED_CATEGORIES_V01} only.`
+        : `Restrict findings strictly to: ${CATEGORY_FOCUS[request.category]}. Do not include art exhibitions, markets, workshops, festivals-as-markets, or general community gatherings unless they are primarily ${request.category}.`;
 
   const input = [
     "You are Keryx Pass A — grounded public event discovery for The Local Agora.",
@@ -38,6 +47,9 @@ export function buildDiscoveryPrompt(request: ScanRequest): BuiltDiscoveryPrompt
     "Exclude clearly past events relative to the requested window.",
     "Do not search for, infer, or reveal private or withheld street addresses.",
     "If a source withholds an address, preserve that wording and leave the address absent.",
+    "Keep the search narrow: prefer official venue/organizer pages, ticket platforms,",
+    "city/arts calendars, and local publications. Aim for at most 12 strong candidates.",
+    "Avoid exhaustive multi-query sprawl; stop once a solid shortlist is found.",
     "",
     `Calendar context (local): ${request.calendarContextDate}`,
     `Location request: ${request.locationText}`,
@@ -58,13 +70,12 @@ export function buildDiscoveryPrompt(request: ScanRequest): BuiltDiscoveryPrompt
     "- short evidence excerpts supporting each stated fact",
     "- explicit unknowns when a fact is not present",
     "",
-    "Prefer official venue/organizer pages, city calendars, ticket platforms, local publications,",
-    "and publicly indexed event pages. Label low-confidence sources honestly.",
+    "Label low-confidence sources honestly.",
   ].join("\n");
 
   return {
     promptId: "keryx.discovery.pass_a",
-    promptVersion: "0.1.0",
+    promptVersion: "0.2.0-v01-narrow",
     input,
   };
 }

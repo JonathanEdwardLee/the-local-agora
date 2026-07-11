@@ -10,7 +10,7 @@ Current build target: DEV Passion Challenge Version 0.1
 AI system: Keryx Engine  
 Product principle: Retro OLED myth-machine outside; current adaptable technology inside  
 Permanent interface rule: No embedded map in any version  
-Last revised: July 10, 2026 — shared Android/web/iOS platform and public-launch roadmap approved; Pass 02B.1A merged against repository history
+Last revised: July 10, 2026 — shared Android/web/iOS platform and public-launch roadmap approved; Pass 02B.1A merged against repository history; July 11, 2026 — ADR-037 official brand tagline and onboarding copy
 
 
 # 1\. ZEUS DECISION
@@ -40,6 +40,30 @@ VISION
 Create a global network of local event indexes that feel like small mythological civic receivers: strange, focused machines that help people find music, art, comedy, theatre, poetry, markets, workshops, and other creative gatherings near them.
 
 
+OFFICIAL BRAND PRESENTATION
+
+
+THE LOCAL AGORA
+
+
+Find your scene.  
+Grow your scene.
+
+
+APPROVED ONBOARDING COPY
+
+
+WELCOME  
+Find your scene.  
+Discover music, comedy, art, and creative events near you.
+
+HELP IT GROW  
+Every event you submit helps someone discover their next favorite venue, artist, or community.
+
+TOGETHER  
+The Local Agora belongs to everyone.
+
+
 MISSION
 
 
@@ -47,6 +71,15 @@ Make it effortless to answer one question:
 
 
 What is happening near me tonight?
+
+
+OPERATIONAL SCAN WORKFLOW PHRASE
+
+
+Choose a place. Choose a time. Scan the Agora.
+
+
+This operational phrase explains the machine workflow and remains valid. It is not the public brand tagline (see ADR-037).
 
 
 COMMUNITY FLYWHEEL

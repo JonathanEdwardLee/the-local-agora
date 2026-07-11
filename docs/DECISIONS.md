@@ -249,3 +249,27 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 **Date:** 2026-07-10  
 **Decision:** After Physical Test 02B.1B visual approval, Panel 04 is a compact search-launch surface (`Search for an event`, `INPUT SEARCH PARAMETERS`, `SCAN THE AGORA`). Location, WHEN, and WHAT live in `JfSearchParameterDialog` and update shared state immediately; Close only dismisses. Vertical space recovered from Panel 04 increases CRT height via responsive `JfMonitorModule.resolveMonitorHeight` while the lower art/control band height stays locked. Empty-location validation uses `JfColors.validationPhosphor` only on the error dialog and invalid location field — not on ordinary info toasts or approved machine chrome. The Search Parameter dialog must remain keyboard-safe per ADR-020: size the dialog face to the remaining height above the real keyboard inset (Flutter `Dialog` already applies viewInsets and strips them from child MediaQuery), keep a scrollable body, and ensure the focused location field stays visible.  
 **Consequence:** Do not restore permanently visible location/WHEN/WHAT controls on the main deck. Do not use amber/yellow for this validation path. Do not apply phosphor green to success/info states. Do not size the dialog to full-screen height while the keyboard is open.
+
+## ADR-037 — Official brand tagline and onboarding copy
+
+**Status:** Accepted  
+**Date:** 2026-07-11  
+**Decision:** Founder- and council-approved public brand presentation for The Local Agora:
+
+- Official product name presentation: `THE LOCAL AGORA`
+- Official public tagline: `Find your scene. Grow your scene.`
+- Approved onboarding copy (three beats):
+  - **WELCOME** — Find your scene. / Discover music, comedy, art, and creative events near you.
+  - **HELP IT GROW** — Every event you submit helps someone discover their next favorite venue, artist, or community.
+  - **TOGETHER** — The Local Agora belongs to everyone.
+
+The operational machine phrase `Choose a place. Choose a time. Scan the Agora.` remains valid for explaining the scan workflow and machine instructions. It is **not** replaced by the public brand tagline. Button and control copy such as `SCAN THE AGORA` remains operational UI language.
+
+**Consequence:** Do not silently rewrite this founder-approved product copy. Do not substitute marketing variants in blueprints, README, store materials, or UI without a new accepted ADR. Do not implement a large onboarding system during Pass 02B.2A (Keryx timeout repair). Preserve the shared 2870 ms Junkfeathers Tech splash unchanged. Place tagline and onboarding experience only in a later council-approved visible-interface pass (likely Scan Control introduction, first-run onboarding, About, Flutter web landing, Play Store materials, contest presentation). Do not place the full onboarding copy in transient toasts or between event records.
+
+## ADR-038 — Version 0.1 live categories are MUSIC, COMEDY, THEATER
+
+**Status:** Accepted  
+**Date:** 2026-07-11  
+**Decision:** For Version 0.1 live scanning and dial UI, the active WHAT categories are **MUSIC**, **COMEDY**, and **THEATER** (wire value `STAGE`). **ART**, **GATHERINGS**, and **ALL SIGNALS** remain in the schema/enum for later versions but are not offered on the V0.1 dial and are rejected by `keryxScanDebug`. Discovery prompts are narrowed accordingly.  
+**Consequence:** Do not re-enable art/gatherings/all-signals on the public dial without a new ADR. Theater UI label maps to existing `STAGE` event type / wire value.

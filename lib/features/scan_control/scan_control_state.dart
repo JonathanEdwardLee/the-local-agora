@@ -29,6 +29,13 @@ enum EventCategory {
   gatherings,
 }
 
+/// Version 0.1 dial options — art / gatherings / all-signals deferred.
+const kV01EventCategories = <EventCategory>[
+  EventCategory.music,
+  EventCategory.comedy,
+  EventCategory.stage,
+];
+
 extension EventCategoryLabel on EventCategory {
   String get label {
     switch (this) {
@@ -39,7 +46,7 @@ extension EventCategoryLabel on EventCategory {
       case EventCategory.art:
         return 'ART';
       case EventCategory.stage:
-        return 'STAGE';
+        return 'THEATER';
       case EventCategory.comedy:
         return 'COMEDY';
       case EventCategory.gatherings:
@@ -53,7 +60,7 @@ class ScanControlState {
   const ScanControlState({
     this.locationText = '',
     this.timeWindow = TimeWindow.thisWeekend,
-    this.category = EventCategory.allSignals,
+    this.category = EventCategory.music,
     this.locationError,
   });
 

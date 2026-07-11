@@ -7,6 +7,13 @@ export interface KeryxConfig {
   normalizationModel: string;
   apiKey: string | undefined;
   modelOverrideReason: string | undefined;
+  /**
+   * When true, cloud debug path skips Interactions and uses generateContent
+   * (streaming when forceStreamDiscovery is also true).
+   */
+  forceGenerateContentPath?: boolean;
+  /** Prefer streaming discovery so idle sockets stay alive during grounding. */
+  forceStreamDiscovery?: boolean;
 }
 
 export function loadKeryxConfig(
@@ -28,5 +35,11 @@ export function assertApiKey(config: KeryxConfig): string {
       "GEMINI_API_KEY is not set. Copy functions/.env.example to functions/.env and provide a key.",
     );
   }
-  return config.apiKey;
+  const key = config.apiKey;
+  if (key.length < 20) {
+    throw new Error(
+      "GEMINI_API_KEY is present but too short to be a valid Google AI key.",
+    );
+  }
+  return key;
 }

@@ -8,6 +8,7 @@ import type { ScanRequest } from "./request_builder";
 export type KeryxApiPath =
   | "interactions+google_search"
   | "generateContent+googleSearch"
+  | "generateContentStream+googleSearch"
   | "interactions+structured_output"
   | "generateContent+structured_output";
 

@@ -145,7 +145,7 @@ void main() {
     );
     await tester.pump();
     await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
-    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
+    // WHAT defaults to MUSIC in V0.1 (art/gatherings/all-signals deferred).
     expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
     expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
     await _closeParams(tester);
@@ -160,6 +160,12 @@ void main() {
     expect(find.text('Springfield, Missouri'), findsWidgets);
     expect(find.text('NEXT 7 DAYS'), findsWidgets);
     expect(find.text('MUSIC'), findsWidgets);
+    expect(find.text('ALL SIGNALS'), findsNothing);
+    expect(find.text('ART'), findsNothing);
+    expect(find.text('GATHERINGS'), findsNothing);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
+    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
+    expect(find.text('THEATER'), findsWidgets);
     await _closeParams(tester);
   });
 

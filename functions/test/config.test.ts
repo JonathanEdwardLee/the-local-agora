@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { loadKeryxConfig } from "../src/config/keryx_config";
+import { assertApiKey, loadKeryxConfig } from "../src/config/keryx_config";
 
 describe("keryx config", () => {
   it("defaults to gemini-3.5-flash", () => {
@@ -20,5 +20,16 @@ describe("keryx config", () => {
     } as NodeJS.ProcessEnv);
     expect(config.discoveryModel).toBe("gemini-2.5-flash");
     expect(config.modelOverrideReason).toBe("temporary compatibility test");
+  });
+
+  it("rejects too-short api keys without revealing them", () => {
+    expect(() =>
+      assertApiKey({
+        discoveryModel: "gemini-3.5-flash",
+        normalizationModel: "gemini-3.5-flash",
+        apiKey: "short",
+        modelOverrideReason: undefined,
+      }),
+    ).toThrow(/too short/);
   });
 });

@@ -86,10 +86,33 @@ describe("secret and app-check source contracts", () => {
 
   it("enforces App Check on debug scan and keeps Node 22 region bounds", () => {
     expect(indexSrc).toMatch(/enforceAppCheck:\s*true/);
-    expect(indexSrc).toMatch(/timeoutSeconds:\s*120/);
+    expect(indexSrc).toMatch(/timeoutSeconds:\s*360/);
+    expect(indexSrc).toMatch(/memory:\s*["']1GiB["']/);
     expect(indexSrc).toMatch(/maxInstances:\s*1/);
     expect(indexSrc).toMatch(/minInstances:\s*0/);
     expect(indexSrc).toMatch(/us-central1/);
+    const callableSrc = fs.readFileSync(
+      path.join(__dirname, "../src/callables/keryx_scan_debug.ts"),
+      "utf8",
+    );
+    expect(callableSrc).toMatch(/forceStreamDiscovery:\s*true/);
+    expect(callableSrc).toMatch(/path=generateContentStream/);
+    expect(callableSrc).toMatch(/"MUSIC"/);
+    expect(callableSrc).toMatch(/"COMEDY"/);
+    expect(callableSrc).toMatch(/"STAGE"/);
+    expect(callableSrc).not.toMatch(/"ART"/);
+    expect(callableSrc).not.toMatch(/"GATHERINGS"/);
+  });
+
+  it("raises undici headersTimeout before other imports take effect", () => {
+    const httpAgentSrc = fs.readFileSync(
+      path.join(__dirname, "../src/http_agent.ts"),
+      "utf8",
+    );
+    expect(indexSrc).toMatch(/ensureLongLivedFetchAgent/);
+    expect(httpAgentSrc).toMatch(/headersTimeout:\s*330_000/);
+    expect(httpAgentSrc).toMatch(/setGlobalDispatcher/);
+    expect(httpAgentSrc).toMatch(/export async function ensureLongLivedFetchAgent/);
   });
 
   it("keeps production scan seam disabled", () => {

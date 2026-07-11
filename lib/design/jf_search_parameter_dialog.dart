@@ -243,7 +243,7 @@ class _JfSearchParameterDialogBodyState
                       JfDialSelector<EventCategory>(
                         key: const ValueKey('jf-what-dial'),
                         label: 'WHAT',
-                        values: EventCategory.values,
+                        values: kV01EventCategories,
                         value: _what,
                         labelOf: (v) => v.label,
                         onChanged: (v) {

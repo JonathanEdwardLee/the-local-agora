@@ -27,12 +27,9 @@ const TIME_WINDOWS = new Set<ClientTimeWindow>([
 ]);
 
 const CATEGORIES = new Set<ClientCategory>([
-  "ALL_SIGNALS",
   "MUSIC",
-  "ART",
-  "STAGE",
   "COMEDY",
-  "GATHERINGS",
+  "STAGE",
 ]);
 
 export interface KeryxScanDebugRequest {
@@ -129,22 +126,48 @@ export async function handleKeryxScanDebug(
   const parsed = parseKeryxScanDebugRequest(request.data);
   const window = resolveScanWindow(parsed.timeWindow);
   const scanStartedAt = new Date().toISOString();
+  const requestId = parsed.clientRequestId;
 
   const config = {
     ...loadKeryxConfig(),
     apiKey,
+    // Cloud Functions: stream grounded discovery to keep idle sockets alive;
+    // skip Interactions for this debug proof (local smoke still uses Interactions).
+    forceGenerateContentPath: true,
+    forceStreamDiscovery: true,
   };
+
+  console.info(
+    `keryxScanDebug start requestId=${requestId} locationLen=${parsed.location.length} window=${parsed.timeWindow} category=${parsed.category} path=generateContentStream apiKeyLen=${apiKey.length}`,
+  );
+
+  const SCAN_DEADLINE_MS = 330_000;
 
   try {
     const engine = new GeminiKeryxEngine(config);
-    const result = await runFeasibilityScan(engine, {
-      locationText: parsed.location,
-      windowStartDate: window.windowStartDate,
-      windowEndDate: window.windowEndDate,
-      category: mapClientCategory(parsed.category),
-      timeZone: "America/Chicago",
-      calendarContextDate: window.calendarContextDate,
-    });
+    const result = await Promise.race([
+      runFeasibilityScan(engine, {
+        locationText: parsed.location,
+        windowStartDate: window.windowStartDate,
+        windowEndDate: window.windowEndDate,
+        category: mapClientCategory(parsed.category),
+        timeZone: "America/Chicago",
+        calendarContextDate: window.calendarContextDate,
+      }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new Error(
+              `Scan exceeded ${SCAN_DEADLINE_MS}ms server deadline before completion.`,
+            ),
+          );
+        }, SCAN_DEADLINE_MS);
+      }),
+    ]);
+
+    console.info(
+      `keryxScanDebug pipeline ok requestId=${requestId} accepted=${result.acceptedAfterAudit.length} discoveryPath=${result.discovery.apiPath} normPath=${result.normalization.apiPath}`,
+    );
 
     const events = result.acceptedAfterAudit.slice(0, MAX_EVENTS).map((event) => ({
       title: event.eventTitle,

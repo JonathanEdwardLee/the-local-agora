@@ -49,6 +49,10 @@ Keryx gathers the signals it can verify. The community adds the ones the public 
 # CORE PRODUCT PROMISE
 
 
+Find your scene. Grow your scene.
+
+
+Operational scan workflow (machine instruction, not the public tagline):  
 Choose a place. Choose a time. Scan the Agora.
 
 
@@ -99,12 +103,18 @@ Descriptor:
 A text-first local event finder powered by public signals and community flyers.
 
 
-Primary tagline:  
+Primary tagline (public brand):  
+Find your scene. Grow your scene.
+
+
+Operational scan workflow phrase (machine / demo instruction — not the public tagline):  
 Choose a place. Choose a time. Scan the Agora.
 
 
-Secondary line:  
-Find the signals. Add what the scene is missing.
+Approved onboarding beats:  
+• WELCOME — Find your scene. Discover music, comedy, art, and creative events near you.  
+• HELP IT GROW — Every event you submit helps someone discover their next favorite venue, artist, or community.  
+• TOGETHER — The Local Agora belongs to everyone.
 
 
 One-sentence pitch:  
@@ -828,8 +838,8 @@ Suggested sequence:
 13\. Confirm the record.  
 14\. Show the new event inside the same city index.  
 15\. End on:  
-   FIND THE SIGNALS.  
-   ADD WHAT THE SCENE IS MISSING.
+   FIND YOUR SCENE.  
+   GROW YOUR SCENE.
 
 
 # JUDGING STRATEGY

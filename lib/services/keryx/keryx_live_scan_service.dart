@@ -124,7 +124,7 @@ class FakeKeryxLiveScanService implements KeryxLiveScanService {
 class FirebaseKeryxLiveScanService implements KeryxLiveScanService {
   FirebaseKeryxLiveScanService({
     FirebaseFunctions? functions,
-    this.timeout = const Duration(seconds: 120),
+    this.timeout = const Duration(seconds: 360),
   }) : _functions = functions ??
             FirebaseFunctions.instanceFor(region: 'us-central1');
 
@@ -146,15 +146,15 @@ class FirebaseKeryxLiveScanService implements KeryxLiveScanService {
         'keryxScanDebug',
         options: HttpsCallableOptions(timeout: timeout),
       );
-      onStage?.call('SEARCHING PUBLIC SIGNALS');
+      // Entire two-pass pipeline runs server-side; stay on this stage until return.
+      onStage?.call('WAITING ON KERYX SERVER');
       final response = await callable.call(<String, dynamic>{
         'location': location,
         'timeWindow': timeWindow,
         'category': category,
         'clientRequestId': ?clientRequestId,
       });
-      onStage?.call('CHECKING SOURCES');
-      onStage?.call('NORMALIZING RECORDS');
+      onStage?.call('READING SERVER RESULT');
       return parseKeryxLiveScanPayload(
         response.data,
         elapsedMs: DateTime.now().difference(started).inMilliseconds,

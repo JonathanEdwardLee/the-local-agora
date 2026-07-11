@@ -126,6 +126,12 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
     setState(() {
       _liveBusy = true;
       _liveStage = 'CONTACTING KERYX';
+      _liveResult = const KeryxLiveScanResult(
+        ok: false,
+        machineTitle: 'LIVE KERYX RUNNING',
+        supportText:
+            'Server scan in progress. Stay on this screen up to ~6 minutes. Do not tap again.',
+      );
     });
 
     final location = _fieldController.text.trim().isEmpty
@@ -367,7 +373,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const SizedBox(height: JfSpacing.md),
                 JfDialSelector<EventCategory>(
                   label: 'WHAT',
-                  values: EventCategory.values,
+                  values: kV01EventCategories,
                   value: _what,
                   labelOf: (v) => v.label,
                   onChanged: (v) => setState(() => _what = v),

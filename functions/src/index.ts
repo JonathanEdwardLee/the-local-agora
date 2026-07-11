@@ -8,6 +8,7 @@ import { setGlobalOptions } from "firebase-functions/v2";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 
 import { handleKeryxScanDebug } from "./callables/keryx_scan_debug";
+import { ensureLongLivedFetchAgent } from "./http_agent";
 
 initializeApp();
 
@@ -75,11 +76,14 @@ export const keryxScanDebug = onCall(
     region: "us-central1",
     minInstances: 0,
     maxInstances: 1,
-    timeoutSeconds: 120,
-    memory: "512MiB",
+    // Grounded discovery can stay quiet ~160s+ before first stream chunk from CF.
+    // Memory ≥1GiB unlocks a full vCPU on Cloud Functions / Cloud Run.
+    timeoutSeconds: 360,
+    memory: "1GiB",
     concurrency: 1,
   },
   async (request) => {
+    await ensureLongLivedFetchAgent();
     return handleKeryxScanDebug(request, geminiApiKey.value());
   },
 );

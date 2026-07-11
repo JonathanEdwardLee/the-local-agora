@@ -2,9 +2,11 @@
 
 Junkfeathers Tech · Flutter · Keryx Engine
 
-**Tell me what is happening here and when.**
+**Find your scene. Grow your scene.**
 
 This repository is the DEV Passion Challenge Version 0.1 codebase for The Local Agora — a text-first local event finder. Android is the first commercial target; iOS remains first-class from the same Flutter codebase; Flutter web supports demonstration.
+
+Operational scan workflow (machine instruction, not the public tagline): **Choose a place. Choose a time. Scan the Agora.**
 
 ## Pass 01 status
 
@@ -15,10 +17,17 @@ Pass 01 establishes the repository foundation and the Keryx feasibility spike (g
 | Item | Value |
 |---|---|
 | Product | The Local Agora |
+| Public tagline | Find your scene. Grow your scene. |
 | Flutter project | `the_local_agora` |
 | Repository | `the-local-agora` |
 | Android application ID | `com.junkfeathers.localagora` |
 | Version | `0.1.0+1` |
+
+Approved onboarding copy (ADR-037; UI placement in a later visible-interface pass):
+
+- **WELCOME** — Find your scene. Discover music, comedy, art, and creative events near you.
+- **HELP IT GROW** — Every event you submit helps someone discover their next favorite venue, artist, or community.
+- **TOGETHER** — The Local Agora belongs to everyone.
 
 ## Governing documents
 
@@ -64,3 +73,4 @@ Follow `DO_NOT_UPLOAD_SECRETS.md`. Never commit Gemini keys, service-account JSO
 - Unknown event facts remain unknown
 - Private / withheld addresses are never inferred or stored
 - Keryx uses a two-pass pipeline (discovery, then normalization)
+- Founder-approved brand copy must not be silently rewritten

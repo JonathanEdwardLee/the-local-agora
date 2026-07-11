@@ -50,11 +50,36 @@ export function isRetryableError(error: unknown): boolean {
     if (/\b(400|401|403|404)\b/.test(message)) return false;
     return true;
   }
+  // Provider hang / our own withTimeout wrapper
+  if (/timed out after \d+ms/i.test(message)) {
+    return true;
+  }
   return false;
 }
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Rejects if `promise` does not settle within `ms`. Clears the timer on settle. */
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  label: string,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`${label} timed out after ${ms}ms`));
+        }, ms);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 export async function withBoundedRetries<T>(
