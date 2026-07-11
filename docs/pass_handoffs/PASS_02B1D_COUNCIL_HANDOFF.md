@@ -4,7 +4,7 @@
 - Objective: Fix Search Parameter dialog so the location field remains visible above the keyboard.
 - Status: **COMPLETE — awaiting physical Android review**
 - Branch: `pass-02b1d-keyboard-safe-parameter-dialog`
-- Commit: *(recorded after commit)*
+- Commit: abde8bfc343c43221bcf7c3412c28d6d8c7ec0c3
 - App version: `0.1.0`
 - Build number: `1`
 
