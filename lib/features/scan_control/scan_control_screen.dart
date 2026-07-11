@@ -11,20 +11,25 @@ import '../../design/jf_search_parameter_dialog.dart';
 import '../../design/jf_signal_coil.dart';
 import '../../design/junkfeathers_tokens.dart';
 import '../../services/keryx/keryx_link_service.dart';
+import '../../services/keryx/keryx_live_scan_service.dart';
 import '../debug/debug_component_gallery.dart';
 import 'scan_control_state.dart';
 
 /// SCREEN 1 — SCAN CONTROL
-/// Compact Panel 04 + Search Parameter dialog. Live Keryx not enabled.
+/// Compact Panel 04 + Search Parameter dialog. Live Keryx not on main Scan.
 class ScanControlScreen extends StatefulWidget {
   const ScanControlScreen({
     super.key,
     this.firebaseReady = false,
+    this.appCheckReady = false,
     this.keryxLinkService,
+    this.keryxLiveScanService,
   });
 
   final bool firebaseReady;
+  final bool appCheckReady;
   final KeryxLinkService? keryxLinkService;
+  final KeryxLiveScanService? keryxLiveScanService;
 
   @override
   State<ScanControlScreen> createState() => _ScanControlScreenState();
@@ -260,8 +265,11 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                                     MaterialPageRoute<void>(
                                       builder: (_) => DebugComponentGallery(
                                         firebaseReady: widget.firebaseReady,
+                                        appCheckReady: widget.appCheckReady,
                                         keryxLinkService:
                                             widget.keryxLinkService,
+                                        keryxLiveScanService:
+                                            widget.keryxLiveScanService,
                                       ),
                                     ),
                                   );

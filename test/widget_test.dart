@@ -468,6 +468,7 @@ void main() {
     final pubspec = File('pubspec.yaml').readAsStringSync();
     expect(pubspec.contains('firebase_core:'), isTrue);
     expect(pubspec.contains('cloud_functions:'), isTrue);
+    expect(pubspec.contains('firebase_app_check:'), isTrue);
     expect(pubspec.contains('firebase_auth'), isFalse);
     expect(pubspec.contains('google_maps'), isFalse);
     expect(pubspec.contains('google_fonts'), isFalse);

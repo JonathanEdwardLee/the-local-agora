@@ -15,6 +15,7 @@ import '../../design/jf_status_line.dart';
 import '../../design/junkfeathers_tokens.dart';
 import '../../services/keryx/keryx_link_result.dart';
 import '../../services/keryx/keryx_link_service.dart';
+import '../../services/keryx/keryx_live_scan_service.dart';
 import '../scan_control/scan_control_state.dart';
 
 /// Debug-only visual review surface. Not linked from release builds.
@@ -22,11 +23,15 @@ class DebugComponentGallery extends StatefulWidget {
   const DebugComponentGallery({
     super.key,
     this.firebaseReady = false,
+    this.appCheckReady = false,
     this.keryxLinkService,
+    this.keryxLiveScanService,
   });
 
   final bool firebaseReady;
+  final bool appCheckReady;
   final KeryxLinkService? keryxLinkService;
+  final KeryxLiveScanService? keryxLiveScanService;
 
   @override
   State<DebugComponentGallery> createState() => _DebugComponentGalleryState();
@@ -35,17 +40,50 @@ class DebugComponentGallery extends StatefulWidget {
 class _DebugComponentGalleryState extends State<DebugComponentGallery> {
   final _fieldController = TextEditingController(text: 'Springfield, Missouri');
   final _invalidController = TextEditingController();
-  TimeWindow _when = TimeWindow.tonight;
-  EventCategory _what = EventCategory.allSignals;
+  TimeWindow _when = TimeWindow.nextSevenDays;
+  EventCategory _what = EventCategory.music;
   bool _selected = true;
   KeryxLinkResult _linkResult = KeryxLinkResult.untested;
   bool _linkBusy = false;
+  KeryxLiveScanResult _liveResult = KeryxLiveScanResult.untested;
+  bool _liveBusy = false;
+  String? _liveStage;
 
   @override
   void dispose() {
     _fieldController.dispose();
     _invalidController.dispose();
     super.dispose();
+  }
+
+  String get _timeWindowWire {
+    switch (_when) {
+      case TimeWindow.tonight:
+        return 'TONIGHT';
+      case TimeWindow.tomorrow:
+        return 'TOMORROW';
+      case TimeWindow.thisWeekend:
+        return 'THIS_WEEKEND';
+      case TimeWindow.nextSevenDays:
+        return 'NEXT_7_DAYS';
+    }
+  }
+
+  String get _categoryWire {
+    switch (_what) {
+      case EventCategory.allSignals:
+        return 'ALL_SIGNALS';
+      case EventCategory.music:
+        return 'MUSIC';
+      case EventCategory.art:
+        return 'ART';
+      case EventCategory.stage:
+        return 'STAGE';
+      case EventCategory.comedy:
+        return 'COMEDY';
+      case EventCategory.gatherings:
+        return 'GATHERINGS';
+    }
   }
 
   Future<void> _testKeryxLink() async {
@@ -70,10 +108,61 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
     );
   }
 
+  Future<void> _confirmLiveScan() async {
+    final service = widget.keryxLiveScanService;
+    if (service == null || _liveBusy) return;
+
+    final confirmed = await showJfOledDialog<bool>(
+      context: context,
+      title: 'LIVE KERYX TEST',
+      body:
+          'This performs a real Google AI search and may use cloud credits.\n\n'
+          'Parameters: ${_fieldController.text.trim().isEmpty ? "Springfield, Missouri" : _fieldController.text.trim()} // ${_when.label} // ${_what.label}',
+      confirmLabel: 'RUN ONE TEST',
+      secondaryLabel: 'CANCEL',
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() {
+      _liveBusy = true;
+      _liveStage = 'CONTACTING KERYX';
+    });
+
+    final location = _fieldController.text.trim().isEmpty
+        ? 'Springfield, Missouri'
+        : _fieldController.text.trim();
+
+    final result = await service.runDebugScan(
+      location: location,
+      timeWindow: _timeWindowWire,
+      category: _categoryWire,
+      onStage: (stage) {
+        if (!mounted) return;
+        setState(() => _liveStage = stage);
+        showJfOledToast(context, stage);
+      },
+    );
+    if (!mounted) return;
+    setState(() {
+      _liveResult = result;
+      _liveBusy = false;
+      _liveStage = null;
+    });
+    showJfOledToast(
+      context,
+      result.machineTitle,
+      detail: result.supportText,
+      warning: !result.ok,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final canTest = widget.firebaseReady && widget.keryxLinkService != null;
+    final canLive = widget.firebaseReady &&
+        widget.appCheckReady &&
+        widget.keryxLiveScanService != null;
 
     return Scaffold(
       backgroundColor: JfColors.black,
@@ -95,7 +184,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 ),
                 const SizedBox(height: JfSpacing.xs),
                 const Text(
-                  'Pass 02B.1C parameter dialog + taller CRT. Debug only.',
+                  'Pass 02B.2A secure live Keryx debug scan. Debug only.',
                   style: JfTypography.supporting,
                 ),
                 const SizedBox(height: JfSpacing.lg),
@@ -122,6 +211,72 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                     'Firebase is not initialized in this session.',
                     style: JfTypography.warning,
                   ),
+                ],
+                const SizedBox(height: JfSpacing.lg),
+                const JfSectionLabel('LIVE KERYX DEBUG'),
+                const SizedBox(height: JfSpacing.sm),
+                Text(
+                  _liveStage ?? _liveResult.machineTitle,
+                  style: JfTypography.controlLabel,
+                ),
+                const SizedBox(height: JfSpacing.xs),
+                Text(
+                  _liveResult.supportText,
+                  style: JfTypography.supporting,
+                ),
+                if (_liveResult.elapsedMs != null) ...[
+                  const SizedBox(height: JfSpacing.xs),
+                  Text(
+                    'ELAPSED // ${_liveResult.elapsedMs} MS // CACHE // ${_liveResult.cacheStatus.toUpperCase()}',
+                    style: JfTypography.micro,
+                  ),
+                ],
+                const SizedBox(height: JfSpacing.sm),
+                JfDeviceButton(
+                  key: const ValueKey('jf-test-live-keryx'),
+                  label: 'TEST LIVE KERYX SCAN',
+                  semanticLabel: 'Test live Keryx scan',
+                  onPressed: canLive && !_liveBusy ? _confirmLiveScan : null,
+                ),
+                if (!canLive) ...[
+                  const SizedBox(height: JfSpacing.xs),
+                  Text(
+                    widget.appCheckReady
+                        ? 'Live debug scan is unavailable in this session.'
+                        : 'App Check is not ready. Live debug scan stays blocked.',
+                    style: JfTypography.warning,
+                  ),
+                ],
+                if (_liveResult.events.isNotEmpty) ...[
+                  const SizedBox(height: JfSpacing.md),
+                  Text(
+                    'SIGNALS // ${_liveResult.signalCount}',
+                    style: JfTypography.controlLabel.copyWith(fontSize: 11),
+                  ),
+                  const SizedBox(height: JfSpacing.sm),
+                  for (final event in _liveResult.events) ...[
+                    Text(
+                      event.title,
+                      style: JfTypography.supporting,
+                    ),
+                    Text(
+                      [
+                        if (event.date != null) event.date!,
+                        if (event.startTime != null) event.startTime!,
+                        if (event.venue != null) event.venue!,
+                        if (event.city != null) event.city!,
+                      ].join(' // '),
+                      style: JfTypography.micro,
+                    ),
+                    if (event.sourceUrl != null)
+                      Text(event.sourceUrl!, style: JfTypography.micro),
+                    const SizedBox(height: JfSpacing.sm),
+                  ],
+                ],
+                if (_liveResult.warnings.isNotEmpty) ...[
+                  const SizedBox(height: JfSpacing.sm),
+                  for (final warning in _liveResult.warnings.take(8))
+                    Text(warning, style: JfTypography.micro),
                 ],
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 01 IDENTITY'),

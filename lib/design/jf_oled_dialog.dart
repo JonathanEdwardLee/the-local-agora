@@ -57,8 +57,8 @@ Future<T?> showJfOledDialog<T>({
                     semanticLabel: secondaryLabel,
                     variant: JfButtonVariant.compact,
                     onPressed: () {
-                      Navigator.of(ctx).pop();
                       onSecondary?.call();
+                      Navigator.of(ctx).pop(false);
                     },
                   ),
                   const SizedBox(height: JfSpacing.sm),
@@ -67,8 +67,8 @@ Future<T?> showJfOledDialog<T>({
                   label: confirmLabel,
                   semanticLabel: confirmLabel,
                   onPressed: () {
-                    Navigator.of(ctx).pop();
                     onConfirm?.call();
+                    Navigator.of(ctx).pop(true);
                   },
                 ),
               ],

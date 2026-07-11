@@ -32,16 +32,20 @@ describe("keryxStatus callable contract", () => {
     );
   });
 
-  it("does not import Gemini engine from status module surface", async () => {
+  it("status callable remains free of Gemini engine imports", async () => {
     const src = await import("node:fs").then((fs) =>
       fs.readFileSync(new URL("../src/index.ts", import.meta.url), "utf8"),
     );
-    expect(src).not.toContain("gemini");
-    expect(src).not.toContain("GEMINI");
-    expect(src).not.toContain("loadKeryxConfig");
+    const statusBlock = src.slice(
+      src.indexOf("export const keryxStatus"),
+      src.indexOf("export const keryxScanNotEnabled"),
+    );
+    expect(statusBlock).not.toMatch(/gemini|GEMINI|loadKeryxConfig|secrets:/i);
     expect(src).toContain("maxInstances: 1");
     expect(src).toContain("minInstances: 0");
     expect(src).toContain("scanEnabled: false");
+    expect(src).toContain("export const keryxScanDebug");
+    expect(src).toContain('defineSecret("GEMINI_API_KEY")');
   });
 });
 

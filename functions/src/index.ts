@@ -1,10 +1,13 @@
 /**
  * Firebase Cloud Functions 2nd generation entrypoints.
- * Pass 02B.1: status callable only — no Gemini, no live scan.
+ * Pass 02B.2A: status + App Check–protected debug live scan.
  */
 import { initializeApp } from "firebase-admin/app";
+import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+
+import { handleKeryxScanDebug } from "./callables/keryx_scan_debug";
 
 initializeApp();
 
@@ -12,6 +15,9 @@ setGlobalOptions({
   region: "us-central1",
   maxInstances: 10,
 });
+
+/** Bound only to keryxScanDebug — never to status or disabled seams. */
+const geminiApiKey = defineSecret("GEMINI_API_KEY");
 
 /**
  * Health/status callable for Flutter ↔ Firebase wiring checks.
@@ -38,8 +44,8 @@ export const keryxStatus = onCall(
 );
 
 /**
- * Placeholder seam for a future HTTPS callable scan.
- * Intentionally rejects — live scan is not enabled in Pass 02B.1.
+ * Placeholder seam for a future public HTTPS callable scan.
+ * Intentionally rejects — public live scan is not enabled.
  */
 export const keryxScanNotEnabled = onCall(
   {
@@ -55,5 +61,25 @@ export const keryxScanNotEnabled = onCall(
       "failed-precondition",
       "Keryx scan callable is not enabled. Live scanning arrives in a later governed pass.",
     );
+  },
+);
+
+/**
+ * Debug-only live Keryx two-pass scan. App Check enforced. Secret-bound.
+ * Not connected to ordinary SCAN THE AGORA.
+ */
+export const keryxScanDebug = onCall(
+  {
+    enforceAppCheck: true,
+    secrets: [geminiApiKey],
+    region: "us-central1",
+    minInstances: 0,
+    maxInstances: 1,
+    timeoutSeconds: 120,
+    memory: "512MiB",
+    concurrency: 1,
+  },
+  async (request) => {
+    return handleKeryxScanDebug(request, geminiApiKey.value());
   },
 );

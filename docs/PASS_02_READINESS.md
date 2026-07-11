@@ -1,9 +1,10 @@
 # THE LOCAL AGORA — PASS 02 READINESS
 
-**Pass:** 02B.1D — Keyboard-Safe Search Parameter Dialog
-**Date:** July 10, 2026
-**Branch:** `main` (integrated from `pass-02b1d-keyboard-safe-parameter-dialog`)
-**Physical result:** `PASS 02B.1D PHYSICALLY APPROVED` / `PHYSICALLY APPROVED — READY FOR MAIN`
+**Pass:** 02B.2A — Secure Live Keryx Debug Scan  
+**Date:** July 10, 2026  
+**Branch:** `pass-02b2a-secure-live-keryx-debug-scan`  
+**Approved main:** `49c81ff7cd4acb4b1ee41d2ddb6d29f203547ae4`  
+**02B.2A status:** **FOUNDER GATES REQUIRED** (App Check debug token + `GEMINI_API_KEY` secret) before deploy/live test
 
 ---
 
