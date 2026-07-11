@@ -23,11 +23,13 @@ Pass 01 establishes the repository foundation and the Keryx feasibility spike (g
 | Android application ID | `com.junkfeathers.localagora` |
 | Version | `0.1.0+1` |
 
-Approved onboarding copy (ADR-037; UI placement in a later visible-interface pass):
+Approved onboarding copy (ADR-037; Pass 02C Welcome dialog over main — see `docs/LOCAL_AGORA_WELCOME_DIALOG.md`):
 
 - **WELCOME** — Find your scene. Discover music, comedy, art, and creative events near you.
 - **HELP IT GROW** — Every event you submit helps someone discover their next favorite venue, artist, or community.
 - **TOGETHER** — The Local Agora belongs to everyone.
+
+Startup sequence (ADR-039): Junkfeathers Tech universal splash → existing main app → Welcome dialog over main when appropriate. No Local Agora product splash.
 
 ## Governing documents
 
@@ -35,7 +37,7 @@ Approved onboarding copy (ADR-037; UI placement in a later visible-interface pas
 2. `DO_NOT_UPLOAD_SECRETS.md`
 3. `docs/MASTER_BLUEPRINT.md`
 4. `docs/DEV_CONTEST_V0.1_BLUEPRINT.md`
-5. `docs/DECISIONS.md`
+6. `docs/LOCAL_AGORA_WELCOME_DIALOG.md`
 
 ## Local setup
 

@@ -10,7 +10,7 @@ Current build target: DEV Passion Challenge Version 0.1
 AI system: Keryx Engine  
 Product principle: Retro OLED myth-machine outside; current adaptable technology inside  
 Permanent interface rule: No embedded map in any version  
-Last revised: July 10, 2026 — shared Android/web/iOS platform and public-launch roadmap approved; Pass 02B.1A merged against repository history; July 11, 2026 — ADR-037 official brand tagline and onboarding copy
+Last revised: July 10, 2026 — shared Android/web/iOS platform and public-launch roadmap approved; Pass 02B.1A merged against repository history; July 11, 2026 — ADR-037 official brand tagline and onboarding copy; July 11, 2026 — ADR-039 universal splash + Welcome dialog (Pass 02C)
 
 
 # 1\. ZEUS DECISION
@@ -65,6 +65,9 @@ The Local Agora belongs to everyone.
 
 
 MISSION
+
+
+The Local Agora exists to help people discover and strengthen their local creative communities.
 
 
 Make it effortless to answer one question:
@@ -235,7 +238,9 @@ The Local Agora uses the same approved Junkfeathers Tech splash identity as ever
 • Total branded sequence: exactly 2870 ms
 
 
-This is a reusable company identity, not an app-specific redesign opportunity. Do not change the timing constants without an explicit founder policy change. Do not redraw, recolor, simplify, replace, or modernize the logo. The rotating tips are app-specific and may teach Local Agora features, but the logo, procedural geometry, and 2870 ms core sequence remain identical. The implementation may follow the working Keryx loop during contest development, but it is required before public release and should appear in the final contest presentation when schedule permits. Startup must remain lightweight. For this challenge, recreate the approved behavior from the documented specification and approved brand artwork rather than copying pre-challenge application source code.
+This is a reusable company identity, not an app-specific redesign opportunity. Do not change the timing constants without an explicit founder policy change. Do not redraw, recolor, simplify, replace, or modernize the logo. The rotating tips are app-specific and may teach Local Agora features, but the logo, procedural geometry, and 2870 ms core sequence remain identical.
+
+**Canonical authority (ADR-039 / Pass 02C):** Use the founder-supplied Junkfeathers Universal Splash package. Runtime integration: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Do not recreate from prose. Do not invent a Local Agora product splash. Startup sequence: universal splash → existing main app → optional Welcome dialog over main (`docs/LOCAL_AGORA_WELCOME_DIALOG.md`).
 
 
 LOCKED PROJECT IDENTITY

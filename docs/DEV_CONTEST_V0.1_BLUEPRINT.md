@@ -198,7 +198,7 @@ The machine may look recovered from another age, but its internals should use cu
 
 
 Shared splash requirement:  
-The final contest presentation should use the approved reusable Junkfeathers Tech splash when schedule permits: exact approved logo and procedural geometry, 990 ms glitch-in/reveal, 1000 ms clean hold, and 880 ms glitch-out/hide, for a total branded sequence of 2870 ms. The splash may be implemented after the working Keryx loop, but it is mandatory before public release. Local Agora rotating tips may differ and should teach real app behavior. Do not alter the timing, redesign the logo, or substitute a generic Flutter splash. Recreate the approved behavior from this specification and approved brand artwork inside the new challenge repository rather than copying pre-challenge application source code.
+Use the approved reusable Junkfeathers Tech splash from the canonical universal package (Pass 02C): exact approved logo and procedural geometry, 990 ms glitch-in/reveal, 1000 ms clean hold, and 880 ms glitch-out/hide, for a total branded sequence of 2870 ms. Runtime sources: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Local Agora rotating tips may differ and should teach real app behavior. Do not alter the timing, redesign the logo, substitute a generic Flutter splash, or invent a Local Agora product splash. Startup sequence: Junkfeathers splash → existing main app → Welcome dialog over main when appropriate (see `docs/LOCAL_AGORA_WELCOME_DIALOG.md`).
 
 
 # APP LANGUAGE

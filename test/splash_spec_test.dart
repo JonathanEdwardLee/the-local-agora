@@ -7,6 +7,6 @@ void main() {
     expect(JunkfeathersSplashSpec.holdMs.inMilliseconds, 1000);
     expect(JunkfeathersSplashSpec.hideMs.inMilliseconds, 880);
     expect(JunkfeathersSplashSpec.totalBrandedSequence.inMilliseconds, 2870);
-    expect(JunkfeathersSplashSpec.animationImplemented, isFalse);
+    expect(JunkfeathersSplashSpec.animationImplemented, isTrue);
   });
 }

@@ -24,12 +24,16 @@ class ScanControlScreen extends StatefulWidget {
     this.appCheckReady = false,
     this.keryxLinkService,
     this.keryxLiveScanService,
+    this.onOpenWelcome,
   });
 
   final bool firebaseReady;
   final bool appCheckReady;
   final KeryxLinkService? keryxLinkService;
   final KeryxLiveScanService? keryxLiveScanService;
+
+  /// Manual Welcome reopen (ignores permanent suppression).
+  final Future<void> Function()? onOpenWelcome;
 
   @override
   State<ScanControlScreen> createState() => _ScanControlScreenState();
@@ -91,10 +95,7 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
 
   void _onLocationChanged(String value) {
     setState(() {
-      _state = _state.copyWith(
-        locationText: value,
-        clearLocationError: true,
-      );
+      _state = _state.copyWith(locationText: value, clearLocationError: true);
       _readinessShown = false;
     });
   }
@@ -157,10 +158,7 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
     }
 
     setState(() {
-      _state = _state.copyWith(
-        locationText: trimmed,
-        clearLocationError: true,
-      );
+      _state = _state.copyWith(locationText: trimmed, clearLocationError: true);
       _readinessShown = true;
     });
 
@@ -197,6 +195,22 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const JfMachineIdentityPanel(),
+                    if (widget.onOpenWelcome != null) ...[
+                      const SizedBox(height: JfSpacing.sm),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: JfDeviceButton(
+                          key: const ValueKey('agora-open-welcome'),
+                          label: 'ABOUT',
+                          semanticLabel: 'Open Local Agora welcome',
+                          variant: JfButtonVariant.compact,
+                          expanded: false,
+                          onPressed: () {
+                            widget.onOpenWelcome?.call();
+                          },
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: JfSpacing.sm),
                     JfMonitorModule(
                       lines: _monitorLines,

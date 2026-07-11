@@ -94,7 +94,12 @@ void main() {
   testWidgets('no callable request on startup', (tester) async {
     final fake = FakeKeryxLinkService();
     await tester.pumpWidget(
-      TheLocalAgoraApp(firebaseReady: true, keryxLinkService: fake),
+      TheLocalAgoraApp(
+        firebaseReady: true,
+        keryxLinkService: fake,
+        enableStartupSplash: false,
+        autoShowWelcome: false,
+      ),
     );
     await tester.pump();
     expect(fake.probeCount, 0);
@@ -109,7 +114,12 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
     await tester.pumpWidget(
-      TheLocalAgoraApp(firebaseReady: true, keryxLinkService: fake),
+      TheLocalAgoraApp(
+        firebaseReady: true,
+        keryxLinkService: fake,
+        enableStartupSplash: false,
+        autoShowWelcome: false,
+      ),
     );
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('jf-open-params')));
@@ -135,7 +145,12 @@ void main() {
       dismissJfOledToastForTest();
     });
     await tester.pumpWidget(
-      TheLocalAgoraApp(firebaseReady: true, keryxLinkService: fake),
+      TheLocalAgoraApp(
+        firebaseReady: true,
+        keryxLinkService: fake,
+        enableStartupSplash: false,
+        autoShowWelcome: false,
+      ),
     );
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('jf-open-params')));
@@ -159,58 +174,60 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('debug link button invokes service once and disables while busy',
-      (tester) async {
-    final fake = FakeKeryxLinkService(
-      delay: const Duration(milliseconds: 400),
-    );
-    tester.view.physicalSize = const Size(400, 2000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(() {
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-      dismissJfOledToastForTest();
-    });
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildJunkfeathersTheme(),
-        home: DebugComponentGallery(
-          firebaseReady: true,
-          keryxLinkService: fake,
+  testWidgets(
+    'debug link button invokes service once and disables while busy',
+    (tester) async {
+      final fake = FakeKeryxLinkService(
+        delay: const Duration(milliseconds: 400),
+      );
+      tester.view.physicalSize = const Size(400, 2000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        dismissJfOledToastForTest();
+      });
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildJunkfeathersTheme(),
+          home: DebugComponentGallery(
+            firebaseReady: true,
+            keryxLinkService: fake,
+          ),
         ),
-      ),
-    );
-    await tester.pump();
-    expect(find.text('KERYX LINK UNTESTED'), findsOneWidget);
-    final linkButton = find.text('TEST KERYX LINK');
-    await tester.ensureVisible(linkButton);
-    await tester.pump();
-    await tester.tap(linkButton);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    expect(find.textContaining('CONNECTING TO KERYX'), findsWidgets);
+      );
+      await tester.pump();
+      expect(find.text('KERYX LINK UNTESTED'), findsOneWidget);
+      final linkButton = find.text('TEST KERYX LINK');
+      await tester.ensureVisible(linkButton);
+      await tester.pump();
+      await tester.tap(linkButton);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(find.textContaining('CONNECTING TO KERYX'), findsWidgets);
 
-    final busyButton = tester.widget<JfDeviceButton>(
-      find.widgetWithText(JfDeviceButton, 'TEST KERYX LINK'),
-    );
-    expect(busyButton.onPressed, isNull);
+      final busyButton = tester.widget<JfDeviceButton>(
+        find.widgetWithText(JfDeviceButton, 'TEST KERYX LINK'),
+      );
+      expect(busyButton.onPressed, isNull);
 
-    await tester.pump(const Duration(milliseconds: 450));
-    await tester.pump();
-    expect(fake.probeCount, 1);
-    expect(find.text('KERYX LINK READY'), findsWidgets);
-    expect(
-      find.textContaining('Live event scanning remains disabled'),
-      findsWidgets,
-    );
+      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pump();
+      expect(fake.probeCount, 1);
+      expect(find.text('KERYX LINK READY'), findsWidgets);
+      expect(
+        find.textContaining('Live event scanning remains disabled'),
+        findsWidgets,
+      );
 
-    final readyButton = tester.widget<JfDeviceButton>(
-      find.widgetWithText(JfDeviceButton, 'TEST KERYX LINK'),
-    );
-    expect(readyButton.onPressed, isNotNull);
-    dismissJfOledToastForTest();
-    await tester.pump();
-  });
+      final readyButton = tester.widget<JfDeviceButton>(
+        find.widgetWithText(JfDeviceButton, 'TEST KERYX LINK'),
+      );
+      expect(readyButton.onPressed, isNotNull);
+      dismissJfOledToastForTest();
+      await tester.pump();
+    },
+  );
 
   test('debug link test remains debug-only', () {
     final scan = File(

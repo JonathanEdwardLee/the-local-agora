@@ -25,7 +25,9 @@ Future<void> _pumpScanControl(WidgetTester tester) async {
     tester.view.resetDevicePixelRatio();
     dismissJfOledToastForTest();
   });
-  await tester.pumpWidget(const TheLocalAgoraApp());
+  await tester.pumpWidget(
+    const TheLocalAgoraApp(enableStartupSplash: false, autoShowWelcome: false),
+  );
   await tester.pump();
 }
 
@@ -86,14 +88,20 @@ void main() {
   testWidgets('panel 01 remains locked identity plate', (tester) async {
     await _pumpScanControl(tester);
     expect(find.text('THE LOCAL AGORA'), findsOneWidget);
-    expect(find.textContaining('AGORA MK-I // V0.1.0 // FREE // KERYX'),
-        findsOneWidget);
+    expect(
+      find.textContaining('AGORA MK-I // V0.1.0 // FREE // KERYX'),
+      findsOneWidget,
+    );
     expect(find.byType(JfRetroDateDisplay), findsOneWidget);
+    expect(find.byKey(const ValueKey('agora-open-welcome')), findsOneWidget);
+    expect(find.text('ABOUT'), findsOneWidget);
     final size = tester.getSize(find.byType(JfMachineIdentityPanel));
     expect(size.height, lessThan(100));
   });
 
-  testWidgets('combined panel 02 keeps art band and taller CRT', (tester) async {
+  testWidgets('combined panel 02 keeps art band and taller CRT', (
+    tester,
+  ) async {
     await _pumpScanControl(tester);
     expect(find.byType(JfMonitorModule), findsOneWidget);
     expect(find.byType(JfCrtMonitor), findsOneWidget);
@@ -101,8 +109,7 @@ void main() {
     expect(find.byType(JfSignalCoil), findsOneWidget);
     expect(find.byType(JfIndicatorBoard), findsOneWidget);
     expect(find.byType(JfMachineScrollbar), findsOneWidget);
-    final module =
-        tester.widget<JfMonitorModule>(find.byType(JfMonitorModule));
+    final module = tester.widget<JfMonitorModule>(find.byType(JfMonitorModule));
     expect(module.monitorHeight, greaterThanOrEqualTo(260));
     expect(module.monitorHeight, greaterThan(module.bandHeight));
     expect(module.bandHeight, JfMonitorModule.defaultBandHeight);
@@ -121,8 +128,9 @@ void main() {
     expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
   });
 
-  testWidgets('parameter dialog opens with location WHEN WHAT and Close',
-      (tester) async {
+  testWidgets('parameter dialog opens with location WHEN WHAT and Close', (
+    tester,
+  ) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
     expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
@@ -139,10 +147,7 @@ void main() {
   testWidgets('parameter state persists and updates monitor', (tester) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
-    await tester.enterText(
-      find.byType(TextField),
-      'Springfield, Missouri',
-    );
+    await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
     await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
     // WHAT defaults to MUSIC in V0.1 (art/gatherings/all-signals deferred).
@@ -190,8 +195,9 @@ void main() {
     expect(find.text('SCAN CONTROL READY'), findsNothing);
   });
 
-  testWidgets('valid Scan shows ordinary info toast not phosphor',
-      (tester) async {
+  testWidgets('valid Scan shows ordinary info toast not phosphor', (
+    tester,
+  ) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
@@ -218,7 +224,9 @@ void main() {
     );
   });
 
-  testWidgets('monitor scrollbar enables when content overflows', (tester) async {
+  testWidgets('monitor scrollbar enables when content overflows', (
+    tester,
+  ) async {
     final lines = List<String>.generate(40, (i) => 'LINE // $i');
     await tester.pumpWidget(
       MaterialApp(
@@ -273,14 +281,20 @@ void main() {
       tester.view.resetDevicePixelRatio();
       tester.view.resetViewInsets();
     });
-    await tester.pumpWidget(const TheLocalAgoraApp());
+    await tester.pumpWidget(
+      const TheLocalAgoraApp(
+        enableStartupSplash: false,
+        autoShowWelcome: false,
+      ),
+    );
     await tester.pump();
     expect(tester.takeException(), isNull);
     await tester.ensureVisible(find.text('SCAN THE AGORA'));
   });
 
-  testWidgets('parameter dialog keeps location visible under keyboard inset',
-      (tester) async {
+  testWidgets('parameter dialog keeps location visible under keyboard inset', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(400, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -289,7 +303,12 @@ void main() {
       tester.view.resetViewInsets();
       dismissJfOledToastForTest();
     });
-    await tester.pumpWidget(const TheLocalAgoraApp());
+    await tester.pumpWidget(
+      const TheLocalAgoraApp(
+        enableStartupSplash: false,
+        autoShowWelcome: false,
+      ),
+    );
     await tester.pump();
     await _openParams(tester);
 
@@ -325,38 +344,45 @@ void main() {
   });
 
   testWidgets(
-      'parameter dialog stays keyboard-safe on smaller portrait viewport',
-      (tester) async {
-    tester.view.physicalSize = const Size(360, 640);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(() {
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-      tester.view.resetViewInsets();
-      dismissJfOledToastForTest();
-    });
-    await tester.pumpWidget(const TheLocalAgoraApp());
-    await tester.pump();
-    await _openParams(tester);
-    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
-    await tester.pump(const Duration(milliseconds: 120));
-    await tester.tap(find.byType(TextField));
-    await tester.pump(const Duration(milliseconds: 100));
+    'parameter dialog stays keyboard-safe on smaller portrait viewport',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetViewInsets();
+        dismissJfOledToastForTest();
+      });
+      await tester.pumpWidget(
+        const TheLocalAgoraApp(
+          enableStartupSplash: false,
+          autoShowWelcome: false,
+        ),
+      );
+      await tester.pump();
+      await _openParams(tester);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+      await tester.pump(const Duration(milliseconds: 120));
+      await tester.tap(find.byType(TextField));
+      await tester.pump(const Duration(milliseconds: 100));
 
-    final fieldRect = tester.getRect(
-      find.byKey(const ValueKey('jf-param-location')),
-    );
-    final keyboardTop = tester.view.physicalSize.height - 280;
-    expect(fieldRect.top, greaterThanOrEqualTo(0));
-    expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
-    expect(tester.takeException(), isNull);
+      final fieldRect = tester.getRect(
+        find.byKey(const ValueKey('jf-param-location')),
+      );
+      final keyboardTop = tester.view.physicalSize.height - 280;
+      expect(fieldRect.top, greaterThanOrEqualTo(0));
+      expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
+      expect(tester.takeException(), isNull);
 
-    await tester.ensureVisible(find.byKey(const ValueKey('jf-param-close')));
-    expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
-  });
+      await tester.ensureVisible(find.byKey(const ValueKey('jf-param-close')));
+      expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
+    },
+  );
 
-  testWidgets('dismissing keyboard does not close parameter dialog',
-      (tester) async {
+  testWidgets('dismissing keyboard does not close parameter dialog', (
+    tester,
+  ) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
     await tester.tap(find.byType(TextField));
@@ -374,9 +400,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfWaitingScanPrompt(forceStatic: true),
-        ),
+        home: const Scaffold(body: JfWaitingScanPrompt(forceStatic: true)),
       ),
     );
     await tester.pump(const Duration(milliseconds: 300));
@@ -384,7 +408,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('monitor scrollbar hides thumb when content fits', (tester) async {
+  testWidgets('monitor scrollbar hides thumb when content fits', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildJunkfeathersTheme(),
@@ -412,9 +438,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfSignalCoil(forceStatic: true, height: 60),
-        ),
+        home: const Scaffold(body: JfSignalCoil(forceStatic: true, height: 60)),
       ),
     );
     await tester.pump(const Duration(milliseconds: 200));
@@ -425,9 +449,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfIndicatorBoard(forceStatic: true),
-        ),
+        home: const Scaffold(body: JfIndicatorBoard(forceStatic: true)),
       ),
     );
     await tester.pump(const Duration(milliseconds: 200));
@@ -475,6 +497,7 @@ void main() {
     expect(pubspec.contains('firebase_core:'), isTrue);
     expect(pubspec.contains('cloud_functions:'), isTrue);
     expect(pubspec.contains('firebase_app_check:'), isTrue);
+    expect(pubspec.contains('shared_preferences:'), isTrue);
     expect(pubspec.contains('firebase_auth'), isFalse);
     expect(pubspec.contains('google_maps'), isFalse);
     expect(pubspec.contains('google_fonts'), isFalse);
@@ -514,8 +537,9 @@ void main() {
   test('portrait orientation configuration remains', () {
     final mainSrc = File('lib/main.dart').readAsStringSync();
     expect(mainSrc.contains('DeviceOrientation.portraitUp'), isTrue);
-    final manifest =
-        File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
+    final manifest = File(
+      'android/app/src/main/AndroidManifest.xml',
+    ).readAsStringSync();
     expect(manifest.contains('android:screenOrientation="portrait"'), isTrue);
   });
 

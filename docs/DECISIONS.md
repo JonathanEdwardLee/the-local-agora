@@ -66,7 +66,7 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 
 **Status:** Accepted  
 **Decision:** Every Junkfeathers Tech app uses the exact approved Junkfeathers Tech logo and procedural geometry with fixed timing: 990 ms glitch-in/reveal, 1000 ms clean hold, and 880 ms glitch-out/hide, totaling 2870 ms. Local Agora may use its own rotating tips, but the logo, geometry, and timing are not redesigned or altered without an explicit founder policy change.  
-**Scheduling:** Implement after the core Keryx loop when necessary, but before public release and in the final contest presentation when schedule permits. For this contest, recreate the approved behavior from the specification and approved brand artwork rather than copying pre-challenge application source code.
+**Scheduling:** Implemented in Pass 02C from the founder-supplied canonical universal splash package. Runtime sources live at `lib/brand/junkfeathers_splash/`. Reference package: `docs/Junkfeathers Universal Splash/`. Do not recreate from prose or re-extract from Orpheus Deck unless that package is incomplete or demonstrably broken. Local Agora tips remain app-owned.
 
 ## ADR-010 — Future monetization is subscription-only
 
@@ -265,7 +265,7 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 
 The operational machine phrase `Choose a place. Choose a time. Scan the Agora.` remains valid for explaining the scan workflow and machine instructions. It is **not** replaced by the public brand tagline. Button and control copy such as `SCAN THE AGORA` remains operational UI language.
 
-**Consequence:** Do not silently rewrite this founder-approved product copy. Do not substitute marketing variants in blueprints, README, store materials, or UI without a new accepted ADR. Do not implement a large onboarding system during Pass 02B.2A (Keryx timeout repair). Preserve the shared 2870 ms Junkfeathers Tech splash unchanged. Place tagline and onboarding experience only in a later council-approved visible-interface pass (likely Scan Control introduction, first-run onboarding, About, Flutter web landing, Play Store materials, contest presentation). Do not place the full onboarding copy in transient toasts or between event records.
+**Consequence:** Do not silently rewrite this founder-approved product copy. Do not substitute marketing variants in blueprints, README, store materials, or UI without a new accepted ADR. Pass 02C places this copy in the first-run Welcome dialog over the main Scan Control shell (see `docs/LOCAL_AGORA_WELCOME_DIALOG.md` and ADR-039). Preserve the shared 2870 ms Junkfeathers Tech splash unchanged. Do not place the full onboarding copy in transient toasts or between event records.
 
 ## ADR-038 — Version 0.1 live categories are MUSIC, COMEDY, THEATER
 
@@ -273,3 +273,21 @@ The operational machine phrase `Choose a place. Choose a time. Scan the Agora.` 
 **Date:** 2026-07-11  
 **Decision:** For Version 0.1 live scanning and dial UI, the active WHAT categories are **MUSIC**, **COMEDY**, and **THEATER** (wire value `STAGE`). **ART**, **GATHERINGS**, and **ALL SIGNALS** remain in the schema/enum for later versions but are not offered on the V0.1 dial and are rejected by `keryxScanDebug`. Discovery prompts are narrowed accordingly.  
 **Consequence:** Do not re-enable art/gatherings/all-signals on the public dial without a new ADR. Theater UI label maps to existing `STAGE` event type / wire value.
+
+## ADR-039 — Startup identity: universal Junkfeathers splash + Welcome over main
+
+**Status:** Accepted  
+**Date:** 2026-07-11  
+**Decision:** Approved startup sequence for The Local Agora:
+
+1. Universal Junkfeathers Tech splash (canonical package integrated at `lib/brand/junkfeathers_splash/`; reference material at `docs/Junkfeathers Universal Splash/`)
+2. Direct transition to the existing Local Agora main app (Scan Control)
+3. First-run Welcome dialog over the real main app when automatic display is appropriate
+
+There is no Local Agora product splash, no intermediate tagline screen, and no multi-screen onboarding carousel. The Junkfeathers Tech splash is the only startup splash. Timing remains 990 + 1000 + 880 = 2870 ms. App-specific tips live outside the universal component (`lib/brand/local_agora_splash_tips.dart`). Welcome suppression uses local `shared_preferences` key `hasDismissedAgoraWelcomePermanently`. Manual reopen is a subordinate production `ABOUT` control on Scan Control.
+
+**Canonical splash authority:** Do not recreate the splash from prose. Do not extract it again from Orpheus Deck unless the canonical package is incomplete or demonstrably broken. Do not redraw or reinterpret the logo. Prefer `onComplete` + app-owned `StartupGate` over `destination` / `Navigator.pushReplacement`.
+
+**Known limitation:** Firebase and App Check still initialize before `runApp`. The splash widget itself remains network-independent; local SDK init may delay first paint. Do not gate splash completion on network success.
+
+**Consequence:** Do not add a Local Agora splash, tagline interstitial, or onboarding carousel. Do not store Welcome suppression in Firebase. Do not expand Settings solely for Welcome. Do not expand the proven Keryx pipeline as part of splash/Welcome work.

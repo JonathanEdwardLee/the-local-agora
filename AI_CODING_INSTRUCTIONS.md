@@ -9,7 +9,7 @@ Applies to: Cursor, Antigravity, and any coding AI working in this repository
 Project AI system: Keryx Engine  
 Current priority: DEV Passion Challenge Version 0.1  
 Permanent product rule: No embedded map in any version  
-Last revised: July 10, 2026 — shared-platform, cache-first, web-launch, iOS-demand, and repository–Drive sync rules integrated; July 11, 2026 — ADR-037 brand tagline and onboarding copy recorded
+Last revised: July 10, 2026 — shared-platform, cache-first, web-launch, iOS-demand, and repository–Drive sync rules integrated; July 11, 2026 — ADR-037 brand tagline and onboarding copy recorded; July 11, 2026 — ADR-039 universal splash + Welcome dialog (Pass 02C)
 
 
 # 1\. PURPOSE
@@ -158,7 +158,7 @@ The stored index helps the next visitor.
 Do not turn the application into a generic social network, map application, AI assistant personality, promotional-copy generator, ticketing platform, or engagement feed.
 
 
-Do not silently rewrite founder-approved product copy (tagline, onboarding beats, or operational scan phrase). UI placement of tagline/onboarding awaits a council-approved visible-interface pass; do not invent a large onboarding system during unrelated repair passes.
+Do not silently rewrite founder-approved product copy (tagline, onboarding beats, or operational scan phrase). Pass 02C places approved Welcome copy in the first-run dialog over Scan Control (`docs/LOCAL_AGORA_WELCOME_DIALOG.md`). Do not invent a Local Agora product splash, tagline interstitial, or onboarding carousel.
 
 
 # 4\. CURRENT VERSION 0.1 SCOPE
@@ -303,7 +303,7 @@ Every Junkfeathers Tech application uses the same approved Junkfeathers Tech spl
 • Total branded sequence: exactly 2870 ms
 
 
-The splash implementation may be scheduled after the core Version 0.1 Keryx loop works, but it is not optional and must exist before public release and should appear in the final contest presentation when schedule permits. Do not change the timing constants without the founder explicitly changing the company standard. Do not redraw, reinterpret, replace, recolor, simplify, or “modernize” the logo. Do not substitute a generic Flutter splash. App-specific rotating tips may change for The Local Agora and should describe real features only. Keep startup lightweight and do not initialize expensive AI, Firebase, billing, or risky plugins solely to display the splash. Because the contest repository must be new, recreate the approved splash from this specification and approved brand artwork during the challenge rather than copying pre-challenge application source code.
+The splash is integrated from the canonical Junkfeathers Universal Splash package (Pass 02C / ADR-039). Runtime: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Do not change the timing constants without the founder explicitly changing the company standard. Do not redraw, reinterpret, replace, recolor, simplify, or “modernize” the logo. Do not substitute a generic Flutter splash or invent a Local Agora product splash. App-specific rotating tips live in `lib/brand/local_agora_splash_tips.dart` and must describe real features only. Keep the splash network-independent. Prefer app-owned `StartupGate` + `onComplete` over splash-owned navigation. Do not recreate the splash from prose or re-extract from Orpheus Deck unless the canonical package is incomplete or demonstrably broken.
 
 
 # 6\. JUNKFEATHERS TECH DESIGN SYSTEM

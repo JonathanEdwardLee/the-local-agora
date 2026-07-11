@@ -71,6 +71,12 @@ yarn-error.log*
 functions/.eval-cache/
 *.eval.raw.json
 
+# Universal splash reference package tooling (keep sources; ignore local tool output)
+docs/Junkfeathers Universal Splash/build/
+docs/Junkfeathers Universal Splash/.dart_tool/
+docs/Junkfeathers Universal Splash/.packages
+docs/Junkfeathers Universal Splash/pubspec.lock
+
 # OS
 Thumbs.db
 Desktop.ini
