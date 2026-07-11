@@ -26,11 +26,17 @@ class JfMonitorModule extends StatelessWidget {
   final bool? forceStatic;
   final bool showWaitingPrompt;
 
-  /// Default CRT height after absorbing former panel 03 space.
-  static const double defaultMonitorHeight = 220;
+  /// Default CRT height after Panel 04 compact deck recovers vertical space.
+  static const double defaultMonitorHeight = 300;
 
-  /// Lower band height (square art + indicator board).
+  /// Lower band height (square art + indicator board) — locked.
   static const double defaultBandHeight = 72;
+
+  /// Responsive CRT height for supported phone viewports.
+  static double resolveMonitorHeight(BuildContext context) {
+    final h = MediaQuery.sizeOf(context).height;
+    return (h * 0.40).clamp(260.0, 360.0);
+  }
 
   @override
   Widget build(BuildContext context) {

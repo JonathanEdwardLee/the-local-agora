@@ -1,8 +1,26 @@
 # THE LOCAL AGORA — PASS 02 READINESS
 
-**Pass:** 02B.1B — Approved UI Refinement After Keryx Link Success  
+**Pass:** 02B.1C — Search Parameter Dialog and Maximum CRT Height  
 **Date:** July 10, 2026  
-**Branch:** `pass-02b1b-monitor-control-refinement`
+**Branch:** `pass-02b1c-parameter-dialog-monitor-height`
+
+---
+
+## Pass 02B.1C parameter dialog + CRT height (July 10, 2026)
+
+| Item | Status |
+|---|---|
+| Pass 02B.1B physical result | **VISUAL FOUNDATION APPROVED — FINAL PANEL 04 REFINEMENT REQUESTED** |
+| Pass 02B.1C UI refinements | **COMPLETE** (awaiting physical review) |
+| Branch | `pass-02b1c-parameter-dialog-monitor-height` |
+| Handoff | `docs/pass_handoffs/PASS_02B1C_COUNCIL_HANDOFF.md` |
+| Panel 01 | **Locked — unchanged** |
+| Panel 02 art/control band | **Locked appearance — CRT height increased only** |
+| Panel 04 | Compact deck + `JfSearchParameterDialog` |
+| Validation accent | `JfColors.validationPhosphor` (error path only) |
+| Firebase / backend | **Unchanged** — no deploy |
+| Live Keryx / Gemini | **NO** |
+| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
 
 ---
 
@@ -11,14 +29,16 @@
 | Item | Status |
 |---|---|
 | Pass 02B.1 physical test | **FUNCTIONALITY APPROVED — UI REFINEMENT REQUESTED** |
-| Pass 02B.1B UI refinements | **COMPLETE** (awaiting physical review) |
+| Pass 02B.1B UI refinements | **COMPLETE** — physical: **VISUAL FOUNDATION APPROVED — FINAL PANEL 04 REFINEMENT REQUESTED** |
 | Branch | `pass-02b1b-monitor-control-refinement` |
 | Handoff | `docs/pass_handoffs/PASS_02B1B_COUNCIL_HANDOFF.md` |
 | Combined Panel 02 | CRT + lower square coil + indicator board |
-| Panel 04 WHEN/WHAT reveal | Side-by-side toggles; exclusive dial; auto-collapse |
+| Panel 04 WHEN/WHAT reveal | Superseded by Pass 02B.1C parameter dialog |
 | Firebase / backend | **Unchanged** — no deploy |
 | Live Keryx / Gemini | **NO** |
-| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
+| New debug APK | Superseded by Pass 02B.1C APK for physical review |
+
+Physical test: use the **Pass 02B.1C** APK and the numbered script in the Pass 02B.1C council handoff.
 
 ---
 
@@ -35,7 +55,7 @@
 | Live Keryx / Gemini | **NO** |
 | GitHub remote | **Connected** (`origin` → JonathanEdwardLee/the-local-agora) |
 
-Physical test: use the **Pass 02B.1B** APK and the numbered script in the Pass 02B.1B council handoff.
+Physical test: use the **Pass 02B.1C** APK and the numbered script in the Pass 02B.1C council handoff.
 
 ---
 

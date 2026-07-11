@@ -12,6 +12,9 @@ abstract final class JfColors {
 
   /// Restrained amber — warnings, uncertainty, missing info, review only.
   static const Color amber = Color(0xFFC9A227);
+
+  /// Retro faded phosphor green — search-parameter validation errors only.
+  static const Color validationPhosphor = Color(0xFF6B9B6E);
 }
 
 abstract final class JfTypography {
@@ -86,6 +89,16 @@ abstract final class JfTypography {
     fontWeight: FontWeight.bold,
     letterSpacing: 0.6,
     color: JfColors.amber,
+    height: 1.3,
+  );
+
+  /// Validation error copy — faded phosphor green only.
+  static const TextStyle validationError = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 11,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.6,
+    color: JfColors.validationPhosphor,
     height: 1.3,
   );
 }

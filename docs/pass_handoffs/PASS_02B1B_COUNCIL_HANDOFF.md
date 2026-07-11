@@ -169,3 +169,22 @@ Install the Pass 02B.1B debug APK and run §15. After physical approval, the sma
 **Pass 02B.2 — Secure Live Keryx Scan Activation**
 
 (Do not begin until UI approval is recorded.)
+
+---
+
+## 19. Physical result record (Pass 02B.1C intake)
+
+**Date:** 2026-07-10  
+**Result:** `VISUAL FOUNDATION APPROVED — FINAL PANEL 04 REFINEMENT REQUESTED`
+
+Recorded findings (do not erase earlier evidence above):
+- Panel 01 approved
+- Combined Panel 02 approved
+- Merged signal art approved
+- Decorative indicator board approved
+- No separate Panel 03 approved
+- Keryx link still approved
+- Panel 04 needs one final control-layout revision (search parameter dialog)
+- CRT should receive the recovered vertical space from the simplified Panel 04
+
+Follow-on pass: `pass-02b1c-parameter-dialog-monitor-height` — see `docs/pass_handoffs/PASS_02B1C_COUNCIL_HANDOFF.md`.

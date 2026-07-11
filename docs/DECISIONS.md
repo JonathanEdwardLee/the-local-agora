@@ -238,7 +238,14 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 
 ## ADR-035 — Combined monitor module with conditional WHEN/WHAT reveal
 
+**Status:** Superseded (layout portion) / Accepted (combined module)  
+**Date:** 2026-07-10  
+**Decision:** After Physical Test 02B.1, Scan Control uses one combined Panel 02 monitor module (taller CRT + lower band with square triple-ring art and a non-interactive decorative indicator board). There is no separate primary Panel 03. Panel 04 originally kept the location field and exposed WHEN/WHAT through side-by-side machine buttons that reveal one dial at a time and collapse after selection.  
+**Consequence:** Do not restore a separate main-screen Panel 03 box. Combined Panel 02 module remains. Panel 04 selector reveal was superseded by ADR-036.
+
+## ADR-036 — Search parameter dialog and phosphor validation accent
+
 **Status:** Accepted  
 **Date:** 2026-07-10  
-**Decision:** After Physical Test 02B.1, Scan Control uses one combined Panel 02 monitor module (taller CRT + lower band with square triple-ring art and a non-interactive decorative indicator board). There is no separate primary Panel 03. Panel 04 keeps the location field and exposes WHEN/WHAT through side-by-side machine buttons that reveal one dial at a time and collapse after selection.  
-**Consequence:** Do not restore a separate main-screen Panel 03 box. Do not keep both dials permanently expanded.
+**Decision:** After Physical Test 02B.1B visual approval, Panel 04 is a compact search-launch surface (`Search for an event`, `INPUT SEARCH PARAMETERS`, `SCAN THE AGORA`). Location, WHEN, and WHAT live in `JfSearchParameterDialog` and update shared state immediately; Close only dismisses. Vertical space recovered from Panel 04 increases CRT height via responsive `JfMonitorModule.resolveMonitorHeight` while the lower art/control band height stays locked. Empty-location validation uses `JfColors.validationPhosphor` only on the error dialog and invalid location field — not on ordinary info toasts or approved machine chrome.  
+**Consequence:** Do not restore permanently visible location/WHEN/WHAT controls on the main deck. Do not use amber/yellow for this validation path. Do not apply phosphor green to success/info states.

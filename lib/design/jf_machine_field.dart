@@ -45,7 +45,7 @@ class JfMachineField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               errorText: errorText,
-              errorStyle: JfTypography.warning.copyWith(fontSize: 10),
+              errorStyle: JfTypography.validationError.copyWith(fontSize: 10),
             ),
           ),
         ),

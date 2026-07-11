@@ -13,7 +13,7 @@ ThemeData buildJunkfeathersTheme() {
       onPrimary: JfColors.black,
       onSecondary: JfColors.black,
       onSurface: JfColors.white,
-      error: JfColors.amber,
+      error: JfColors.validationPhosphor,
     ),
   );
 
@@ -39,6 +39,7 @@ ThemeData buildJunkfeathersTheme() {
       fillColor: JfColors.black,
       hintStyle: JfTypography.supporting,
       labelStyle: JfTypography.controlLabel,
+      errorStyle: JfTypography.validationError.copyWith(fontSize: 10),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: JfSpacing.md,
         vertical: JfSpacing.md,
@@ -57,11 +58,17 @@ ThemeData buildJunkfeathersTheme() {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: JfBorders.square,
-        borderSide: const BorderSide(color: JfColors.amber, width: 2),
+        borderSide: const BorderSide(
+          color: JfColors.validationPhosphor,
+          width: 2,
+        ),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: JfBorders.square,
-        borderSide: const BorderSide(color: JfColors.amber, width: 2),
+        borderSide: const BorderSide(
+          color: JfColors.validationPhosphor,
+          width: 2,
+        ),
       ),
     ),
     dialogTheme: DialogThemeData(

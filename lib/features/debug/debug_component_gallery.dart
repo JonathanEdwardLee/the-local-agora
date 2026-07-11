@@ -9,14 +9,13 @@ import '../../design/jf_monitor_module.dart';
 import '../../design/jf_numeric_display.dart';
 import '../../design/jf_oled_dialog.dart';
 import '../../design/jf_oled_toast.dart';
+import '../../design/jf_search_parameter_dialog.dart';
 import '../../design/jf_section_label.dart';
 import '../../design/jf_status_line.dart';
 import '../../design/junkfeathers_tokens.dart';
 import '../../services/keryx/keryx_link_result.dart';
 import '../../services/keryx/keryx_link_service.dart';
 import '../scan_control/scan_control_state.dart';
-
-enum _GalleryReveal { none, when, what }
 
 /// Debug-only visual review surface. Not linked from release builds.
 class DebugComponentGallery extends StatefulWidget {
@@ -35,16 +34,17 @@ class DebugComponentGallery extends StatefulWidget {
 
 class _DebugComponentGalleryState extends State<DebugComponentGallery> {
   final _fieldController = TextEditingController(text: 'Springfield, Missouri');
+  final _invalidController = TextEditingController();
   TimeWindow _when = TimeWindow.tonight;
   EventCategory _what = EventCategory.allSignals;
   bool _selected = true;
-  _GalleryReveal _reveal = _GalleryReveal.none;
   KeryxLinkResult _linkResult = KeryxLinkResult.untested;
   bool _linkBusy = false;
 
   @override
   void dispose() {
     _fieldController.dispose();
+    _invalidController.dispose();
     super.dispose();
   }
 
@@ -95,7 +95,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 ),
                 const SizedBox(height: JfSpacing.xs),
                 const Text(
-                  'Pass 02B.1B combined monitor + selector reveal. Debug only.',
+                  'Pass 02B.1C parameter dialog + taller CRT. Debug only.',
                   style: JfTypography.supporting,
                 ),
                 const SizedBox(height: JfSpacing.lg),
@@ -130,8 +130,8 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 02 COMBINED MONITOR'),
                 const SizedBox(height: JfSpacing.sm),
-                const JfMonitorModule(
-                  lines: [
+                JfMonitorModule(
+                  lines: const [
                     'AWAITING LOCATION INPUT',
                     'WINDOW // TONIGHT',
                     'SIGNAL TYPE // ALL SIGNALS',
@@ -143,13 +143,14 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                     'LINE // SCROLL SAMPLE 05',
                     'LINE // SCROLL SAMPLE 06',
                   ],
+                  monitorHeight: JfMonitorModule.resolveMonitorHeight(context),
                 ),
                 const SizedBox(height: JfSpacing.sm),
                 const Text('REDUCED MOTION MODULE', style: JfTypography.micro),
                 const SizedBox(height: JfSpacing.xs),
                 const JfMonitorModule(
                   lines: ['ENGINE LINK // NOT CONNECTED'],
-                  monitorHeight: 120,
+                  monitorHeight: 160,
                   forceStatic: true,
                 ),
                 const SizedBox(height: JfSpacing.lg),
@@ -157,69 +158,65 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const SizedBox(height: JfSpacing.sm),
                 const JfIndicatorBoard(height: 72, forceStatic: true),
                 const SizedBox(height: JfSpacing.lg),
-                const JfSectionLabel('PANEL 04 SELECTOR REVEAL'),
+                const JfSectionLabel('PANEL 04 COMPACT DECK'),
+                const SizedBox(height: JfSpacing.sm),
+                const Text('Search for an event', style: JfTypography.supporting),
+                const SizedBox(height: JfSpacing.md),
+                JfDeviceButton(
+                  label: 'INPUT SEARCH PARAMETERS',
+                  onPressed: () => showJfSearchParameterDialog(
+                    context: context,
+                    locationController: _fieldController,
+                    timeWindow: _when,
+                    category: _what,
+                    onLocationChanged: (_) {},
+                    onTimeChanged: (v) => setState(() => _when = v),
+                    onCategoryChanged: (v) => setState(() => _what = v),
+                  ),
+                ),
+                const SizedBox(height: JfSpacing.sm),
+                const JfDeviceButton(
+                  label: 'SCAN THE AGORA',
+                  onPressed: null,
+                ),
+                const SizedBox(height: JfSpacing.lg),
+                const JfSectionLabel('VALIDATION FIELD + ERROR DIALOG'),
                 const SizedBox(height: JfSpacing.sm),
                 JfMachineField(
                   label: 'CITY OR ZIP CODE',
-                  controller: _fieldController,
-                  hintText: 'Enter location',
+                  controller: _invalidController,
+                  errorText: 'LOCATION REQUIRED — enter a city or ZIP code.',
+                ),
+                const SizedBox(height: JfSpacing.sm),
+                JfDeviceButton(
+                  label: 'SHOW LOCATION ERROR DIALOG',
+                  variant: JfButtonVariant.compact,
+                  onPressed: () => showJfOledDialog<void>(
+                    context: context,
+                    title: 'LOCATION REQUIRED',
+                    body:
+                        'Enter a city or ZIP code before scanning the Agora.',
+                    validationError: true,
+                  ),
+                ),
+                const SizedBox(height: JfSpacing.lg),
+                const JfSectionLabel('STANDALONE DIALS'),
+                const SizedBox(height: JfSpacing.sm),
+                JfDialSelector<TimeWindow>(
+                  label: 'WHEN',
+                  values: TimeWindow.values,
+                  value: _when,
+                  labelOf: (v) => v.label,
+                  onChanged: (v) => setState(() => _when = v),
                 ),
                 const SizedBox(height: JfSpacing.md),
-                Row(
-                  children: [
-                    Expanded(
-                      child: JfDeviceButton(
-                        label: 'WHEN // ${_when.label}',
-                        variant: JfButtonVariant.selectable,
-                        selected: _reveal == _GalleryReveal.when,
-                        onPressed: () => setState(() {
-                          _reveal = _reveal == _GalleryReveal.when
-                              ? _GalleryReveal.none
-                              : _GalleryReveal.when;
-                        }),
-                      ),
-                    ),
-                    const SizedBox(width: JfSpacing.sm),
-                    Expanded(
-                      child: JfDeviceButton(
-                        label: 'WHAT // ${_what.label}',
-                        variant: JfButtonVariant.selectable,
-                        selected: _reveal == _GalleryReveal.what,
-                        onPressed: () => setState(() {
-                          _reveal = _reveal == _GalleryReveal.what
-                              ? _GalleryReveal.none
-                              : _GalleryReveal.what;
-                        }),
-                      ),
-                    ),
-                  ],
+                JfDialSelector<EventCategory>(
+                  label: 'WHAT',
+                  values: EventCategory.values,
+                  value: _what,
+                  labelOf: (v) => v.label,
+                  onChanged: (v) => setState(() => _what = v),
                 ),
-                if (_reveal == _GalleryReveal.when) ...[
-                  const SizedBox(height: JfSpacing.md),
-                  JfDialSelector<TimeWindow>(
-                    label: 'WHEN',
-                    values: TimeWindow.values,
-                    value: _when,
-                    labelOf: (v) => v.label,
-                    onChanged: (v) => setState(() {
-                      _when = v;
-                      _reveal = _GalleryReveal.none;
-                    }),
-                  ),
-                ],
-                if (_reveal == _GalleryReveal.what) ...[
-                  const SizedBox(height: JfSpacing.md),
-                  JfDialSelector<EventCategory>(
-                    label: 'WHAT',
-                    values: EventCategory.values,
-                    value: _what,
-                    labelOf: (v) => v.label,
-                    onChanged: (v) => setState(() {
-                      _what = v;
-                      _reveal = _GalleryReveal.none;
-                    }),
-                  ),
-                ],
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('TOP OLED TOASTS'),
                 const SizedBox(height: JfSpacing.sm),
@@ -235,12 +232,12 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 ),
                 const SizedBox(height: JfSpacing.sm),
                 JfDeviceButton(
-                  label: 'TOP WARNING TOAST',
+                  label: 'TOP WARNING TOAST (LEGACY AMBER)',
                   variant: JfButtonVariant.compact,
                   onPressed: () => showJfOledToast(
                     context,
-                    'LOCATION REQUIRED',
-                    detail: 'Enter a city or ZIP code.',
+                    'LEGACY WARNING SAMPLE',
+                    detail: 'Not used for empty-location validation.',
                     warning: true,
                   ),
                 ),
@@ -276,29 +273,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   ],
                 ),
                 const SizedBox(height: JfSpacing.sm),
-                JfDeviceButton(
-                  label: 'SHOW SQUARE DIALOG',
-                  variant: JfButtonVariant.compact,
-                  onPressed: () => showJfOledDialog<void>(
-                    context: context,
-                    title: 'SQUARE DIALOG',
-                    body: '2 px white frame.',
-                  ),
-                ),
-                const SizedBox(height: JfSpacing.sm),
                 const JfStatusLine('LOADING // SEARCHING PUBLIC SIGNALS'),
-                const JfStatusLine(
-                  'EMPTY // NO CURRENT SIGNALS FOUND',
-                  tone: JfStatusTone.secondary,
-                ),
-                const JfStatusLine(
-                  'ERROR // LOCATION REQUIRED',
-                  tone: JfStatusTone.error,
-                ),
-                const JfStatusLine(
-                  'OFFLINE // NETWORK UNAVAILABLE',
-                  tone: JfStatusTone.secondary,
-                ),
                 const SizedBox(height: JfSpacing.xl),
                 JfDeviceButton(
                   label: 'RETURN TO SCAN CONTROL',

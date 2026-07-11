@@ -112,13 +112,11 @@ void main() {
       TheLocalAgoraApp(firebaseReady: true, keryxLinkService: fake),
     );
     await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('jf-when-toggle')));
+    await tester.tap(find.byKey(const ValueKey('jf-open-params')));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.byKey(const ValueKey('jf-dial-next-WHEN')));
-    await tester.pump(const Duration(milliseconds: 50));
-    await tester.pump();
-    await tester.tap(find.byKey(const ValueKey('jf-what-toggle')));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('jf-dial-next-WHAT')));
@@ -140,11 +138,18 @@ void main() {
       TheLocalAgoraApp(firebaseReady: true, keryxLinkService: fake),
     );
     await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('jf-open-params')));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('jf-param-close')));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     final scan = find.text('SCAN THE AGORA');
     await tester.ensureVisible(scan);
-    await tester.pump();
     await tester.tap(scan);
     await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();

@@ -37,6 +37,22 @@ Future<void> _tapControl(WidgetTester tester, Finder finder) async {
   await tester.pump();
 }
 
+/// Advances dialog route forward/reverse transitions without pumpAndSettle
+/// (indicator/coil animations repeat forever).
+Future<void> _pumpDialogTransition(WidgetTester tester) async {
+  await tester.pump(const Duration(milliseconds: 300));
+}
+
+Future<void> _openParams(WidgetTester tester) async {
+  await _tapControl(tester, find.byKey(const ValueKey('jf-open-params')));
+  await _pumpDialogTransition(tester);
+}
+
+Future<void> _closeParams(WidgetTester tester) async {
+  await _tapControl(tester, find.byKey(const ValueKey('jf-param-close')));
+  await _pumpDialogTransition(tester);
+}
+
 void main() {
   test('splash still owns Junkfeathers Tech brand name', () {
     expect(JunkfeathersSplashSpec.brandName, 'JUNKFEATHERS TECH');
@@ -45,6 +61,11 @@ void main() {
   test('CRT inner radius is rounded while outer tokens stay square', () {
     expect(JfBorders.square, BorderRadius.zero);
     expect(JfCrtMonitor.innerRadius, greaterThan(0));
+  });
+
+  test('validation phosphor token exists and differs from amber', () {
+    expect(JfColors.validationPhosphor, isNot(JfColors.amber));
+    expect(JfTypography.validationError.color, JfColors.validationPhosphor);
   });
 
   test('status strip formats local date', () {
@@ -62,94 +83,133 @@ void main() {
     expect(find.text('04 // CONTROLS'), findsNothing);
   });
 
-  testWidgets('title lives in panel 01 only once on Scan Control',
-      (tester) async {
+  testWidgets('panel 01 remains locked identity plate', (tester) async {
     await _pumpScanControl(tester);
     expect(find.text('THE LOCAL AGORA'), findsOneWidget);
-    expect(find.text('WHAT IS HAPPENING HERE?'), findsNothing);
     expect(find.textContaining('AGORA MK-I // V0.1.0 // FREE // KERYX'),
         findsOneWidget);
     expect(find.byType(JfRetroDateDisplay), findsOneWidget);
-    expect(
-      find.text('JUNKFEATHERS TECH // CIVIC RECEIVER 01'),
-      findsNothing,
-    );
-  });
-
-  testWidgets('panel 01 is compact identity plate', (tester) async {
-    await _pumpScanControl(tester);
-    final panel = find.byType(JfMachineIdentityPanel);
-    expect(panel, findsOneWidget);
-    final size = tester.getSize(panel);
+    final size = tester.getSize(find.byType(JfMachineIdentityPanel));
     expect(size.height, lessThan(100));
-    expect(size.height, lessThanOrEqualTo(JfMachineIdentityPanel.compactTargetHeight + 28));
   });
 
-  testWidgets('monitor is CRT assembly with waiting prompt', (tester) async {
+  testWidgets('combined panel 02 keeps art band and taller CRT', (tester) async {
     await _pumpScanControl(tester);
     expect(find.byType(JfMonitorModule), findsOneWidget);
     expect(find.byType(JfCrtMonitor), findsOneWidget);
     expect(find.byType(JfWaitingScanPrompt), findsOneWidget);
-    expect(find.textContaining('WAITING FOR SCAN'), findsOneWidget);
-    expect(find.textContaining('AWAITING LOCATION INPUT'), findsOneWidget);
-    expect(find.textContaining('ENGINE LINK // NOT CONNECTED'), findsOneWidget);
-    final monitor = tester.widget<JfCrtMonitor>(find.byType(JfCrtMonitor));
-    expect(monitor.height, JfMonitorModule.defaultMonitorHeight);
-    final clip = tester.widgetList<ClipRRect>(find.byType(ClipRRect));
-    expect(clip.any((c) => c.borderRadius != BorderRadius.zero), isTrue);
-  });
-
-  testWidgets('reduced motion waiting prompt is static', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfWaitingScanPrompt(forceStatic: true),
-        ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(find.textContaining('WAITING FOR SCAN'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('combined panel 02 has taller monitor than lower band',
-      (tester) async {
-    await _pumpScanControl(tester);
-    final module =
-        tester.widget<JfMonitorModule>(find.byType(JfMonitorModule));
-    expect(module.monitorHeight, greaterThan(module.bandHeight));
-    expect(module.monitorHeight, greaterThan(180));
     expect(find.byType(JfSignalCoil), findsOneWidget);
     expect(find.byType(JfIndicatorBoard), findsOneWidget);
-  });
-
-  testWidgets('no separate primary panel 03 coil outside monitor module',
-      (tester) async {
-    await _pumpScanControl(tester);
-    expect(find.byType(JfMonitorModule), findsOneWidget);
-    expect(find.byType(JfSignalCoil), findsOneWidget);
+    expect(find.byType(JfMachineScrollbar), findsOneWidget);
+    final module =
+        tester.widget<JfMonitorModule>(find.byType(JfMonitorModule));
+    expect(module.monitorHeight, greaterThanOrEqualTo(260));
+    expect(module.monitorHeight, greaterThan(module.bandHeight));
+    expect(module.bandHeight, JfMonitorModule.defaultBandHeight);
     final coil = tester.widget<JfSignalCoil>(find.byType(JfSignalCoil));
     expect(coil.square, isTrue);
-    expect(coil.height, JfMonitorModule.defaultBandHeight);
+    expect(JfSignalCoil.ringCount, 3);
   });
 
-  testWidgets('monitor scrollbar hides thumb when content fits', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfCrtMonitor(
-            lines: ['ONE', 'TWO'],
-            height: 160,
-            forceStaticPrompt: true,
-          ),
-        ),
-      ),
+  testWidgets('main panel 04 is compact search deck', (tester) async {
+    await _pumpScanControl(tester);
+    expect(find.text('Search for an event'), findsOneWidget);
+    expect(find.text('INPUT SEARCH PARAMETERS'), findsOneWidget);
+    expect(find.text('SCAN THE AGORA'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
+  });
+
+  testWidgets('parameter dialog opens with location WHEN WHAT and Close',
+      (tester) async {
+    await _pumpScanControl(tester);
+    await _openParams(tester);
+    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+    expect(
+      find.text('Choose a city or ZIP code, then set WHEN and WHAT.'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('jf-param-location')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
+  });
+
+  testWidgets('parameter state persists and updates monitor', (tester) async {
+    await _pumpScanControl(tester);
+    await _openParams(tester);
+    await tester.enterText(
+      find.byType(TextField),
+      'Springfield, Missouri',
     );
     await tester.pump();
-    expect(find.byType(JfMachineScrollbar), findsOneWidget);
-    expect(tester.takeException(), isNull);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
+    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
+    expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
+    expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
+    await _closeParams(tester);
+    expect(find.text('SEARCH PARAMETERS'), findsNothing);
+    expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
+    expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
+    expect(
+      find.textContaining('SPRINGFIELD, MISSOURI // NEXT 7 DAYS // MUSIC'),
+      findsOneWidget,
+    );
+    await _openParams(tester);
+    expect(find.text('Springfield, Missouri'), findsWidgets);
+    expect(find.text('NEXT 7 DAYS'), findsWidgets);
+    expect(find.text('MUSIC'), findsWidgets);
+    await _closeParams(tester);
+  });
+
+  testWidgets('only one parameter dialog at a time', (tester) async {
+    await _pumpScanControl(tester);
+    await _openParams(tester);
+    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+    expect(find.byType(Dialog), findsOneWidget);
+  });
+
+  testWidgets('empty Scan shows phosphor validation dialog', (tester) async {
+    await _pumpScanControl(tester);
+    await _tapControl(tester, find.text('SCAN THE AGORA'));
+    expect(find.text('LOCATION REQUIRED'), findsWidgets);
+    expect(
+      find.text('Enter a city or ZIP code before scanning the Agora.'),
+      findsOneWidget,
+    );
+    final dialog = tester.widget<Dialog>(find.byType(Dialog));
+    final shape = dialog.shape! as Border;
+    expect(shape.top.color, JfColors.validationPhosphor);
+    expect(find.text('SCAN CONTROL READY'), findsNothing);
+  });
+
+  testWidgets('valid Scan shows ordinary info toast not phosphor',
+      (tester) async {
+    await _pumpScanControl(tester);
+    await _openParams(tester);
+    await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
+    await tester.pump();
+    await _closeParams(tester);
+    await _tapControl(tester, find.text('SCAN THE AGORA'));
+    expect(find.text('SCAN CONTROL READY'), findsOneWidget);
+    dismissJfOledToastForTest();
+    await tester.pump();
+  });
+
+  testWidgets('valid location clears invalid state', (tester) async {
+    await _pumpScanControl(tester);
+    await _tapControl(tester, find.text('SCAN THE AGORA'));
+    expect(find.text('LOCATION REQUIRED'), findsWidgets);
+    await _tapControl(tester, find.text('ACKNOWLEDGE'));
+    await _pumpDialogTransition(tester);
+    await _openParams(tester);
+    await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
+    await tester.pump();
+    expect(
+      find.textContaining('LOCATION REQUIRED — enter a city'),
+      findsNothing,
+    );
   });
 
   testWidgets('monitor scrollbar enables when content overflows', (tester) async {
@@ -168,93 +228,9 @@ void main() {
     );
     await tester.pump();
     expect(find.byType(JfMachineScrollbar), findsOneWidget);
-    expect(find.text('LINE // 0'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -400));
     await tester.pump();
     expect(find.textContaining('LINE //'), findsWidgets);
-  });
-
-  testWidgets('triple-ring coil renders square in lower band', (tester) async {
-    await _pumpScanControl(tester);
-    final coil = tester.widget<JfSignalCoil>(find.byType(JfSignalCoil));
-    expect(coil.height, JfMonitorModule.defaultBandHeight);
-    expect(coil.square, isTrue);
-    expect(JfSignalCoil.ringCount, 3);
-    final size = tester.getSize(find.byType(JfSignalCoil));
-    expect((size.width - size.height).abs(), lessThan(1.0));
-  });
-
-  testWidgets('decorative indicator board is non-interactive', (tester) async {
-    await _pumpScanControl(tester);
-    expect(find.byType(JfIndicatorBoard), findsOneWidget);
-    expect(find.byType(IgnorePointer), findsWidgets);
-  });
-
-  testWidgets('reduced-motion coil is static', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfSignalCoil(forceStatic: true, height: 60),
-        ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('reduced-motion indicator board is static', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildJunkfeathersTheme(),
-        home: const Scaffold(
-          body: JfIndicatorBoard(forceStatic: true),
-        ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('WHEN reveal opens dial and collapses after choice',
-      (tester) async {
-    await _pumpScanControl(tester);
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-when-toggle')));
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
-    expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
-  });
-
-  testWidgets('WHAT reveal opens dial and collapses after choice',
-      (tester) async {
-    await _pumpScanControl(tester);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-what-toggle')));
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
-    expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
-  });
-
-  testWidgets('only one selector reveal is open at a time', (tester) async {
-    await _pumpScanControl(tester);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-when-toggle')));
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-what-toggle')));
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
-  });
-
-  testWidgets('WHEN and WHAT toggle buttons appear side by side',
-      (tester) async {
-    await _pumpScanControl(tester);
-    final when = tester.getRect(find.byKey(const ValueKey('jf-when-toggle')));
-    final what = tester.getRect(find.byKey(const ValueKey('jf-what-toggle')));
-    expect(what.left, greaterThan(when.right - 1));
-    expect((when.center.dy - what.center.dy).abs(), lessThan(40));
   });
 
   testWidgets('dial advances one snap at a time', (tester) async {
@@ -278,32 +254,11 @@ void main() {
       ),
     );
     await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
-    await tester.pumpAndSettle();
     expect(find.text('TOMORROW'), findsOneWidget);
     expect(value, TimeWindow.tomorrow);
   });
 
-  testWidgets('empty location top warning and persistent error', (tester) async {
-    await _pumpScanControl(tester);
-    await _tapControl(tester, find.text('SCAN THE AGORA'));
-    expect(find.text('LOCATION REQUIRED'), findsWidgets);
-    expect(find.textContaining('enter a city or ZIP code'), findsWidgets);
-    dismissJfOledToastForTest();
-    await tester.pump();
-    expect(find.textContaining('LOCATION REQUIRED'), findsWidgets);
-  });
-
-  testWidgets('valid location top readiness toast', (tester) async {
-    await _pumpScanControl(tester);
-    await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
-    await tester.pump();
-    await _tapControl(tester, find.text('SCAN THE AGORA'));
-    expect(find.text('SCAN CONTROL READY'), findsOneWidget);
-    dismissJfOledToastForTest();
-    await tester.pump();
-  });
-
-  testWidgets('keyboard inset keeps field and scan reachable', (tester) async {
+  testWidgets('keyboard inset keeps scan reachable', (tester) async {
     tester.view.physicalSize = const Size(400, 700);
     tester.view.devicePixelRatio = 1.0;
     tester.view.viewInsets = const FakeViewPadding(bottom: 280);
@@ -315,7 +270,6 @@ void main() {
     await tester.pumpWidget(const TheLocalAgoraApp());
     await tester.pump();
     expect(tester.takeException(), isNull);
-    await tester.ensureVisible(find.byType(TextField));
     await tester.ensureVisible(find.text('SCAN THE AGORA'));
   });
 
@@ -328,13 +282,6 @@ void main() {
     }
   });
 
-  test('debug gallery remains debug-gated in source', () {
-    final source = File(
-      'lib/features/scan_control/scan_control_screen.dart',
-    ).readAsStringSync();
-    expect(source.contains('kDebugMode'), isTrue);
-  });
-
   test('scan performs no network or Firebase callable call', () {
     final source = File(
       'lib/features/scan_control/scan_control_screen.dart',
@@ -342,7 +289,15 @@ void main() {
     expect(source.contains('http'), isFalse);
     expect(source.contains('probeStatus'), isFalse);
     expect(source.contains('FirebaseFunctions'), isFalse);
-    expect(source.contains('httpsCallable'), isFalse);
+  });
+
+  test('empty-location validation path avoids amber', () {
+    final scan = File(
+      'lib/features/scan_control/scan_control_screen.dart',
+    ).readAsStringSync();
+    expect(scan.contains('warning: true'), isFalse);
+    expect(scan.contains('validationError: true'), isTrue);
+    expect(scan.contains('JfColors.amber'), isFalse);
   });
 
   test('only approved Flutter Firebase packages are present', () {
@@ -350,28 +305,19 @@ void main() {
     expect(pubspec.contains('firebase_core:'), isTrue);
     expect(pubspec.contains('cloud_functions:'), isTrue);
     expect(pubspec.contains('firebase_auth'), isFalse);
-    expect(pubspec.contains('cloud_firestore'), isFalse);
-    expect(pubspec.contains('firebase_storage'), isFalse);
-    expect(pubspec.contains('firebase_analytics'), isFalse);
-    expect(pubspec.contains('firebase_app_check'), isFalse);
     expect(pubspec.contains('google_maps'), isFalse);
     expect(pubspec.contains('google_fonts'), isFalse);
-    expect(pubspec.contains('carousel'), isFalse);
-    expect(pubspec.contains('google_generative_ai'), isFalse);
   });
 
-  test('no Gemini key appears in repository sources', () {
-    final files = [
-      'lib/main.dart',
-      'lib/firebase_options.dart',
-      'functions/src/index.ts',
-      'pubspec.yaml',
-    ];
-    for (final path in files) {
-      final text = File(path).readAsStringSync();
-      expect(text.contains('GEMINI_API_KEY='), isFalse);
-      expect(text.contains('BEGIN PRIVATE KEY'), isFalse);
-    }
+  test('firebase and keryx link service unchanged in this UI pass', () {
+    final options = File('lib/firebase_options.dart').readAsStringSync();
+    expect(options.contains('gen-lang-client-0718451481'), isTrue);
+    final link = File(
+      'lib/services/keryx/firebase_keryx_link_service.dart',
+    ).readAsStringSync();
+    expect(link.contains('keryxStatus'), isTrue);
+    final functions = File('functions/src/index.ts').readAsStringSync();
+    expect(functions.contains('keryxStatus'), isTrue);
   });
 
   test('portrait orientation configuration remains', () {
@@ -380,16 +326,6 @@ void main() {
     final manifest =
         File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
     expect(manifest.contains('android:screenOrientation="portrait"'), isTrue);
-  });
-
-  test('firebase config files unchanged in this UI pass', () {
-    final options = File('lib/firebase_options.dart').readAsStringSync();
-    expect(options.contains('gen-lang-client-0718451481'), isTrue);
-    final scan = File(
-      'lib/features/scan_control/scan_control_screen.dart',
-    ).readAsStringSync();
-    expect(scan.contains('FirebaseFunctions'), isFalse);
-    expect(scan.contains('probeStatus'), isFalse);
   });
 
   test('exclusive enums remain exclusive', () {

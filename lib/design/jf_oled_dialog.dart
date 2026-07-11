@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'junkfeathers_tokens.dart';
 import 'jf_device_button.dart';
+import 'junkfeathers_tokens.dart';
 
 /// Square OLED dialog — no rounded Material card shape.
 Future<T?> showJfOledDialog<T>({
@@ -10,7 +10,20 @@ Future<T?> showJfOledDialog<T>({
   required String body,
   String confirmLabel = 'ACKNOWLEDGE',
   VoidCallback? onConfirm,
+  bool validationError = false,
+  String? secondaryLabel,
+  VoidCallback? onSecondary,
 }) {
+  final accent =
+      validationError ? JfColors.validationPhosphor : JfColors.white;
+  final bodyStyle = validationError
+      ? JfTypography.validationError
+      : JfTypography.supporting;
+  final titleStyle = JfTypography.controlLabel.copyWith(
+    fontSize: 13,
+    color: accent,
+  );
+
   return showDialog<T>(
     context: context,
     barrierColor: JfColors.black.withValues(alpha: 0.72),
@@ -19,8 +32,8 @@ Future<T?> showJfOledDialog<T>({
         backgroundColor: JfColors.black,
         elevation: 0,
         insetPadding: const EdgeInsets.all(JfSpacing.xl),
-        shape: const Border.fromBorderSide(
-          BorderSide(color: JfColors.white, width: 2),
+        shape: Border.fromBorderSide(
+          BorderSide(color: accent, width: 2),
         ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 440),
@@ -30,14 +43,26 @@ Future<T?> showJfOledDialog<T>({
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(title, style: JfTypography.controlLabel.copyWith(fontSize: 13)),
+                Text(title, style: titleStyle),
                 const SizedBox(height: JfSpacing.sm),
                 Flexible(
                   child: SingleChildScrollView(
-                    child: Text(body, style: JfTypography.supporting),
+                    child: Text(body, style: bodyStyle),
                   ),
                 ),
                 const SizedBox(height: JfSpacing.lg),
+                if (secondaryLabel != null) ...[
+                  JfDeviceButton(
+                    label: secondaryLabel,
+                    semanticLabel: secondaryLabel,
+                    variant: JfButtonVariant.compact,
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      onSecondary?.call();
+                    },
+                  ),
+                  const SizedBox(height: JfSpacing.sm),
+                ],
                 JfDeviceButton(
                   label: confirmLabel,
                   semanticLabel: confirmLabel,

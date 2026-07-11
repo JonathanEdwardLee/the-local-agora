@@ -2,22 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../design/jf_device_button.dart';
-import '../../design/jf_dial_selector.dart';
-import '../../design/jf_machine_field.dart';
 import '../../design/jf_machine_identity_panel.dart';
 import '../../design/jf_monitor_module.dart';
+import '../../design/jf_oled_dialog.dart';
 import '../../design/jf_oled_toast.dart';
 import '../../design/jf_panel.dart';
+import '../../design/jf_search_parameter_dialog.dart';
 import '../../design/jf_signal_coil.dart';
 import '../../design/junkfeathers_tokens.dart';
 import '../../services/keryx/keryx_link_service.dart';
 import '../debug/debug_component_gallery.dart';
 import 'scan_control_state.dart';
 
-enum _SelectorReveal { none, when, what }
-
 /// SCREEN 1 — SCAN CONTROL
-/// Integrated machine face. Live Keryx not enabled in Pass 02B.1B.
+/// Compact Panel 04 + Search Parameter dialog. Live Keryx not enabled.
 class ScanControlScreen extends StatefulWidget {
   const ScanControlScreen({
     super.key,
@@ -38,7 +36,7 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   ScanControlState _state = const ScanControlState();
   bool _fieldFocused = false;
   bool _readinessShown = false;
-  _SelectorReveal _reveal = _SelectorReveal.none;
+  bool _paramDialogOpen = false;
 
   @override
   void initState() {
@@ -55,7 +53,6 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   }
 
   JfSignalCoilMode get _coilMode {
-    if (_state.locationError != null) return JfSignalCoilMode.warning;
     if (_readinessShown) return JfSignalCoilMode.ready;
     if (_fieldFocused) return JfSignalCoilMode.focused;
     return JfSignalCoilMode.idle;
@@ -80,6 +77,13 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
     return lines;
   }
 
+  String? get _parameterSummary {
+    final loc = _state.locationText.trim();
+    if (loc.isEmpty) return null;
+    return '${loc.toUpperCase()} // ${_state.timeWindow.label} // '
+        '${_state.category.label}';
+  }
+
   void _onLocationChanged(String value) {
     setState(() {
       _state = _state.copyWith(
@@ -90,27 +94,40 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
     });
   }
 
-  void _toggleReveal(_SelectorReveal target) {
-    setState(() {
-      _reveal = _reveal == target ? _SelectorReveal.none : target;
-    });
-  }
-
   void _selectTime(TimeWindow window) {
-    setState(() {
-      _state = _state.copyWith(timeWindow: window);
-      _reveal = _SelectorReveal.none;
-    });
+    setState(() => _state = _state.copyWith(timeWindow: window));
   }
 
   void _selectCategory(EventCategory category) {
-    setState(() {
-      _state = _state.copyWith(category: category);
-      _reveal = _SelectorReveal.none;
-    });
+    setState(() => _state = _state.copyWith(category: category));
   }
 
-  void _onScanPressed() {
+  Future<void> _openParameterDialog() async {
+    if (_paramDialogOpen) return;
+    _paramDialogOpen = true;
+    await showJfSearchParameterDialog(
+      context: context,
+      locationController: _locationController,
+      locationFocus: _locationFocus,
+      timeWindow: _state.timeWindow,
+      category: _state.category,
+      locationError: _state.locationError,
+      onLocationChanged: _onLocationChanged,
+      onTimeChanged: _selectTime,
+      onCategoryChanged: _selectCategory,
+      onFocusChange: (focused) {
+        setState(() => _fieldFocused = focused);
+      },
+    );
+    if (mounted) {
+      setState(() {});
+      _paramDialogOpen = false;
+    } else {
+      _paramDialogOpen = false;
+    }
+  }
+
+  Future<void> _onScanPressed() async {
     final trimmed = _locationController.text.trim();
     if (trimmed.isEmpty) {
       setState(() {
@@ -120,12 +137,16 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
         );
         _readinessShown = false;
       });
-      _locationFocus.requestFocus();
-      showJfOledToast(
-        context,
-        'LOCATION REQUIRED',
-        detail: 'Enter a city or ZIP code.',
-        warning: true,
+      await showJfOledDialog<void>(
+        context: context,
+        title: 'LOCATION REQUIRED',
+        body: 'Enter a city or ZIP code before scanning the Agora.',
+        confirmLabel: 'ACKNOWLEDGE',
+        validationError: true,
+        secondaryLabel: 'INPUT SEARCH PARAMETERS',
+        onSecondary: () {
+          _openParameterDialog();
+        },
       );
       return;
     }
@@ -148,6 +169,8 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final monitorHeight = JfMonitorModule.resolveMonitorHeight(context);
+    final summary = _parameterSummary;
 
     return Scaffold(
       backgroundColor: JfColors.black,
@@ -172,9 +195,8 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                     const SizedBox(height: JfSpacing.sm),
                     JfMonitorModule(
                       lines: _monitorLines,
-                      monitorHeight: JfMonitorModule.defaultMonitorHeight,
+                      monitorHeight: monitorHeight,
                       bandHeight: JfMonitorModule.defaultBandHeight,
-                      warning: _state.locationError != null,
                       coilMode: _coilMode,
                     ),
                     const SizedBox(height: JfSpacing.sm),
@@ -193,82 +215,27 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Text(
-                              'Choose a city or ZIP code, then set WHEN and WHAT.',
+                              'Search for an event',
                               style: JfTypography.supporting,
                             ),
-                            const SizedBox(height: JfSpacing.md),
-                            JfMachineField(
-                              label: 'CITY OR ZIP CODE',
-                              controller: _locationController,
-                              focusNode: _locationFocus,
-                              hintText: 'Springfield, Missouri',
-                              errorText: _state.locationError,
-                              onChanged: _onLocationChanged,
-                              onFocusChange: (focused) {
-                                setState(() => _fieldFocused = focused);
-                              },
-                              textInputAction: TextInputAction.done,
-                            ),
-                            const SizedBox(height: JfSpacing.md),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: JfDeviceButton(
-                                    key: const ValueKey('jf-when-toggle'),
-                                    label:
-                                        'WHEN // ${_state.timeWindow.label}',
-                                    variant: JfButtonVariant.selectable,
-                                    selected:
-                                        _reveal == _SelectorReveal.when,
-                                    expanded: true,
-                                    semanticLabel:
-                                        'When ${_state.timeWindow.label}',
-                                    onPressed: () =>
-                                        _toggleReveal(_SelectorReveal.when),
-                                  ),
+                            if (summary != null) ...[
+                              const SizedBox(height: JfSpacing.sm),
+                              Text(
+                                summary,
+                                style: JfTypography.micro.copyWith(
+                                  color: JfColors.white70,
+                                  fontSize: 9,
                                 ),
-                                const SizedBox(width: JfSpacing.sm),
-                                Expanded(
-                                  child: JfDeviceButton(
-                                    key: const ValueKey('jf-what-toggle'),
-                                    label: 'WHAT // ${_state.category.label}',
-                                    variant: JfButtonVariant.selectable,
-                                    selected:
-                                        _reveal == _SelectorReveal.what,
-                                    expanded: true,
-                                    semanticLabel:
-                                        'What ${_state.category.label}',
-                                    onPressed: () =>
-                                        _toggleReveal(_SelectorReveal.what),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (_reveal == _SelectorReveal.when) ...[
-                              const SizedBox(height: JfSpacing.md),
-                              JfDialSelector<TimeWindow>(
-                                key: const ValueKey('jf-when-dial'),
-                                label: 'WHEN',
-                                values: TimeWindow.values,
-                                value: _state.timeWindow,
-                                labelOf: (v) => v.label,
-                                onChanged: _selectTime,
-                                semanticPrefix: 'When',
                               ),
                             ],
-                            if (_reveal == _SelectorReveal.what) ...[
-                              const SizedBox(height: JfSpacing.md),
-                              JfDialSelector<EventCategory>(
-                                key: const ValueKey('jf-what-dial'),
-                                label: 'WHAT',
-                                values: EventCategory.values,
-                                value: _state.category,
-                                labelOf: (v) => v.label,
-                                onChanged: _selectCategory,
-                                semanticPrefix: 'What',
-                              ),
-                            ],
-                            const SizedBox(height: JfSpacing.lg),
+                            const SizedBox(height: JfSpacing.md),
+                            JfDeviceButton(
+                              key: const ValueKey('jf-open-params'),
+                              label: 'INPUT SEARCH PARAMETERS',
+                              semanticLabel: 'Input search parameters',
+                              onPressed: _openParameterDialog,
+                            ),
+                            const SizedBox(height: JfSpacing.sm),
                             JfDeviceButton(
                               label: 'SCAN THE AGORA',
                               semanticLabel: 'Scan the Agora',
