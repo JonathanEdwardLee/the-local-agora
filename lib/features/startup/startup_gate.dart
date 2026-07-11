@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../brand/junkfeathers_splash/junkfeathers_splash.dart';
 import '../../brand/local_agora_splash_tips.dart';
+import '../welcome/agora_about_dialog.dart';
 import '../welcome/agora_welcome_dialog.dart';
 import '../welcome/welcome_suppression_store.dart';
 
 typedef StartupShellBuilder =
-    Widget Function(BuildContext context, Future<void> Function() openWelcome);
+    Widget Function(BuildContext context, Future<void> Function() openAbout);
 
 /// App-owned startup gate: universal splash once, then Local Agora main shell.
 ///
@@ -105,21 +106,30 @@ class _MainShellHostState extends State<_MainShellHost> {
   Future<void> _maybeShowAutomaticWelcome() async {
     if (!mounted || _autoWelcomeAttempted || _dialogOpen) return;
     _autoWelcomeAttempted = true;
-    final dismissed = await widget.welcomeStore.isPermanentlyDismissed();
-    if (!mounted || dismissed) return;
-    await _openWelcome(manual: false);
+    final show = await widget.welcomeStore.isShowWelcomeOnStartup();
+    if (!mounted || !show) return;
+    await _openWelcome();
   }
 
-  Future<void> openWelcomeManually() => _openWelcome(manual: true);
+  Future<void> openAbout() async {
+    if (!mounted || _dialogOpen) return;
+    _dialogOpen = true;
+    try {
+      await showAgoraAboutDialog(context: context, store: widget.welcomeStore);
+    } finally {
+      if (mounted) {
+        _dialogOpen = false;
+      }
+    }
+  }
 
-  Future<void> _openWelcome({required bool manual}) async {
+  Future<void> _openWelcome() async {
     if (!mounted || _dialogOpen) return;
     _dialogOpen = true;
     try {
       await showAgoraWelcomeDialog(
         context: context,
         store: widget.welcomeStore,
-        manual: manual,
       );
     } finally {
       if (mounted) {
@@ -130,6 +140,6 @@ class _MainShellHostState extends State<_MainShellHost> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context, openWelcomeManually);
+    return widget.builder(context, openAbout);
   }
 }

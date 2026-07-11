@@ -55,7 +55,7 @@ APPROVED ONBOARDING COPY
 
 WELCOME  
 Find your scene.  
-Discover music, comedy, art, and creative events near you.
+Discover music, comedy, and theater events near you.
 
 HELP IT GROW  
 Every event you submit helps someone discover their next favorite venue, artist, or community.
@@ -240,7 +240,7 @@ The Local Agora uses the same approved Junkfeathers Tech splash identity as ever
 
 This is a reusable company identity, not an app-specific redesign opportunity. Do not change the timing constants without an explicit founder policy change. Do not redraw, recolor, simplify, replace, or modernize the logo. The rotating tips are app-specific and may teach Local Agora features, but the logo, procedural geometry, and 2870 ms core sequence remain identical.
 
-**Canonical authority (ADR-039 / Pass 02C):** Use the founder-supplied Junkfeathers Universal Splash package. Runtime integration: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Do not recreate from prose. Do not invent a Local Agora product splash. Startup sequence: universal splash → existing main app → optional Welcome dialog over main (`docs/LOCAL_AGORA_WELCOME_DIALOG.md`).
+**Canonical authority (ADR-039 / ADR-040 / Pass 02C.1):** Use the founder-supplied Junkfeathers Universal Splash package. Runtime integration: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Do not recreate from prose. Do not invent a Local Agora product splash. Timing remains 2870 ms; normal-motion glitch intensity increases continuously with no clean middle pause. Startup sequence: universal splash → existing main app → optional Welcome dialog over main (`docs/LOCAL_AGORA_WELCOME_DIALOG.md`). About lives under Scan beside Add Event.
 
 
 LOCKED PROJECT IDENTITY

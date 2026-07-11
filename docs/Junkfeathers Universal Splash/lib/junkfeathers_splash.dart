@@ -31,8 +31,10 @@ class JunkfeathersSplash extends StatefulWidget {
     this.tipsEnabled = true,
     this.reducedMotionOverride,
     this.deterministicTipIndex,
-  }) : assert(destination != null || onComplete != null,
-            'Either destination or onComplete must be provided');
+  }) : assert(
+         destination != null || onComplete != null,
+         'Either destination or onComplete must be provided',
+       );
 
   @override
   State<JunkfeathersSplash> createState() => _JunkfeathersSplashState();
@@ -107,23 +109,28 @@ class _JunkfeathersSplashState extends State<JunkfeathersSplash>
     }
   }
 
-  double _getLogoOpacity(SplashPhase phase, double progress) {
-    if (phase == SplashPhase.reveal) {
-      final double tOriginal = progress * 0.70;
-      if (tOriginal < 0.20) {
-        final double phaseProgress = tOriginal / 0.20;
-        return (0.04 + 0.96 * phaseProgress).clamp(0.0, 1.0);
+  double _getLogoOpacity(
+    SplashPhase phase,
+    double progress, {
+    required bool reducedMotion,
+  }) {
+    if (reducedMotion) {
+      // Accessible fade: in during reveal, remain readable, soft fade late.
+      if (phase == SplashPhase.reveal) {
+        return progress.clamp(0.0, 1.0);
       }
-      return 1.0;
-    } else if (phase == SplashPhase.hold) {
-      return 1.0;
-    } else {
-      // SplashPhase.hide
-      if (progress > 0.62) {
-        return (1.0 - ((progress - 0.62) / 0.38)).clamp(0.0, 1.0);
+      if (phase == SplashPhase.hold) return 1.0;
+      return (1.0 - progress * 0.35).clamp(0.35, 1.0);
+    }
+
+    // Normal motion: fade in early; stay visible while interference consumes.
+    if (phase == SplashPhase.reveal) {
+      if (progress < 0.35) {
+        return (progress / 0.35).clamp(0.0, 1.0);
       }
       return 1.0;
     }
+    return 1.0;
   }
 
   @override
@@ -150,11 +157,15 @@ class _JunkfeathersSplashState extends State<JunkfeathersSplash>
             phase = SplashPhase.hide;
             phaseProgress =
                 (elapsedMs - (kRevealDurationMs + kHoldDurationMs)) /
-                    kHideDurationMs;
+                kHideDurationMs;
           }
 
           phaseProgress = phaseProgress.clamp(0.0, 1.0);
-          final double logoOpacity = _getLogoOpacity(phase, phaseProgress);
+          final double logoOpacity = _getLogoOpacity(
+            phase,
+            phaseProgress,
+            reducedMotion: reducedMotion,
+          );
 
           return Stack(
             fit: StackFit.expand,

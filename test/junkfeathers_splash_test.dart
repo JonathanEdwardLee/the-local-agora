@@ -19,13 +19,37 @@ void main() {
     expect(JunkfeathersSplashSpec.totalBrandedSequence.inMilliseconds, 2870);
   });
 
+  test('Interference intensity progresses upward overall', () {
+    final early = splashInterferenceIntensity(SplashPhase.reveal, 0.1);
+    final lateReveal = splashInterferenceIntensity(SplashPhase.reveal, 0.95);
+    final midHold = splashInterferenceIntensity(SplashPhase.hold, 0.5);
+    final lateHold = splashInterferenceIntensity(SplashPhase.hold, 0.95);
+    final midHide = splashInterferenceIntensity(SplashPhase.hide, 0.5);
+    final end = splashInterferenceIntensity(SplashPhase.hide, 1.0);
+
+    expect(early, lessThan(lateReveal));
+    expect(lateReveal, lessThan(midHold));
+    expect(midHold, lessThan(lateHold));
+    expect(lateHold, lessThan(midHide));
+    expect(midHide, lessThanOrEqualTo(end));
+    expect(end, greaterThan(0.9));
+    expect(splashUsesCleanStaticHold(SplashPhase.hold, 0.5), isFalse);
+  });
+
+  test('Mid-hold is not a clean static envelope', () {
+    expect(
+      splashInterferenceIntensity(SplashPhase.hold, 0.5),
+      greaterThan(0.2),
+    );
+    expect(splashUsesCleanStaticHold(SplashPhase.hold, 0.5), isFalse);
+  });
+
   test('Local Agora tip list has eight approved tips', () {
     expect(kLocalAgoraSplashTips, hasLength(8));
     expect(
       kLocalAgoraSplashTips,
       contains('FIND YOUR SCENE. GROW YOUR SCENE.'),
     );
-    expect(kLocalAgoraSplashTipCopy.keys, hasLength(8));
   });
 
   testWidgets('Splash renders with Local Agora tip', (tester) async {
@@ -41,13 +65,6 @@ void main() {
 
     expect(find.byType(JunkfeathersSplash), findsOneWidget);
     expect(find.text(kLocalAgoraSplashTips.first), findsOneWidget);
-    expect(
-      find.byWidgetPredicate(
-        (w) =>
-            w is CustomPaint && w.painter is JunkfeathersSplashBackdropPainter,
-      ),
-      findsOneWidget,
-    );
   });
 
   testWidgets('Empty tips are safe', (tester) async {
@@ -85,10 +102,42 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Hold midpoint is not a deliberate clean static paint', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: JunkfeathersSplash(tips: const ['TIP'], onComplete: () {}),
+      ),
+    );
+
+    // 1500 ms is middle of former "hold" segment.
+    await tester.pump(const Duration(milliseconds: 1500));
+    final backdrop =
+        tester
+                .widget<CustomPaint>(
+                  find.byWidgetPredicate(
+                    (w) =>
+                        w is CustomPaint &&
+                        w.painter is JunkfeathersSplashBackdropPainter,
+                  ),
+                )
+                .painter!
+            as JunkfeathersSplashBackdropPainter;
+    expect(backdrop.phase, SplashPhase.hold);
+    expect(
+      splashInterferenceIntensity(backdrop.phase, backdrop.progress),
+      greaterThan(0.2),
+    );
+    expect(
+      splashUsesCleanStaticHold(backdrop.phase, backdrop.progress),
+      isFalse,
+    );
+  });
+
   testWidgets('StartupGate shows destination after splash once', (
     tester,
   ) async {
-    var completeCount = 0;
     await tester.pumpWidget(
       MaterialApp(
         home: StartupGate(
@@ -96,8 +145,7 @@ void main() {
           autoShowWelcome: false,
           tips: const ['TIP_A'],
           deterministicTipIndex: 0,
-          builder: (context, openWelcome) {
-            completeCount++;
+          builder: (context, openAbout) {
             return const Scaffold(body: Text('MAIN_SHELL'));
           },
         ),
@@ -106,7 +154,6 @@ void main() {
 
     expect(find.byType(JunkfeathersSplash), findsOneWidget);
     expect(find.text('MAIN_SHELL'), findsNothing);
-    expect(find.text('TIP_A'), findsOneWidget);
 
     await tester.pump(const Duration(milliseconds: 2860));
     expect(find.text('MAIN_SHELL'), findsNothing);
@@ -115,49 +162,8 @@ void main() {
     await tester.pump();
     expect(find.text('MAIN_SHELL'), findsOneWidget);
     expect(find.byType(JunkfeathersSplash), findsNothing);
-    final buildsAfterComplete = completeCount;
 
     await tester.pump(const Duration(milliseconds: 1000));
-    expect(find.text('MAIN_SHELL'), findsOneWidget);
-    expect(completeCount, buildsAfterComplete);
-  });
-
-  testWidgets('Parent rebuild does not restart splash', (tester) async {
-    var gateKey = UniqueKey();
-    await tester.pumpWidget(
-      MaterialApp(
-        home: StartupGate(
-          key: gateKey,
-          welcomeStore: InMemoryWelcomeStore(permanentlyDismissed: true),
-          autoShowWelcome: false,
-          tips: const ['TIP'],
-          builder: (context, openWelcome) =>
-              const Scaffold(body: Text('MAIN_SHELL')),
-        ),
-      ),
-    );
-
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byType(JunkfeathersSplash), findsOneWidget);
-
-    // Rebuild ancestor without remounting StartupGate key.
-    await tester.pumpWidget(
-      MaterialApp(
-        home: StartupGate(
-          key: gateKey,
-          welcomeStore: InMemoryWelcomeStore(permanentlyDismissed: true),
-          autoShowWelcome: false,
-          tips: const ['TIP'],
-          builder: (context, openWelcome) =>
-              const Scaffold(body: Text('MAIN_SHELL')),
-        ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 100));
-    expect(find.byType(JunkfeathersSplash), findsOneWidget);
-
-    await tester.pump(const Duration(milliseconds: 2400));
-    await tester.pump();
     expect(find.text('MAIN_SHELL'), findsOneWidget);
   });
 

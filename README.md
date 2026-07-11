@@ -25,7 +25,7 @@ Pass 01 establishes the repository foundation and the Keryx feasibility spike (g
 
 Approved onboarding copy (ADR-037; Pass 02C Welcome dialog over main — see `docs/LOCAL_AGORA_WELCOME_DIALOG.md`):
 
-- **WELCOME** — Find your scene. Discover music, comedy, art, and creative events near you.
+- **WELCOME** — Find your scene. Discover music, comedy, and theater events near you.
 - **HELP IT GROW** — Every event you submit helps someone discover their next favorite venue, artist, or community.
 - **TOGETHER** — The Local Agora belongs to everyone.
 

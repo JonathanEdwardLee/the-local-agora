@@ -93,8 +93,10 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(JfRetroDateDisplay), findsOneWidget);
-    expect(find.byKey(const ValueKey('agora-open-welcome')), findsOneWidget);
+    expect(find.byKey(const ValueKey('agora-open-about')), findsOneWidget);
     expect(find.text('ABOUT'), findsOneWidget);
+    expect(find.text('ADD EVENT'), findsOneWidget);
+    expect(find.byKey(const ValueKey('agora-open-welcome')), findsNothing);
     final size = tester.getSize(find.byType(JfMachineIdentityPanel));
     expect(size.height, lessThan(100));
   });

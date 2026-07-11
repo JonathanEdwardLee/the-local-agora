@@ -1,11 +1,57 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-/// The three explicit animation phases of the universal Junkfeathers splash.
+/// Timing segment names preserved (990 / 1000 / 880 ms).
+///
+/// Pass 02C.1 visual meaning (normal motion):
+/// - [SplashPhase.reveal] — logo becomes readable; interference absent then light
+/// - [SplashPhase.hold] — interference continuously increases (not a clean pause)
+/// - [SplashPhase.hide] — interference rises to maximum; splash ends at peak
 enum SplashPhase { reveal, hold, hide }
 
+/// Normalized 0..1 position in the full 2870 ms sequence.
+double splashNormalizedTime(SplashPhase phase, double progress) {
+  const revealMs = 990.0;
+  const holdMs = 1000.0;
+  const hideMs = 880.0;
+  const totalMs = revealMs + holdMs + hideMs;
+  final p = progress.clamp(0.0, 1.0);
+  switch (phase) {
+    case SplashPhase.reveal:
+      return (p * revealMs) / totalMs;
+    case SplashPhase.hold:
+      return (revealMs + p * holdMs) / totalMs;
+    case SplashPhase.hide:
+      return (revealMs + holdMs + p * hideMs) / totalMs;
+  }
+}
+
+/// Monotonic interference envelope from low → high (Pass 02C.1).
+///
+/// Individual frames may jitter randomly; the envelope does not return to a
+/// deliberate clean mid-sequence hold or a cleaning glitch-out.
+double splashInterferenceIntensity(SplashPhase phase, double progress) {
+  final t = splashNormalizedTime(phase, progress);
+  // Segment 1 (~0–0.345): clean/minimal, light interference near the end.
+  if (t <= 0.22) return 0.0;
+  if (t <= 0.345) {
+    return ((t - 0.22) / (0.345 - 0.22)) * 0.15;
+  }
+  // Segments 2–3: continuously worsen to maximum at t = 1.
+  final u = ((t - 0.345) / (1.0 - 0.345)).clamp(0.0, 1.0);
+  return 0.15 + 0.85 * (u * u);
+}
+
+/// True when the painter would render a deliberate clean static midpoint.
+/// Always false after Pass 02C.1 for normal-motion envelopes at mid-hold.
+bool splashUsesCleanStaticHold(SplashPhase phase, double progress) {
+  // Historical clean-hold behavior removed; midpoint of former hold is noisy.
+  if (phase != SplashPhase.hold) return false;
+  return splashInterferenceIntensity(phase, progress) <= 0.001;
+}
+
 /// Renders the full-bleed boot interference: bands, tears, scanlines.
-/// No random star noise or flashing occurs during the hold phase.
+/// Intensity follows [splashInterferenceIntensity] — no clean mid pause.
 class JunkfeathersSplashBackdropPainter extends CustomPainter {
   final SplashPhase phase;
   final double progress;
@@ -21,54 +67,23 @@ class JunkfeathersSplashBackdropPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
     if (reducedMotion) return;
-    if (phase == SplashPhase.hold) return; // Clean black background during hold
 
-    // Translate local phase progress to equivalent reference timeline progress
-    final double tOriginal = phase == SplashPhase.reveal
-        ? progress * 0.70
-        : 0.70 + progress * 0.30;
+    final double intensity = splashInterferenceIntensity(phase, progress);
+    if (intensity <= 0.001) return;
 
-    int phaseFour = 0;
-    double phaseProgress = 0;
-    _splashPhasesFour(tOriginal, (p, pp) {
-      phaseFour = p;
-      phaseProgress = pp;
-    });
-
-    // Phase 0 backdrop is clean black
-    if (phaseFour == 0) return;
-
-    final int globalStep = (tOriginal * 240).floor();
+    final double t = splashNormalizedTime(phase, progress);
+    final int globalStep = (t * 240).floor();
     final Random globalR = Random(globalStep);
 
     final double w = size.width;
     final double h = size.height;
 
-    // Master visibility (fade-in/out ends of sequence).
-    double master = 1.0;
-    if (phaseFour == 0) {
-      master = 0.04 + 0.96 * phaseProgress;
-    } else if (phaseFour == 3) {
-      master = 1.0 - 0.97 * phaseProgress;
-    }
+    // Master tracks interference — does not fade out at the end.
+    final double master = intensity.clamp(0.0, 1.0);
 
-    // Phase-dependent corruption strength
-    int coverBase;
-    double tearAmp;
-    int scanMul; // 1 = every 3px, 2 = denser in heavy phases
-    if (phaseFour == 1) {
-      coverBase = 18 + (globalR.nextInt(15));
-      tearAmp = 3.0 + phaseProgress * 4.0;
-      scanMul = 1;
-    } else if (phaseFour == 2) {
-      coverBase = 48 + (globalR.nextInt(22));
-      tearAmp = 10.0 + phaseProgress * 12.0;
-      scanMul = 2;
-    } else {
-      coverBase = 72 + (globalR.nextInt(25));
-      tearAmp = 22.0 + phaseProgress * 26.0;
-      scanMul = 2;
-    }
+    final int coverBase = (10 + (master * 78)).round();
+    final double tearAmp = 2.0 + master * 42.0;
+    final int scanMul = master > 0.42 ? 2 : 1;
 
     final Paint bandPaint = Paint()
       ..color = Colors.black.withValues(alpha: master);
@@ -93,13 +108,13 @@ class JunkfeathersSplashBackdropPainter extends CustomPainter {
           bandPaint,
         );
       } else {
-        if (globalR.nextInt(100) < (phaseFour >= 2 ? 22 : 12)) {
+        if (globalR.nextInt(100) < (master > 0.5 ? 22 : 12)) {
           canvas.drawRect(
             Rect.fromLTWH(tearDx, y.toDouble(), w, 1.2),
             fastLine,
           );
         }
-        if (phaseFour >= 2 && globalR.nextInt(100) < 18) {
+        if (master > 0.45 && globalR.nextInt(100) < 18) {
           canvas.drawRect(
             Rect.fromLTWH(tearDx + w * 0.35, y.toDouble(), w * 0.12, 1),
             tearWhite,
@@ -139,89 +154,62 @@ class JunkfeathersLogoMarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.scale(size.width / 128, size.height / 64);
 
-    if (phase == SplashPhase.hold) {
-      // Hold phase: completely clean state
+    final double t = splashNormalizedTime(phase, progress);
+    final double intensity = splashInterferenceIntensity(phase, progress);
+
+    // Logo readability fade-in early; remains present while interference grows.
+    double logoMaster = 1.0;
+    if (t < 0.12) {
+      logoMaster = 0.04 + 0.96 * (t / 0.12);
+    }
+
+    if (reducedMotion) {
       _drawWordmarkGlitch(
         canvas,
         'JUNKFEATHERS',
         7,
-        1.0,
+        logoMaster,
         12.0,
         0,
-        0.20,
+        t,
         sliceGlitch: false,
       );
       _drawWordmarkGlitch(
         canvas,
         'TECH',
         22,
-        1.0,
+        logoMaster,
         12.0,
         0,
-        0.20,
+        t,
         sliceGlitch: false,
       );
-
-      _drawBirdOutlined(canvas, 32, 45, 10.8, 1.0);
-      _drawBirdOutlined(canvas, 96, 45, 10.8, 1.0);
+      _drawBirdOutlined(canvas, 32, 45, 10.8, logoMaster);
+      _drawBirdOutlined(canvas, 96, 45, 10.8, logoMaster);
       return;
     }
-
-    // Translate local phase progress to equivalent reference timeline progress
-    final double tOriginal = phase == SplashPhase.reveal
-        ? progress * 0.70
-        : 0.70 + progress * 0.30;
-
-    int phaseFour = 0;
-    double phaseProgress = 0;
-    _splashPhasesFour(tOriginal, (p, pp) {
-      phaseFour = p;
-      phaseProgress = pp;
-    });
 
     const int totalSteps = 240;
-    final int globalStep = (tOriginal * totalSteps).floor();
+    final int globalStep = (t * totalSteps).floor();
     final Random globalR = Random(globalStep);
 
-    if (phaseFour == 3 && phaseProgress > 0.88) {
-      return;
-    }
-
-    double jMag = 0;
-    if (!reducedMotion) {
-      if (phaseFour == 1) jMag = 1.0;
-      if (phaseFour == 2) jMag = 2.0;
-      if (phaseFour == 3) {
-        jMag = (3.2 + phaseProgress * 3.5) * (1.0 - phaseProgress * 0.55);
-      }
-    }
-
+    final double jMag = intensity * 5.8;
     double jitterX = 0;
     double jitterY = 0;
-    if (!reducedMotion && phaseFour >= 1) {
+    if (intensity > 0.02) {
       jitterX = (globalR.nextDouble() - 0.5) * 2.0 * jMag;
       jitterY = (globalR.nextDouble() - 0.5) * 2.0 * jMag;
-    }
-
-    if (jitterX != 0 || jitterY != 0) {
       canvas.translate(jitterX, jitterY);
     }
 
-    double master = 1.0;
-    if (phaseFour == 0) {
-      master = 0.06 + 0.94 * phaseProgress;
-    }
-    if (phaseFour == 3) {
-      master = 1.0 - 0.98 * phaseProgress;
-    }
-    if (!reducedMotion && (phaseFour == 1 || phaseFour == 2)) {
-      if (globalR.nextInt(100) < 8) {
-        master *= 0.5 + globalR.nextDouble() * 0.5;
-      }
+    double master = logoMaster;
+    if (intensity > 0.08 &&
+        globalR.nextInt(100) < (6 + (intensity * 10).round())) {
+      master *= 0.5 + globalR.nextDouble() * 0.5;
     }
 
     const double wordPx = 12.0;
-    final bool sliceGlitch = !reducedMotion && (phaseFour >= 1);
+    final bool sliceGlitch = intensity > 0.08;
 
     _drawWordmarkGlitch(
       canvas,
@@ -230,7 +218,7 @@ class JunkfeathersLogoMarkPainter extends CustomPainter {
       master,
       wordPx,
       globalStep ^ 31,
-      tOriginal,
+      t,
       sliceGlitch: sliceGlitch,
     );
     _drawWordmarkGlitch(
@@ -240,23 +228,23 @@ class JunkfeathersLogoMarkPainter extends CustomPainter {
       master,
       wordPx,
       globalStep ^ 997,
-      tOriginal,
+      t,
       sliceGlitch: sliceGlitch,
     );
 
     _drawBirdOutlined(canvas, 32, 45, 10.8, master);
     _drawBirdOutlined(canvas, 96, 45, 10.8, master);
 
-    // Final phase: slice the mark itself
-    if (!reducedMotion && phaseFour == 3) {
+    // Increasing obstruction as intensity rises — no cleaning fade at the end.
+    if (intensity > 0.35) {
       final Random corruptR = Random(globalStep ^ 0x5fce);
-      final int cov = (36 + phaseProgress * 58).round().clamp(32, 98).toInt();
+      final int cov = (20 + intensity * 72).round().clamp(20, 98).toInt();
       for (int yy = 0; yy < 64; yy += 3) {
         if (corruptR.nextInt(100) >= cov) continue;
         final bh = corruptR.nextInt(5) + 1;
         canvas.drawRect(
           Rect.fromLTWH(0, yy.toDouble(), 128, bh.toDouble()),
-          Paint()..color = Colors.black.withValues(alpha: master),
+          Paint()..color = Colors.black.withValues(alpha: master * intensity),
         );
       }
     }
@@ -426,24 +414,4 @@ class JunkfeathersLogoMarkPainter extends CustomPainter {
       old.phase != phase ||
       old.progress != progress ||
       old.reducedMotion != reducedMotion;
-}
-
-/// Helper function to parse/evaluate original phase values (0 to 3).
-void _splashPhasesFour(
-  double t,
-  void Function(int phase, double phaseProgress) out,
-) {
-  const double kSpEndFade = 0.20;
-  const double kSpEndLight = 0.42;
-  const double kSpEndHeavy = 0.70;
-
-  if (t < kSpEndFade) {
-    out(0, t / kSpEndFade);
-  } else if (t < kSpEndLight) {
-    out(1, (t - kSpEndFade) / (kSpEndLight - kSpEndFade));
-  } else if (t < kSpEndHeavy) {
-    out(2, (t - kSpEndLight) / (kSpEndHeavy - kSpEndLight));
-  } else {
-    out(3, (t - kSpEndHeavy) / (1.0 - kSpEndHeavy));
-  }
 }

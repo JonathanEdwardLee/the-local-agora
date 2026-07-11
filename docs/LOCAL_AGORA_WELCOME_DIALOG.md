@@ -1,8 +1,8 @@
 # Local Agora Welcome Dialog
 
-**Status:** Founder-approved Pass 02C implementation  
+**Status:** Pass 02C implemented; Pass 02C.1 physical-test repairs applied  
 **Date:** 2026-07-11  
-**Related:** ADR-037, ADR-039, `docs/Junkfeathers Universal Splash/` (canonical splash reference)
+**Related:** ADR-037, ADR-038, ADR-039, ADR-040
 
 ## Purpose
 
@@ -17,12 +17,22 @@ JUNKFEATHERS TECH UNIVERSAL SPLASH (2870 ms)
     ↓
 EXISTING LOCAL AGORA MAIN APP (Scan Control)
     ↓
-Welcome dialog over main app when automatic display is appropriate
+Welcome dialog over main app when SHOW WELCOME ON STARTUP is ON
 ```
 
 There is **no** Local Agora product splash, **no** intermediate tagline screen, and **no** multi-screen onboarding carousel.
 
-## Exact founder-approved copy
+## Splash progression (Pass 02C.1)
+
+Timing remains 990 + 1000 + 880 = **2870 ms**, but normal-motion visuals are:
+
+1. Logo becomes visible / readable  
+2. Glitch interference fades in and **continuously worsens**  
+3. Splash ends at **strongest** interference  
+
+There is **no** deliberate clean motionless hold in the middle of normal animation. Reduced-motion mode may use a simple accessible fade.
+
+## Exact founder-approved Welcome copy
 
 Do not silently rewrite.
 
@@ -30,7 +40,7 @@ Do not silently rewrite.
 
 **Find your scene.**
 
-Discover music, comedy, art, and creative events near you.
+Discover music, comedy, and theater events near you.
 
 ### HELP IT GROW
 
@@ -40,62 +50,52 @@ Every event you submit helps someone discover their next favorite venue, artist,
 
 The Local Agora belongs to everyone.
 
+Contest V0.1 discovery categories are **music, comedy, and theater** only. Do not imply art or gatherings discovery in current-version UI copy.
+
 ## Controls
 
 | Control | Behavior |
 |---------|----------|
-| `CLOSE` | Dismisses the dialog. Does **not** set permanent suppression. Automatic display may occur again on a future cold launch. |
-| `DON'T SHOW AGAIN` | Stores local Boolean `hasDismissedAgoraWelcomePermanently`, dismisses, and prevents future **automatic** display. |
+| `CLOSE` | Dismisses the dialog. Does **not** change the startup preference. |
+| `DON'T SHOW AGAIN` | Sets `hasDismissedAgoraWelcomePermanently` = true (SHOW WELCOME ON STARTUP → OFF). |
+
+## About surface (Pass 02C.1)
+
+`ABOUT` sits in a secondary row beneath `SCAN THE AGORA`, beside `ADD EVENT`:
+
+```text
+SCAN THE AGORA
+ADD EVENT    ABOUT
+```
+
+About is a **real product-information surface**, not a Welcome reopen shortcut.
+
+Approved About statement:
+
+> Made by a musician for people seeking a solid place to promote and discover local music, comedy, and theater performances.
+
+About also includes:
+
+- `THE LOCAL AGORA`
+- `Find your scene. Grow your scene.`
+- `SHOW WELCOME ON STARTUP` (ON/OFF) — same preference as DON'T SHOW AGAIN  
+- `CLOSE`
 
 ## Persistence
 
-- Mechanism: `shared_preferences` (local device only)
+- Mechanism: `shared_preferences`
 - Key: `hasDismissedAgoraWelcomePermanently`
-- **Not** stored in Firestore, Auth, Cloud Storage, or Remote Config
-- No account, network, App Check, Gemini, or location required
+- Switch ON ⇒ stored value `false`
+- Switch OFF ⇒ stored value `true`
+- Local only — not Firebase
 
-## Manual reopen
+## Acceptance criteria (Pass 02C.1)
 
-Production-facing compact `ABOUT` control on Scan Control (identity/status area), subordinate to `SCAN THE AGORA`. Manual reopen **ignores** the suppression Boolean and shows the dialog on demand.
-
-## Visual requirements
-
-- Monospace typography
-- Black primary surface; white / bone-white text
-- Square geometry; no rounded Material card appearance
-- No shadows; no glassmorphism
-- 2 px primary dialog border
-- Compact spacing; scrollable under text scaling
-- Design-system control inversion (`JfDeviceButton`)
-
-## Lifecycle / accessibility acceptance
-
-- Automatic Welcome schedules after the main shell’s first completed frame
-- Does not reopen repeatedly from ordinary rebuilds
-- Does not appear twice while already open
-- Splash completion happens once; parent rebuilds do not restart splash
-- Text scaling must leave CLOSE / DON'T SHOW AGAIN reachable
-- Dialog remains dismissible (barrier + CLOSE)
-
-## Implementation map
-
-| Piece | Location |
-|-------|----------|
-| Universal splash (runtime) | `lib/brand/junkfeathers_splash/` |
-| Canonical reference package | `docs/Junkfeathers Universal Splash/` |
-| Local Agora tips | `lib/brand/local_agora_splash_tips.dart` |
-| Startup gate | `lib/features/startup/startup_gate.dart` |
-| Welcome dialog / copy / store | `lib/features/welcome/` |
-| Reopen control | `ScanControlScreen` `ABOUT` |
-
-## Acceptance criteria (Pass 02C)
-
-1. Canonical Junkfeathers Tech splash runs first (990 + 1000 + 880 = 2870 ms).
-2. One Local Agora tip per launch; tips do not extend splash timing.
-3. Direct transition to existing main interface.
-4. Welcome appears over main when suppression is false.
-5. CLOSE and DON'T SHOW AGAIN behave as specified.
-6. Manual `ABOUT` reopen works after permanent suppression.
-7. Automated tests cover splash + Welcome behaviors.
-8. Fresh debug APK available for physical Android review.
-9. Proven Keryx / Gemini pipeline undisturbed.
+1. Splash interference envelope increases; no clean mid pause.  
+2. Welcome body uses music / comedy / theater only.  
+3. No ABOUT under identity panel 01.  
+4. ADD EVENT + ABOUT under SCAN.  
+5. ABOUT opens real About content with startup switch.  
+6. Preference restoreable from About after DON'T SHOW AGAIN.  
+7. Keryx untouched.  
+8. Fresh debug APK for physical review (not yet physically approved).

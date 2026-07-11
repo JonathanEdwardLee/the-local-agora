@@ -259,13 +259,15 @@ Firebase project IDs, Hosting site names, and URLs are recorded here after the s
 - Official product name presentation: `THE LOCAL AGORA`
 - Official public tagline: `Find your scene. Grow your scene.`
 - Approved onboarding copy (three beats):
-  - **WELCOME** — Find your scene. / Discover music, comedy, art, and creative events near you.
+  - **WELCOME** — Find your scene. / Discover music, comedy, and theater events near you.
   - **HELP IT GROW** — Every event you submit helps someone discover their next favorite venue, artist, or community.
   - **TOGETHER** — The Local Agora belongs to everyone.
 
+Contest V0.1 discovery categories in current-version UI copy are music, comedy, and theater only (ADR-038). Do not present art or gatherings as discoverable in Welcome/About for this contest build.
+
 The operational machine phrase `Choose a place. Choose a time. Scan the Agora.` remains valid for explaining the scan workflow and machine instructions. It is **not** replaced by the public brand tagline. Button and control copy such as `SCAN THE AGORA` remains operational UI language.
 
-**Consequence:** Do not silently rewrite this founder-approved product copy. Do not substitute marketing variants in blueprints, README, store materials, or UI without a new accepted ADR. Pass 02C places this copy in the first-run Welcome dialog over the main Scan Control shell (see `docs/LOCAL_AGORA_WELCOME_DIALOG.md` and ADR-039). Preserve the shared 2870 ms Junkfeathers Tech splash unchanged. Do not place the full onboarding copy in transient toasts or between event records.
+**Consequence:** Do not silently rewrite this founder-approved product copy. Do not substitute marketing variants in blueprints, README, store materials, or UI without a new accepted ADR. Pass 02C places this copy in the first-run Welcome dialog over the main Scan Control shell (see `docs/LOCAL_AGORA_WELCOME_DIALOG.md` and ADR-039). Pass 02C.1 corrects Welcome category wording and About placement (ADR-040). Preserve the shared 2870 ms Junkfeathers Tech splash timing. Do not place the full onboarding copy in transient toasts or between event records.
 
 ## ADR-038 — Version 0.1 live categories are MUSIC, COMEDY, THEATER
 
@@ -284,10 +286,23 @@ The operational machine phrase `Choose a place. Choose a time. Scan the Agora.` 
 2. Direct transition to the existing Local Agora main app (Scan Control)
 3. First-run Welcome dialog over the real main app when automatic display is appropriate
 
-There is no Local Agora product splash, no intermediate tagline screen, and no multi-screen onboarding carousel. The Junkfeathers Tech splash is the only startup splash. Timing remains 990 + 1000 + 880 = 2870 ms. App-specific tips live outside the universal component (`lib/brand/local_agora_splash_tips.dart`). Welcome suppression uses local `shared_preferences` key `hasDismissedAgoraWelcomePermanently`. Manual reopen is a subordinate production `ABOUT` control on Scan Control.
+There is no Local Agora product splash, no intermediate tagline screen, and no multi-screen onboarding carousel. The Junkfeathers Tech splash is the only startup splash. Timing remains 990 + 1000 + 880 = 2870 ms. App-specific tips live outside the universal component (`lib/brand/local_agora_splash_tips.dart`). Welcome suppression uses local `shared_preferences` key `hasDismissedAgoraWelcomePermanently`. Pass 02C.1 places product About beside Add Event under Scan (ADR-040); About is not a Welcome reopen shortcut.
 
-**Canonical splash authority:** Do not recreate the splash from prose. Do not extract it again from Orpheus Deck unless the canonical package is incomplete or demonstrably broken. Do not redraw or reinterpret the logo. Prefer `onComplete` + app-owned `StartupGate` over `destination` / `Navigator.pushReplacement`.
+**Canonical splash authority:** Do not recreate the splash from prose. Do not extract it again from Orpheus Deck unless the canonical package is incomplete or demonstrably broken. Do not redraw or reinterpret the logo geometry. Prefer `onComplete` + app-owned `StartupGate` over `destination` / `Navigator.pushReplacement`.
 
 **Known limitation:** Firebase and App Check still initialize before `runApp`. The splash widget itself remains network-independent; local SDK init may delay first paint. Do not gate splash completion on network success.
 
 **Consequence:** Do not add a Local Agora splash, tagline interstitial, or onboarding carousel. Do not store Welcome suppression in Firebase. Do not expand Settings solely for Welcome. Do not expand the proven Keryx pipeline as part of splash/Welcome work.
+
+## ADR-040 — Pass 02C.1 physical-test splash, Welcome copy, and About repairs
+
+**Status:** Accepted (awaiting physical re-review; not merge-approved)  
+**Date:** 2026-07-11  
+**Decision:** Founder physical review of Pass 02C required:
+
+1. **Splash progression** — Preserve 2870 ms timing segments, but normal animation must not use a clean motionless mid hold or a cleaning glitch-out. Visual intensity rises: logo readable → interference fades in → continuously worsens → ends at strongest interference. Reduced-motion may remain a simple fade.
+2. **Welcome copy** — Current-version Welcome body is exactly: `Discover music, comedy, and theater events near you.` Do not claim art or gatherings discovery in contest UI copy.
+3. **About placement** — Remove About from identity/status area 01. Place a secondary row directly under `SCAN THE AGORA`: `ADD EVENT` | `ABOUT` (balanced, compact, subordinate).
+4. **About surface** — About is a real product-information dialog including product title, tagline, approved About statement, `SHOW WELCOME ON STARTUP` ON/OFF (same `hasDismissedAgoraWelcomePermanently` preference), and `CLOSE`. It must not merely reopen Welcome.
+
+**Consequence:** Do not restore the identity-panel About control. Do not reintroduce a clean splash hold for normal motion. Do not merge Pass 02C/02C.1 until founder physical approval.

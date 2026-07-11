@@ -138,7 +138,7 @@ Grow your scene.
 Approved onboarding copy (do not silently rewrite):
 
 
-WELCOME — Find your scene. Discover music, comedy, art, and creative events near you.  
+WELCOME — Find your scene. Discover music, comedy, and theater events near you.  
 HELP IT GROW — Every event you submit helps someone discover their next favorite venue, artist, or community.  
 TOGETHER — The Local Agora belongs to everyone.
 
@@ -303,7 +303,7 @@ Every Junkfeathers Tech application uses the same approved Junkfeathers Tech spl
 • Total branded sequence: exactly 2870 ms
 
 
-The splash is integrated from the canonical Junkfeathers Universal Splash package (Pass 02C / ADR-039). Runtime: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Do not change the timing constants without the founder explicitly changing the company standard. Do not redraw, reinterpret, replace, recolor, simplify, or “modernize” the logo. Do not substitute a generic Flutter splash or invent a Local Agora product splash. App-specific rotating tips live in `lib/brand/local_agora_splash_tips.dart` and must describe real features only. Keep the splash network-independent. Prefer app-owned `StartupGate` + `onComplete` over splash-owned navigation. Do not recreate the splash from prose or re-extract from Orpheus Deck unless the canonical package is incomplete or demonstrably broken.
+The splash is integrated from the canonical Junkfeathers Universal Splash package (Pass 02C / ADR-039; visual progression repaired in Pass 02C.1 / ADR-040). Runtime: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Timing totals remain 2870 ms. Normal-motion interference must increase continuously with no clean mid hold and must end at peak interference. Do not change the timing totals without the founder explicitly changing the company standard. Do not redraw logo geometry. Do not invent a Local Agora product splash. App-specific tips live in `lib/brand/local_agora_splash_tips.dart`. Prefer app-owned `StartupGate` + `onComplete`.
 
 
 # 6\. JUNKFEATHERS TECH DESIGN SYSTEM

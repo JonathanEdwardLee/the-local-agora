@@ -7,6 +7,18 @@ abstract class WelcomeSuppressionStore {
   Future<void> setPermanentlyDismissed(bool value);
 }
 
+extension WelcomeSuppressionStoreX on WelcomeSuppressionStore {
+  /// Inverse of [isPermanentlyDismissed] for the About startup switch.
+  Future<bool> isShowWelcomeOnStartup() async {
+    return !(await isPermanentlyDismissed());
+  }
+
+  /// ON → dismissed=false; OFF → dismissed=true.
+  Future<void> setShowWelcomeOnStartup(bool show) {
+    return setPermanentlyDismissed(!show);
+  }
+}
+
 /// Suggested logical name: `hasDismissedAgoraWelcomePermanently`.
 class SharedPreferencesWelcomeStore implements WelcomeSuppressionStore {
   SharedPreferencesWelcomeStore([SharedPreferences? prefs]) : _prefs = prefs;

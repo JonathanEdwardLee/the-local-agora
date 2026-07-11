@@ -112,7 +112,7 @@ Choose a place. Choose a time. Scan the Agora.
 
 
 Approved onboarding beats:  
-• WELCOME — Find your scene. Discover music, comedy, art, and creative events near you.  
+• WELCOME — Find your scene. Discover music, comedy, and theater events near you.  
 • HELP IT GROW — Every event you submit helps someone discover their next favorite venue, artist, or community.  
 • TOGETHER — The Local Agora belongs to everyone.
 
@@ -198,7 +198,7 @@ The machine may look recovered from another age, but its internals should use cu
 
 
 Shared splash requirement:  
-Use the approved reusable Junkfeathers Tech splash from the canonical universal package (Pass 02C): exact approved logo and procedural geometry, 990 ms glitch-in/reveal, 1000 ms clean hold, and 880 ms glitch-out/hide, for a total branded sequence of 2870 ms. Runtime sources: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Local Agora rotating tips may differ and should teach real app behavior. Do not alter the timing, redesign the logo, substitute a generic Flutter splash, or invent a Local Agora product splash. Startup sequence: Junkfeathers splash → existing main app → Welcome dialog over main when appropriate (see `docs/LOCAL_AGORA_WELCOME_DIALOG.md`).
+Use the approved reusable Junkfeathers Tech splash from the canonical universal package (Pass 02C / 02C.1): exact approved logo and procedural geometry; timing 990 + 1000 + 880 = 2870 ms. Normal-motion interference intensity increases continuously with **no clean middle pause** and ends at strongest interference (ADR-040). Runtime sources: `lib/brand/junkfeathers_splash/`. Reference: `docs/Junkfeathers Universal Splash/`. Local Agora rotating tips may differ. Do not alter the timing totals, redesign the logo, substitute a generic Flutter splash, or invent a Local Agora product splash. Startup sequence: Junkfeathers splash → existing main app → Welcome dialog over main when appropriate. About control: secondary row under Scan beside Add Event (`docs/LOCAL_AGORA_WELCOME_DIALOG.md`).
 
 
 # APP LANGUAGE

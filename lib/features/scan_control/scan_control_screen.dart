@@ -24,7 +24,7 @@ class ScanControlScreen extends StatefulWidget {
     this.appCheckReady = false,
     this.keryxLinkService,
     this.keryxLiveScanService,
-    this.onOpenWelcome,
+    this.onOpenAbout,
   });
 
   final bool firebaseReady;
@@ -32,8 +32,8 @@ class ScanControlScreen extends StatefulWidget {
   final KeryxLinkService? keryxLinkService;
   final KeryxLiveScanService? keryxLiveScanService;
 
-  /// Manual Welcome reopen (ignores permanent suppression).
-  final Future<void> Function()? onOpenWelcome;
+  /// Opens the About surface (not Welcome).
+  final Future<void> Function()? onOpenAbout;
 
   @override
   State<ScanControlScreen> createState() => _ScanControlScreenState();
@@ -195,22 +195,6 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const JfMachineIdentityPanel(),
-                    if (widget.onOpenWelcome != null) ...[
-                      const SizedBox(height: JfSpacing.sm),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: JfDeviceButton(
-                          key: const ValueKey('agora-open-welcome'),
-                          label: 'ABOUT',
-                          semanticLabel: 'Open Local Agora welcome',
-                          variant: JfButtonVariant.compact,
-                          expanded: false,
-                          onPressed: () {
-                            widget.onOpenWelcome?.call();
-                          },
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: JfSpacing.sm),
                     JfMonitorModule(
                       lines: _monitorLines,
@@ -261,12 +245,34 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                               onPressed: _onScanPressed,
                             ),
                             const SizedBox(height: JfSpacing.sm),
-                            const JfDeviceButton(
-                              label: 'ADD SIGNAL',
-                              locked: true,
-                              lockedMessage: 'FLYER CHANNEL — LATER PASS',
-                              semanticLabel:
-                                  'Add Signal — flyer channel later pass',
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: JfDeviceButton(
+                                    key: const ValueKey('agora-add-event'),
+                                    label: 'ADD EVENT',
+                                    locked: true,
+                                    lockedMessage: 'FLYER CHANNEL — LATER PASS',
+                                    semanticLabel:
+                                        'Add Event — flyer channel later pass',
+                                    variant: JfButtonVariant.compact,
+                                  ),
+                                ),
+                                const SizedBox(width: JfSpacing.sm),
+                                Expanded(
+                                  child: JfDeviceButton(
+                                    key: const ValueKey('agora-open-about'),
+                                    label: 'ABOUT',
+                                    semanticLabel: 'Open About',
+                                    variant: JfButtonVariant.compact,
+                                    onPressed: widget.onOpenAbout == null
+                                        ? null
+                                        : () {
+                                            widget.onOpenAbout?.call();
+                                          },
+                                  ),
+                                ),
+                              ],
                             ),
                             if (kDebugMode) ...[
                               const SizedBox(height: JfSpacing.md),

@@ -123,13 +123,13 @@ class TheLocalAgoraApp extends StatelessWidget {
         enableStartupSplash: enableStartupSplash,
         autoShowWelcome: autoShowWelcome,
         deterministicTipIndex: deterministicTipIndex,
-        builder: (context, openWelcome) {
+        builder: (context, openAbout) {
           return ScanControlScreen(
             firebaseReady: firebaseReady,
             appCheckReady: appCheckReady,
             keryxLinkService: keryxLinkService,
             keryxLiveScanService: keryxLiveScanService,
-            onOpenWelcome: openWelcome,
+            onOpenAbout: openAbout,
           );
         },
       ),

@@ -1,9 +1,12 @@
-/// Founder-approved Welcome dialog copy (ADR-037 / Pass 02C). Do not rewrite.
+/// Founder-approved Welcome dialog copy. Do not silently rewrite.
+///
+/// Pass 02C.1: Welcome body categories match contest V0.1 discovery
+/// (music, comedy, theater only — not art/gatherings).
 abstract final class AgoraWelcomeCopy {
   static const String sectionWelcome = 'WELCOME';
   static const String welcomeHeadline = 'Find your scene.';
   static const String welcomeBody =
-      'Discover music, comedy, art, and creative events near you.';
+      'Discover music, comedy, and theater events near you.';
 
   static const String sectionHelp = 'HELP IT GROW';
   static const String helpBody =
