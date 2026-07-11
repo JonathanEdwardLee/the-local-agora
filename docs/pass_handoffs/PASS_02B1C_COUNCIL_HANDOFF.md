@@ -4,7 +4,7 @@
 - Objective: Move search controls into a dedicated Search Parameter dialog; recover vertical space for a taller CRT; replace amber empty-location validation with faded phosphor green.
 - Status: **COMPLETE — awaiting physical Android review**
 - Branch: `pass-02b1c-parameter-dialog-monitor-height`
-- Commit: *(recorded after commit)*
+- Commit: `300b3a6263f30363787364850e1bb0a55ef92de8`
 - App version: `0.1.0`
 - Build number: `1`
 
