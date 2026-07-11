@@ -5,7 +5,7 @@
 - Status: **READY FOR PHYSICAL ANDROID RE-REVIEW** — **not physically approved; do not merge**
 - Branch: `pass-02c-universal-splash-welcome`
 - Starting HEAD: `a7421ccac97bd0f892e0e7e8f71d7767d99aa11c`
-- Ending HEAD: *(see tip after commit)*
+- Ending HEAD: *f1ef31d3b7d71fc56f5a5a3566336436b7860905*
 - Prior Pass 02C tip remained unapproved
 
 ## 2. Repairs shipped
