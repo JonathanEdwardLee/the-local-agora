@@ -269,3 +269,26 @@ Install the Pass 02B.1C debug APK and run §19.
 After physical approval, the next logical pass remains:
 
 **Pass 02B.2 — Secure Live Keryx Scan Activation**
+
+---
+
+## 23. Physical result record (Pass 02B.1D intake)
+
+**Date:** 2026-07-10  
+**Result:** `FUNCTIONALLY APPROVED — KEYBOARD VISIBILITY FIX REQUIRED`
+
+Recorded findings (do not erase earlier evidence above):
+- All important visual and functional tests passed
+- Panel 01 passed
+- Combined Panel 02 passed
+- CRT height passed
+- Compact Panel 04 passed
+- Search Parameter dialog passed
+- WHEN and WHAT passed
+- Validation color passed
+- Keryx link passed
+- Local-only Scan passed
+- Keyboard caused the location field to move off-screen
+- One narrow keyboard-safe fix is required
+
+Follow-on pass: `pass-02b1d-keyboard-safe-parameter-dialog` — see `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md`.

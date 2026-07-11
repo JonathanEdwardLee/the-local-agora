@@ -1,8 +1,25 @@
 # THE LOCAL AGORA — PASS 02 READINESS
 
-**Pass:** 02B.1C — Search Parameter Dialog and Maximum CRT Height  
+**Pass:** 02B.1D — Keyboard-Safe Search Parameter Dialog  
 **Date:** July 10, 2026  
-**Branch:** `pass-02b1c-parameter-dialog-monitor-height`
+**Branch:** `pass-02b1d-keyboard-safe-parameter-dialog`
+
+---
+
+## Pass 02B.1D keyboard-safe parameter dialog (July 10, 2026)
+
+| Item | Status |
+|---|---|
+| Pass 02B.1C physical result | **FUNCTIONALLY APPROVED — KEYBOARD VISIBILITY FIX REQUIRED** |
+| Pass 02B.1D keyboard fix | **COMPLETE** (awaiting physical review) |
+| Branch | `pass-02b1d-keyboard-safe-parameter-dialog` |
+| Handoff | `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md` |
+| Cause | Dialog `maxHeight` used full screen height while Flutter `Dialog` already pads for keyboard |
+| Fix | Size dialog to remaining height above keyboard + scroll + ensureVisible on focus |
+| Panel 01 / 02 / 04 design | **Unchanged** |
+| Firebase / backend | **Unchanged** — no deploy |
+| Live Keryx / Gemini | **NO** |
+| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
 
 ---
 
@@ -11,7 +28,7 @@
 | Item | Status |
 |---|---|
 | Pass 02B.1B physical result | **VISUAL FOUNDATION APPROVED — FINAL PANEL 04 REFINEMENT REQUESTED** |
-| Pass 02B.1C UI refinements | **COMPLETE** (awaiting physical review) |
+| Pass 02B.1C UI refinements | **COMPLETE** — physical: **FUNCTIONALLY APPROVED — KEYBOARD VISIBILITY FIX REQUIRED** |
 | Branch | `pass-02b1c-parameter-dialog-monitor-height` |
 | Handoff | `docs/pass_handoffs/PASS_02B1C_COUNCIL_HANDOFF.md` |
 | Panel 01 | **Locked — unchanged** |
@@ -20,7 +37,9 @@
 | Validation accent | `JfColors.validationPhosphor` (error path only) |
 | Firebase / backend | **Unchanged** — no deploy |
 | Live Keryx / Gemini | **NO** |
-| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
+| New debug APK | Superseded by Pass 02B.1D APK for physical review |
+
+Physical test: use the **Pass 02B.1D** APK and the numbered script in the Pass 02B.1D council handoff.
 
 ---
 

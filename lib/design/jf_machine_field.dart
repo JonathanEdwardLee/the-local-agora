@@ -15,6 +15,7 @@ class JfMachineField extends StatelessWidget {
     this.onChanged,
     this.onFocusChange,
     this.textInputAction,
+    this.onEditingComplete,
   });
 
   final String label;
@@ -25,6 +26,7 @@ class JfMachineField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<bool>? onFocusChange;
   final TextInputAction? textInputAction;
+  final VoidCallback? onEditingComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class JfMachineField extends StatelessWidget {
             controller: controller,
             focusNode: focusNode,
             onChanged: onChanged,
+            onEditingComplete: onEditingComplete,
             style: JfTypography.fieldInput,
             cursorColor: JfColors.white,
             textInputAction: textInputAction ?? TextInputAction.done,

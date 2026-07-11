@@ -273,13 +273,176 @@ void main() {
     await tester.ensureVisible(find.text('SCAN THE AGORA'));
   });
 
+  testWidgets('parameter dialog keeps location visible under keyboard inset',
+      (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
+      dismissJfOledToastForTest();
+    });
+    await tester.pumpWidget(const TheLocalAgoraApp());
+    await tester.pump();
+    await _openParams(tester);
+
+    final field = find.byKey(const ValueKey('jf-param-location'));
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    tester.view.viewInsets = const FakeViewPadding(bottom: 320);
+    await tester.pump(const Duration(milliseconds: 120));
+    await tester.pump(const Duration(milliseconds: 80));
+
+    final fieldRect = tester.getRect(field);
+    final screen = tester.view.physicalSize;
+    final keyboardTop = screen.height - 320;
+    expect(fieldRect.top, greaterThanOrEqualTo(0));
+    expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
+    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
+    await tester.pump();
+    expect(find.text('Springfield, Missouri'), findsWidgets);
+    expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
+
+    await tester.ensureVisible(find.byKey(const ValueKey('jf-when-dial')));
+    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('jf-what-dial')));
+    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('jf-param-close')));
+    expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
+
+    tester.view.viewInsets = FakeViewPadding.zero;
+    await tester.pump(const Duration(milliseconds: 120));
+    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+  });
+
+  testWidgets(
+      'parameter dialog stays keyboard-safe on smaller portrait viewport',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
+      dismissJfOledToastForTest();
+    });
+    await tester.pumpWidget(const TheLocalAgoraApp());
+    await tester.pump();
+    await _openParams(tester);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+    await tester.pump(const Duration(milliseconds: 120));
+    await tester.tap(find.byType(TextField));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final fieldRect = tester.getRect(
+      find.byKey(const ValueKey('jf-param-location')),
+    );
+    final keyboardTop = tester.view.physicalSize.height - 280;
+    expect(fieldRect.top, greaterThanOrEqualTo(0));
+    expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
+    expect(tester.takeException(), isNull);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('jf-param-close')));
+    expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
+  });
+
+  testWidgets('dismissing keyboard does not close parameter dialog',
+      (tester) async {
+    await _pumpScanControl(tester);
+    await _openParams(tester);
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pump(const Duration(milliseconds: 100));
+    FocusManager.instance.primaryFocus?.unfocus();
+    tester.view.viewInsets = FakeViewPadding.zero;
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+    addTearDown(tester.view.resetViewInsets);
+  });
+
+  testWidgets('reduced motion waiting prompt is static', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: const Scaffold(
+          body: JfWaitingScanPrompt(forceStatic: true),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.textContaining('WAITING FOR SCAN'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('monitor scrollbar hides thumb when content fits', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: const Scaffold(
+          body: JfCrtMonitor(
+            lines: ['ONE', 'TWO'],
+            height: 160,
+            forceStaticPrompt: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(JfMachineScrollbar), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('decorative indicator board is non-interactive', (tester) async {
+    await _pumpScanControl(tester);
+    expect(find.byType(JfIndicatorBoard), findsOneWidget);
+    expect(find.byType(IgnorePointer), findsWidgets);
+  });
+
+  testWidgets('reduced-motion coil is static', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: const Scaffold(
+          body: JfSignalCoil(forceStatic: true, height: 60),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reduced-motion indicator board is static', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: const Scaffold(
+          body: JfIndicatorBoard(forceStatic: true),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('debug gallery gated', (tester) async {
     await _pumpScanControl(tester);
     if (kDebugMode) {
       expect(find.text('DEBUG // COMPONENTS'), findsOneWidget);
+      expect(find.text('TEST KERYX LINK'), findsNothing);
     } else {
       expect(find.text('DEBUG // COMPONENTS'), findsNothing);
     }
+  });
+
+  test('debug gallery remains debug-gated in source', () {
+    final source = File(
+      'lib/features/scan_control/scan_control_screen.dart',
+    ).readAsStringSync();
+    expect(source.contains('kDebugMode'), isTrue);
   });
 
   test('scan performs no network or Firebase callable call', () {
@@ -287,6 +450,7 @@ void main() {
       'lib/features/scan_control/scan_control_screen.dart',
     ).readAsStringSync();
     expect(source.contains('http'), isFalse);
+    expect(source.contains('probeCount'), isFalse);
     expect(source.contains('probeStatus'), isFalse);
     expect(source.contains('FirebaseFunctions'), isFalse);
   });
@@ -318,6 +482,26 @@ void main() {
     expect(link.contains('keryxStatus'), isTrue);
     final functions = File('functions/src/index.ts').readAsStringSync();
     expect(functions.contains('keryxStatus'), isTrue);
+  });
+
+  test('no Gemini key appears in repository sources', () {
+    final files = [
+      'lib/main.dart',
+      'lib/firebase_options.dart',
+      'functions/src/index.ts',
+      'pubspec.yaml',
+    ];
+    for (final path in files) {
+      final text = File(path).readAsStringSync();
+      expect(text.contains('GEMINI_API_KEY='), isFalse);
+      expect(text.contains('BEGIN PRIVATE KEY'), isFalse);
+    }
+  });
+
+  test('no new keyboard-only dependency was added', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    expect(pubspec.contains('keyboard_actions'), isFalse);
+    expect(pubspec.contains('flutter_keyboard_visibility'), isFalse);
   });
 
   test('portrait orientation configuration remains', () {
