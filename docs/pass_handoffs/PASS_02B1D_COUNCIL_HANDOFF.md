@@ -2,9 +2,10 @@
 
 ## 1. Pass identity
 - Objective: Fix Search Parameter dialog so the location field remains visible above the keyboard.
-- Status: **COMPLETE — awaiting physical Android review**
+- Status: **PHYSICALLY APPROVED — READY FOR MAIN**
 - Branch: `pass-02b1d-keyboard-safe-parameter-dialog`
 - Commit: abde8bfc343c43221bcf7c3412c28d6d8c7ec0c3
+- Tip: `f15ab99a8df1ff625a98a567557c60962c5ea62a` (handoff hash record; approval commit follows)
 - App version: `0.1.0`
 - Build number: `1`
 
@@ -108,7 +109,7 @@ Intentionally not restored: side-by-side WHEN/WHAT reveal tests (replaced by par
 | 33. Drive-sync status is explicit | PASS | §17 |
 
 ## 12. Files created, changed, moved, or deleted
-**Created:** `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md`  
+**Created:** `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md`
 **Changed:**
 - `lib/design/jf_search_parameter_dialog.dart` — keyboard-safe height + ensureVisible
 - `lib/design/jf_machine_field.dart` — optional `onEditingComplete`
@@ -117,7 +118,7 @@ Intentionally not restored: side-by-side WHEN/WHAT reveal tests (replaced by par
 - `docs/PASS_02_READINESS.md`
 - `docs/DECISIONS.md` — ADR-036 keyboard-safe dialog note
 
-**Deleted:** none  
+**Deleted:** none
 **Backend / Firebase:** none
 
 ## 13. Commands and actual results
@@ -161,13 +162,13 @@ Keyboard inset visibility (two viewport sizes); dismiss keyboard keeps dialog; r
 ```text
 DRIVE SYNC STATUS: REQUIRED
 ```
-Files requiring sync:
-- `docs/DECISIONS.md` — updated — ADR-036 keyboard-safe dialog note
-- `docs/PASS_02_READINESS.md` — updated — Pass 02B.1D readiness
-- `docs/pass_handoffs/PASS_02B1C_COUNCIL_HANDOFF.md` — updated — physical result §23
-- `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md` — created — this handoff
+Files requiring sync (approved repository versions for Drive mirror after main integration):
+- `docs/DECISIONS.md` — ADR-036 keyboard-safe dialog note
+- `docs/PASS_02_READINESS.md` — Pass 02B.1D readiness + physical approval
+- `docs/pass_handoffs/PASS_02B1C_COUNCIL_HANDOFF.md` — physical result intake
+- `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md` — this handoff + physical approval
 
-Do not create the final Drive-sync ZIP until this keyboard fix receives physical approval.
+Package: `build/drive_sync/PASS_02B1D_MAIN_DRIVE_SYNC.zip` (created at main integration; not committed).
 
 ## 18. Physical Android test script
 1. Install and launch the APK.
@@ -213,10 +214,32 @@ Do not create the final Drive-sync ZIP until this keyboard fix receives physical
 No secrets changed. No Firebase deploy. No Gemini. No new dependencies. Local UI layout fix only.
 
 ## 20. Known limitations and risks
-- Physical confirmation still required before recommending Pass 02B.2
 - Very large keyboards on short devices leave a compact dialog viewport; scrolling remains required for WHEN/WHAT
 
 ## 21. Founder next action
-Install the Pass 02B.1D debug APK and run §18.
+Physical approval recorded. Integrate into `main`, then proceed to Pass 02B.2A (secure live Keryx debug scan) on a new branch from approved `main`.
 
-**Do not recommend Pass 02B.2 until the founder physically confirms that the active text field remains visible above the keyboard.**
+---
+
+## 22. Physical approval record (main integration)
+
+**Date:** 2026-07-10
+**Result:** `PASS 02B.1D PHYSICALLY APPROVED`
+**Integration status:** `PHYSICALLY APPROVED — READY FOR MAIN`
+
+Founder physical results:
+- Location field remains visible above the keyboard
+- Cursor and entered text remain visible
+- Dialog scrolls while the keyboard is open
+- WHEN remains reachable
+- WHAT remains reachable
+- CLOSE remains reachable
+- Keyboard Done leaves the dialog open
+- Refocusing returns the location field to view
+- Validation still works
+- Keryx status link still works
+- Main Scan remains local-only
+- Portrait lock remains active
+- All other approved UI remains correct
+
+Authorization: founder authorized integration into `main`.

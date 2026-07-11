@@ -1,8 +1,9 @@
 # THE LOCAL AGORA — PASS 02 READINESS
 
-**Pass:** 02B.1D — Keyboard-Safe Search Parameter Dialog  
-**Date:** July 10, 2026  
-**Branch:** `pass-02b1d-keyboard-safe-parameter-dialog`
+**Pass:** 02B.1D — Keyboard-Safe Search Parameter Dialog
+**Date:** July 10, 2026
+**Branch:** `main` (integrated from `pass-02b1d-keyboard-safe-parameter-dialog`)
+**Physical result:** `PASS 02B.1D PHYSICALLY APPROVED` / `PHYSICALLY APPROVED — READY FOR MAIN`
 
 ---
 
@@ -11,15 +12,20 @@
 | Item | Status |
 |---|---|
 | Pass 02B.1C physical result | **FUNCTIONALLY APPROVED — KEYBOARD VISIBILITY FIX REQUIRED** |
-| Pass 02B.1D keyboard fix | **COMPLETE** (awaiting physical review) |
-| Branch | `pass-02b1d-keyboard-safe-parameter-dialog` |
+| Pass 02B.1D keyboard fix | **COMPLETE** |
+| Pass 02B.1D physical test | **PASS 02B.1D PHYSICALLY APPROVED** |
+| Integration | **PHYSICALLY APPROVED — READY FOR MAIN** (founder authorized) |
+| Branch | `pass-02b1d-keyboard-safe-parameter-dialog` → `main` |
 | Handoff | `docs/pass_handoffs/PASS_02B1D_COUNCIL_HANDOFF.md` |
 | Cause | Dialog `maxHeight` used full screen height while Flutter `Dialog` already pads for keyboard |
 | Fix | Size dialog to remaining height above keyboard + scroll + ensureVisible on focus |
 | Panel 01 / 02 / 04 design | **Unchanged** |
+| Keyboard visibility | **Physically verified** |
+| Keryx status link | **Passed** |
+| Main Scan | **Local-only** (verified) |
 | Firebase / backend | **Unchanged** — no deploy |
-| Live Keryx / Gemini | **NO** |
-| New debug APK | `build/app/outputs/flutter-apk/app-debug.apk` — **required for physical review** |
+| Live Keryx / Gemini | **NO** (next: Pass 02B.2A debug-only) |
+| Drive sync package | `build/drive_sync/PASS_02B1D_MAIN_DRIVE_SYNC.zip` |
 
 ---
 
