@@ -16,6 +16,7 @@ import 'package:the_local_agora/design/junkfeathers_theme.dart';
 import 'package:the_local_agora/design/junkfeathers_tokens.dart';
 import 'package:the_local_agora/features/scan_control/scan_control_state.dart';
 import 'package:the_local_agora/main.dart';
+import 'package:the_local_agora/services/keryx/demo_keryx_service.dart';
 
 Future<void> _pumpScanControl(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 1600);
@@ -26,7 +27,11 @@ Future<void> _pumpScanControl(WidgetTester tester) async {
     dismissJfOledToastForTest();
   });
   await tester.pumpWidget(
-    const TheLocalAgoraApp(enableStartupSplash: false, autoShowWelcome: false),
+    TheLocalAgoraApp(
+      enableStartupSplash: false,
+      autoShowWelcome: false,
+      keryxService: DemoKeryxService(searchDelay: Duration.zero),
+    ),
   );
   await tester.pump();
 }
@@ -197,18 +202,19 @@ void main() {
     expect(find.text('SCAN CONTROL READY'), findsNothing);
   });
 
-  testWidgets('valid Scan shows ordinary info toast not phosphor', (
-    tester,
-  ) async {
+  testWidgets('valid Scan opens City Index with demo signals', (tester) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
     await _closeParams(tester);
     await _tapControl(tester, find.text('SCAN THE AGORA'));
-    expect(find.text('SCAN CONTROL READY'), findsOneWidget);
-    dismissJfOledToastForTest();
-    await tester.pump();
+    await tester.pump(); // push searching
+    await tester.pump(); // complete zero-delay scan + pop/push index
+    expect(find.text('CITY INDEX'), findsOneWidget);
+    expect(find.textContaining('SIGNALS FOUND'), findsOneWidget);
+    expect(find.textContaining('VERIFIED KERYX SIGNALS'), findsOneWidget);
+    expect(find.text('SCAN CONTROL READY'), findsNothing);
   });
 
   testWidgets('valid location clears invalid state', (tester) async {
@@ -479,10 +485,9 @@ void main() {
     final source = File(
       'lib/features/scan_control/scan_control_screen.dart',
     ).readAsStringSync();
-    expect(source.contains('http'), isFalse);
-    expect(source.contains('probeCount'), isFalse);
-    expect(source.contains('probeStatus'), isFalse);
     expect(source.contains('FirebaseFunctions'), isFalse);
+    expect(source.contains('keryxScanDebug'), isFalse);
+    expect(source.contains('DemoKeryxService'), isTrue);
   });
 
   test('empty-location validation path avoids amber', () {
@@ -500,6 +505,7 @@ void main() {
     expect(pubspec.contains('cloud_functions:'), isTrue);
     expect(pubspec.contains('firebase_app_check:'), isTrue);
     expect(pubspec.contains('shared_preferences:'), isTrue);
+    expect(pubspec.contains('url_launcher:'), isTrue);
     expect(pubspec.contains('firebase_auth'), isFalse);
     expect(pubspec.contains('google_maps'), isFalse);
     expect(pubspec.contains('google_fonts'), isFalse);

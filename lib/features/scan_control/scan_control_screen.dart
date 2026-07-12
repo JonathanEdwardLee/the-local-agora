@@ -5,18 +5,21 @@ import '../../design/jf_device_button.dart';
 import '../../design/jf_machine_identity_panel.dart';
 import '../../design/jf_monitor_module.dart';
 import '../../design/jf_oled_dialog.dart';
-import '../../design/jf_oled_toast.dart';
 import '../../design/jf_panel.dart';
 import '../../design/jf_search_parameter_dialog.dart';
 import '../../design/jf_signal_coil.dart';
 import '../../design/junkfeathers_tokens.dart';
+import '../../services/keryx/demo_keryx_service.dart';
 import '../../services/keryx/keryx_link_service.dart';
 import '../../services/keryx/keryx_live_scan_service.dart';
+import '../../services/keryx/keryx_service.dart';
 import '../debug/debug_component_gallery.dart';
+import '../discovery/city_index_screen.dart';
+import '../discovery/searching_agora_screen.dart';
 import 'scan_control_state.dart';
 
 /// SCREEN 1 — SCAN CONTROL
-/// Compact Panel 04 + Search Parameter dialog. Live Keryx not on main Scan.
+/// Compact Panel 04 + Search Parameter dialog. Main Scan uses DemoKeryxService.
 class ScanControlScreen extends StatefulWidget {
   const ScanControlScreen({
     super.key,
@@ -24,6 +27,7 @@ class ScanControlScreen extends StatefulWidget {
     this.appCheckReady = false,
     this.keryxLinkService,
     this.keryxLiveScanService,
+    this.keryxService,
     this.onOpenAbout,
   });
 
@@ -31,6 +35,9 @@ class ScanControlScreen extends StatefulWidget {
   final bool appCheckReady;
   final KeryxLinkService? keryxLinkService;
   final KeryxLiveScanService? keryxLiveScanService;
+
+  /// Contest discovery path (default: [DemoKeryxService]).
+  final KeryxService? keryxService;
 
   /// Opens the About surface (not Welcome).
   final Future<void> Function()? onOpenAbout;
@@ -42,16 +49,18 @@ class ScanControlScreen extends StatefulWidget {
 class _ScanControlScreenState extends State<ScanControlScreen> {
   late final TextEditingController _locationController;
   late final FocusNode _locationFocus;
+  late final KeryxService _keryx;
   ScanControlState _state = const ScanControlState();
   bool _fieldFocused = false;
-  bool _readinessShown = false;
   bool _paramDialogOpen = false;
+  bool _scanInFlight = false;
 
   @override
   void initState() {
     super.initState();
     _locationController = TextEditingController();
     _locationFocus = FocusNode();
+    _keryx = widget.keryxService ?? DemoKeryxService();
   }
 
   @override
@@ -62,7 +71,7 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   }
 
   JfSignalCoilMode get _coilMode {
-    if (_readinessShown) return JfSignalCoilMode.ready;
+    if (_scanInFlight) return JfSignalCoilMode.ready;
     if (_fieldFocused) return JfSignalCoilMode.focused;
     return JfSignalCoilMode.idle;
   }
@@ -74,14 +83,13 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
           : 'AWAITING LOCATION INPUT',
       'WINDOW // ${_state.timeWindow.label}',
       'SIGNAL TYPE // ${_state.category.label}',
-      'ENGINE LINK // NOT CONNECTED',
+      'ENGINE LINK // DEMO KERYX FIXTURE',
     ];
     if (_state.locationError != null) {
       lines.add('ERROR // LOCATION REQUIRED');
     }
-    if (_readinessShown) {
-      lines.add('STATUS // SCAN CONTROL READY');
-      lines.add('NOTE // LIVE KERYX ARRIVES NEXT PASS');
+    if (_scanInFlight) {
+      lines.add('STATUS // KERYX IS SCANNING PUBLIC SIGNALS');
     }
     return lines;
   }
@@ -96,7 +104,6 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   void _onLocationChanged(String value) {
     setState(() {
       _state = _state.copyWith(locationText: value, clearLocationError: true);
-      _readinessShown = false;
     });
   }
 
@@ -134,6 +141,8 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   }
 
   Future<void> _onScanPressed() async {
+    if (_scanInFlight) return;
+
     final trimmed = _locationController.text.trim();
     if (trimmed.isEmpty) {
       setState(() {
@@ -141,7 +150,6 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
           locationText: '',
           locationError: 'LOCATION REQUIRED — enter a city or ZIP code.',
         );
-        _readinessShown = false;
       });
       await showJfOledDialog<void>(
         context: context,
@@ -159,14 +167,63 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
 
     setState(() {
       _state = _state.copyWith(locationText: trimmed, clearLocationError: true);
-      _readinessShown = true;
+      _scanInFlight = true;
     });
 
-    showJfOledToast(
-      context,
-      'SCAN CONTROL READY',
-      detail: 'Live Keryx connection arrives in the next governed pass.',
+    final request = KeryxScanRequest(
+      location: trimmed,
+      timeWindow: _state.timeWindow,
+      category: _state.category,
     );
+
+    // Searching surface (may be popped by user; scan still completes).
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SearchingAgoraScreen(
+          location: trimmed,
+          windowLabel: _state.timeWindow.label,
+          categoryLabel: _state.category.label,
+        ),
+      ),
+    );
+
+    final result = await _keryx.scan(request);
+    if (!mounted) return;
+
+    // Drop searching route if still on top.
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+
+    setState(() => _scanInFlight = false);
+
+    switch (result.outcome) {
+      case KeryxScanOutcome.results:
+        await Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => CityIndexScreen(result: result),
+          ),
+        );
+      case KeryxScanOutcome.empty:
+        await Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => CityIndexScreen(result: result, empty: true),
+          ),
+        );
+      case KeryxScanOutcome.error:
+        await showJfOledDialog<void>(
+          context: context,
+          title: result.machineTitle.isEmpty
+              ? 'SCAN ERROR'
+              : result.machineTitle,
+          body: result.supportText.isEmpty
+              ? 'The Agora scan could not complete.'
+              : result.supportText,
+          confirmLabel: 'ACKNOWLEDGE',
+          validationError: result.errorKind == KeryxScanErrorKind.invalidPlace,
+        );
+    }
   }
 
   @override
@@ -240,9 +297,10 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                             ),
                             const SizedBox(height: JfSpacing.sm),
                             JfDeviceButton(
+                              key: const ValueKey('jf-scan-agora'),
                               label: 'SCAN THE AGORA',
                               semanticLabel: 'Scan the Agora',
-                              onPressed: _onScanPressed,
+                              onPressed: _scanInFlight ? null : _onScanPressed,
                             ),
                             const SizedBox(height: JfSpacing.sm),
                             Row(

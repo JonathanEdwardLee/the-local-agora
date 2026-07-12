@@ -8,6 +8,7 @@ import 'package:the_local_agora/design/jf_oled_toast.dart';
 import 'package:the_local_agora/design/junkfeathers_theme.dart';
 import 'package:the_local_agora/features/debug/debug_component_gallery.dart';
 import 'package:the_local_agora/main.dart';
+import 'package:the_local_agora/services/keryx/demo_keryx_service.dart';
 import 'package:the_local_agora/services/keryx/firebase_keryx_link_service.dart';
 import 'package:the_local_agora/services/keryx/keryx_link_result.dart';
 import 'package:the_local_agora/services/keryx/keryx_link_service.dart';
@@ -99,6 +100,7 @@ void main() {
         keryxLinkService: fake,
         enableStartupSplash: false,
         autoShowWelcome: false,
+        keryxService: DemoKeryxService(searchDelay: Duration.zero),
       ),
     );
     await tester.pump();
@@ -119,6 +121,7 @@ void main() {
         keryxLinkService: fake,
         enableStartupSplash: false,
         autoShowWelcome: false,
+        keryxService: DemoKeryxService(searchDelay: Duration.zero),
       ),
     );
     await tester.pump();
@@ -150,6 +153,7 @@ void main() {
         keryxLinkService: fake,
         enableStartupSplash: false,
         autoShowWelcome: false,
+        keryxService: DemoKeryxService(searchDelay: Duration.zero),
       ),
     );
     await tester.pump();
@@ -168,8 +172,9 @@ void main() {
     await tester.tap(scan);
     await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();
+    await tester.pump();
     expect(fake.probeCount, 0);
-    expect(find.text('SCAN CONTROL READY'), findsWidgets);
+    expect(find.text('CITY INDEX'), findsOneWidget);
     dismissJfOledToastForTest();
     await tester.pump();
   });

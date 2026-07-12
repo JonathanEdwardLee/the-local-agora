@@ -66,8 +66,9 @@ void main() {
     }
   });
 
-  testWidgets('debug gallery shows live scan control only when ready',
-      (tester) async {
+  testWidgets('debug gallery shows live scan control only when ready', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(400, 2000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {

@@ -9,7 +9,7 @@ Applies to: Cursor, Antigravity, and any coding AI working in this repository
 Project AI system: Keryx Engine  
 Current priority: DEV Passion Challenge Version 0.1  
 Permanent product rule: No embedded map in any version  
-Last revised: July 10, 2026 — shared-platform, cache-first, web-launch, iOS-demand, and repository–Drive sync rules integrated; July 11, 2026 — ADR-037 brand tagline and onboarding copy recorded; July 11, 2026 — ADR-039 universal splash + Welcome dialog (Pass 02C)
+Last revised: July 12, 2026 — ADR-041 contest-safe DemoKeryxService discovery slice (Pass 03); July 11, 2026 — ADR-039 universal splash + Welcome dialog (Pass 02C); July 10, 2026 — shared-platform / cache-first rules
 
 
 # 1\. PURPOSE
@@ -504,6 +504,8 @@ Recommended logical modules:
 
 
 Keryx-specific code must sit behind a Keryx service interface. Flutter widgets must never call privileged model providers, grounded-search tools, or production write operations directly. Use protected callable or HTTPS endpoints for secret-bearing and expensive operations.
+
+Pass 03 contest lock (ADR-041): Ordinary `SCAN THE AGORA` uses app-owned `KeryxService.scan` with default `DemoKeryxService` (deterministic verified fixture). Do not wire the main Scan path to the paid live `keryxScanDebug` callable. Live path remains debug-gallery-only and confirmation-gated. Do not present fixture results as a fresh live scan.
 
 
 Contest backend lock:  

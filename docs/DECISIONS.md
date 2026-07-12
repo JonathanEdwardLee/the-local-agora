@@ -306,3 +306,23 @@ There is no Local Agora product splash, no intermediate tagline screen, and no m
 4. **About surface** — About is a real product-information dialog including product title, tagline, approved About statement, `SHOW WELCOME ON STARTUP` ON/OFF (same `hasDismissedAgoraWelcomePermanently` preference), and `CLOSE`. It must not merely reopen Welcome.
 
 **Consequence:** Do not restore the identity-panel About control. Do not reintroduce a clean splash hold for normal motion. Physical Android approval recorded 2026-07-12 (`PASS 02C.1 PHYSICALLY APPROVED — COMMIT AND PUSH`). Do not merge to `main` until founder/council explicitly directs.
+
+## ADR-041 — Contest-safe Agora discovery vertical slice (Pass 03)
+
+**Status:** Accepted (implementation complete; awaiting physical/web approval; do not merge yet)  
+**Date:** 2026-07-12  
+**Decision:**
+
+1. **Service boundary** — UI calls app-owned `KeryxService.scan(KeryxScanRequest)`. Default contest path is `DemoKeryxService` (deterministic verified fixture). The Firebase live `keryxScanDebug` path remains debug-gallery-only, confirmation-gated, App Check–protected. No automatic live fallback. No Flutter auto-retry of the paid callable. No paid live scan authorized in Pass 03.
+
+2. **Fixture provenance** — Springfield demo signals are reconstructed from previously evaluated/verified Keryx titles and public-safe fields (`docs/KERYX_EVALUATION.md` / Pass 01). Documented in `lib/data/fixtures/FIXTURE_PROVENANCE.md`. Must be labeled verified Keryx / demo fixture — never presented as a fresh live scan or as the exact original 10-signal JSON.
+
+3. **Results** — Chronological City Index (known start → date-only → unknown). Honest empty: `NO SUPPORTED SIGNALS FOUND`. Count language never claims completeness.
+
+4. **Open Record** — Dedicated route/page (not a dialog). `OPEN ORIGINAL SOURCE` uses `url_launcher` with human-readable source labels; raw redirect URLs are not shown as body text.
+
+5. **Categories** — Public V0.1 surface remains MUSIC / COMEDY / THEATER only.
+
+6. **Future work** — Shared Firestore cache-first (ADR-028) and async scan jobs remain deferred. Demo searching delay is short (~1.1 s), not a long fake wait.
+
+**Consequence:** Do not wire ordinary `SCAN THE AGORA` to the live paid callable in this contest slice. Do not invent unsupported event facts. Do not add maps, accounts, or social feeds.

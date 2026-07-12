@@ -10,9 +10,11 @@ import 'features/scan_control/scan_control_screen.dart';
 import 'features/startup/startup_gate.dart';
 import 'features/welcome/welcome_suppression_store.dart';
 import 'firebase_options.dart';
+import 'services/keryx/demo_keryx_service.dart';
 import 'services/keryx/firebase_keryx_link_service.dart';
 import 'services/keryx/keryx_link_service.dart';
 import 'services/keryx/keryx_live_scan_service.dart';
+import 'services/keryx/keryx_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +50,7 @@ Future<void> main() async {
       keryxLiveScanService: firebaseReady && appCheckReady && !kIsWeb
           ? FirebaseKeryxLiveScanService()
           : null,
+      keryxService: DemoKeryxService(),
     ),
   );
 }
@@ -92,6 +95,7 @@ class TheLocalAgoraApp extends StatelessWidget {
     this.appCheckReady = false,
     this.keryxLinkService,
     this.keryxLiveScanService,
+    this.keryxService,
     this.welcomeStore,
     this.enableStartupSplash = true,
     this.autoShowWelcome = true,
@@ -103,6 +107,7 @@ class TheLocalAgoraApp extends StatelessWidget {
   final bool appCheckReady;
   final KeryxLinkService? keryxLinkService;
   final KeryxLiveScanService? keryxLiveScanService;
+  final KeryxService? keryxService;
   final WelcomeSuppressionStore? welcomeStore;
   final bool enableStartupSplash;
   final bool autoShowWelcome;
@@ -129,6 +134,7 @@ class TheLocalAgoraApp extends StatelessWidget {
             appCheckReady: appCheckReady,
             keryxLinkService: keryxLinkService,
             keryxLiveScanService: keryxLiveScanService,
+            keryxService: keryxService ?? DemoKeryxService(),
             onOpenAbout: openAbout,
           );
         },

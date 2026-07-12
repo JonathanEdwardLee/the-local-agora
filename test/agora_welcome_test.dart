@@ -193,7 +193,10 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.byKey(const ValueKey('agora-welcome-startup-on')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('agora-welcome-startup-on')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byKey(const ValueKey('agora-welcome-startup-on')));
     await tester.pump(JfMotion.press);

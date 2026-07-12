@@ -8,9 +8,9 @@ This repository is the DEV Passion Challenge Version 0.1 codebase for The Local 
 
 Operational scan workflow (machine instruction, not the public tagline): **Choose a place. Choose a time. Scan the Agora.**
 
-## Pass 01 status
+## Pass 03 status
 
-Pass 01 establishes the repository foundation and the Keryx feasibility spike (grounded discovery + fact-constrained normalization). The full civic receiver UI arrives in a later pass.
+Contest-safe discovery vertical slice on branch `pass-03-agora-discovery-vertical-slice`: Scan → short searching transition → chronological City Index → dedicated Open Record route. Default path is `DemoKeryxService` (verified Keryx demonstration fixture). Live `keryxScanDebug` remains debug-gallery-only. See ADR-041 and `lib/data/fixtures/FIXTURE_PROVENANCE.md`.
 
 ## Locked identity
 
