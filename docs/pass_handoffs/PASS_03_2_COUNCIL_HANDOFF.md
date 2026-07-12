@@ -2,10 +2,10 @@
 
 ## 1. Pass identity
 - Objective: Public plain language, search overlay, CRT-first event actions
-- Status: **READY FOR PHYSICAL + WEB RE-REVIEW** — not merge-approved
+- Status: **PHYSICALLY APPROVED** — not merge-approved
 - Branch: `pass-03-agora-discovery-vertical-slice`
 - Starting commit: `089e29808dab137dd6c5f6837bcc5cdd850440c1`
-- Ending commit: `8021606b810eea1c75711c6ba6a637044786f9b6`
+- Ending commit: `79d2704c7ce5b9f3842d1ac2de30cfb95feccb32`
 - ADR: ADR-043
 
 ## 2. Public language
@@ -35,7 +35,7 @@ Backend / App Check / live callable unchanged.
 | dart format | PASS (0 changed) |
 | flutter analyze | PASS — no issues |
 | flutter test | PASS — 112 tests |
-| flutter build apk --debug | PASS — `build/app/outputs/flutter-apk/app-debug.apk` (162,993,954 bytes ≈ 155.4 MB) |
+| flutter build apk --debug | PASS — `build/app/outputs/flutter-apk/app-debug.apk` — 162,993,954 bytes |
 | flutter build web | PASS — `build/web` |
 
 ## 8. Drive sync
@@ -48,4 +48,4 @@ Backend / App Check / live callable unchanged.
 - No additional paid live scan was run during this pass.
 
 ## 10. Next
-Founder physical + web approval; merge only when directed.
+Pass 03.2 physically approved. Do not merge to main until explicitly directed.
