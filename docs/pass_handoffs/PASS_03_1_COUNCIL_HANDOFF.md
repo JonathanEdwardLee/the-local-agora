@@ -5,7 +5,7 @@
 - Status: **READY FOR PHYSICAL + WEB RE-REVIEW** — not merge-approved
 - Branch: `pass-03-agora-discovery-vertical-slice`
 - Starting commit: `a92e62825cb0c8879ba391bc34cf085cf13abecb`
-- Ending commit: *(filled at tip)*
+- Ending commit: `bd4a3019355070fbee231b64a9c4cee23cf0e23d`
 - ADR: ADR-042
 
 ## 2. CRT results
