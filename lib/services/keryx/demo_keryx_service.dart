@@ -17,6 +17,9 @@ class DemoKeryxService implements KeryxService {
   bool _inFlight = false;
 
   @override
+  Future<bool> hasConsumedBetaAllowance() async => false;
+
+  @override
   Future<KeryxScanResult> scan(KeryxScanRequest request) async {
     if (_inFlight) {
       return KeryxScanResult(
@@ -50,9 +53,9 @@ class DemoKeryxService implements KeryxService {
         return KeryxScanResult(
           outcome: KeryxScanOutcome.empty,
           request: request,
-          machineTitle: 'NO SUPPORTED SIGNALS FOUND',
+          machineTitle: 'NO SUPPORTED EVENTS FOUND',
           supportText:
-              'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
+              'TRY ANOTHER TIME FRAME OR EVENT TYPE.\n'
               'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.\n'
               'Demo fixture covers Springfield, Missouri / 65806.',
           origin: KeryxResultOrigin.verifiedDemo,
@@ -65,10 +68,8 @@ class DemoKeryxService implements KeryxService {
         return KeryxScanResult(
           outcome: KeryxScanOutcome.empty,
           request: request,
-          machineTitle: 'NO SUPPORTED SIGNALS FOUND',
-          supportText:
-              'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
-              'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.',
+          machineTitle: 'NO SUPPORTED EVENTS FOUND',
+          supportText: 'TRY ANOTHER TIME FRAME OR EVENT TYPE.',
           origin: KeryxResultOrigin.verifiedDemo,
           lastCheckedAt: kSpringfieldDemoLastChecked,
           elapsedMs: searchDelay.inMilliseconds,
@@ -92,10 +93,8 @@ class DemoKeryxService implements KeryxService {
         return KeryxScanResult(
           outcome: KeryxScanOutcome.empty,
           request: request,
-          machineTitle: 'NO SUPPORTED SIGNALS FOUND',
-          supportText:
-              'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
-              'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.',
+          machineTitle: 'NO SUPPORTED EVENTS FOUND',
+          supportText: 'TRY ANOTHER TIME FRAME OR EVENT TYPE.',
           origin: KeryxResultOrigin.verifiedDemo,
           lastCheckedAt: kSpringfieldDemoLastChecked,
           elapsedMs: searchDelay.inMilliseconds,
@@ -106,9 +105,8 @@ class DemoKeryxService implements KeryxService {
         outcome: KeryxScanOutcome.results,
         request: request,
         signals: sorted,
-        machineTitle: 'AGORA SIGNALS READY',
-        supportText:
-            'Chronological index from verified Keryx demonstration signals.',
+        machineTitle: 'AGORA EVENTS READY',
+        supportText: 'Chronological upcoming events from verified demo data.',
         origin: KeryxResultOrigin.verifiedDemo,
         lastCheckedAt: kSpringfieldDemoLastChecked,
         elapsedMs: searchDelay.inMilliseconds,

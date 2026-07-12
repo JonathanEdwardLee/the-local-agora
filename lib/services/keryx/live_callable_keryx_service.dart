@@ -17,6 +17,9 @@ class LiveCallableKeryxService implements KeryxService {
   int callCount = 0;
 
   @override
+  Future<bool> hasConsumedBetaAllowance() async => false;
+
+  @override
   Future<KeryxScanResult> scan(KeryxScanRequest request) async {
     if (inFlightGuard && _inFlight) {
       return KeryxScanResult(
@@ -45,10 +48,8 @@ class LiveCallableKeryxService implements KeryxService {
       return KeryxScanResult(
         outcome: KeryxScanOutcome.empty,
         request: request,
-        machineTitle: 'NO SUPPORTED SIGNALS FOUND',
-        supportText:
-            'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
-            'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.',
+        machineTitle: 'NO SUPPORTED EVENTS FOUND',
+        supportText: 'TRY ANOTHER TIME FRAME OR EVENT TYPE.',
         origin: KeryxResultOrigin.live,
         lastCheckedAt: DateTime.now().toUtc(),
       );
@@ -103,7 +104,7 @@ class LiveCallableKeryxService implements KeryxService {
         return KeryxScanResult(
           outcome: KeryxScanOutcome.empty,
           request: request,
-          machineTitle: 'NO SUPPORTED SIGNALS FOUND',
+          machineTitle: 'NO SUPPORTED EVENTS FOUND',
           supportText:
               'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
               'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.',
@@ -117,8 +118,8 @@ class LiveCallableKeryxService implements KeryxService {
         outcome: KeryxScanOutcome.results,
         request: request,
         signals: sorted,
-        machineTitle: 'AGORA SIGNALS READY',
-        supportText: 'Chronological index from a live Keryx scan.',
+        machineTitle: 'AGORA EVENTS READY',
+        supportText: 'Chronological upcoming events from a live search.',
         origin: KeryxResultOrigin.live,
         lastCheckedAt: checked,
         elapsedMs: live.elapsedMs,
@@ -134,23 +135,24 @@ class LiveCallableKeryxService implements KeryxService {
   ) {
     final msg = live.supportText.toLowerCase();
     var kind = KeryxScanErrorKind.unknown;
-    var title = 'ERR // LIVE KERYX FAILED';
+    var title = 'EVENT SEARCH FAILED';
     if (msg.contains('timeout') || msg.contains('deadline')) {
       kind = KeryxScanErrorKind.timedOut;
-      title = 'ERR // SCAN TIMED OUT';
+      title = 'EVENT SEARCH FAILED';
     } else if (msg.contains('network') ||
         msg.contains('unavailable') ||
         msg.contains('offline')) {
       kind = KeryxScanErrorKind.noNetwork;
-      title = 'ERR // NETWORK UNAVAILABLE';
+      title = 'EVENT SEARCH FAILED';
     } else if (msg.contains('malform') || msg.contains('unexpected payload')) {
       kind = KeryxScanErrorKind.malformedResponse;
-      title = 'ERR // MALFORMED RESPONSE';
-    } else if (msg.contains('app check') || msg.contains('not ready')) {
+      title = 'EVENT SEARCH FAILED';
+    } else if (msg.contains('app check') ||
+        msg.contains('not ready') ||
+        msg.contains('unauthenticated')) {
       kind = KeryxScanErrorKind.serviceUnavailable;
-      title = 'ERR // SERVICE UNAVAILABLE';
+      title = 'EVENT SEARCH FAILED';
     }
-
     return KeryxScanResult(
       outcome: KeryxScanOutcome.error,
       request: request,

@@ -314,24 +314,30 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const JfSectionLabel('PANEL 04 COMPACT DECK'),
                 const SizedBox(height: JfSpacing.sm),
                 const Text(
-                  'Search for an event',
+                  'Search for an event (debug deck)',
                   style: JfTypography.supporting,
                 ),
                 const SizedBox(height: JfSpacing.md),
                 JfDeviceButton(
-                  label: 'INPUT SEARCH PARAMETERS',
-                  onPressed: () => showJfSearchParameterDialog(
-                    context: context,
-                    locationController: _fieldController,
-                    timeWindow: _when,
-                    category: _what,
-                    onLocationChanged: (_) {},
-                    onTimeChanged: (v) => setState(() => _when = v),
-                    onCategoryChanged: (v) => setState(() => _what = v),
-                  ),
+                  label: 'SEARCH FOR AN EVENT',
+                  onPressed: () async {
+                    final result = await showJfSearchParameterDialog(
+                      context: context,
+                      locationController: _fieldController,
+                      timeWindow: _when,
+                      category: _what,
+                    );
+                    if (!mounted || result == null) return;
+                    if (result.timeWindow != null) {
+                      setState(() => _when = result.timeWindow!);
+                    }
+                    if (result.category != null) {
+                      setState(() => _what = result.category!);
+                    }
+                  },
                 ),
                 const SizedBox(height: JfSpacing.sm),
-                const JfDeviceButton(label: 'SCAN THE AGORA', onPressed: null),
+                const JfDeviceButton(label: 'SCAN FOR EVENTS', onPressed: null),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('VALIDATION FIELD + ERROR DIALOG'),
                 const SizedBox(height: JfSpacing.sm),

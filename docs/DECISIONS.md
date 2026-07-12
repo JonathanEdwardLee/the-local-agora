@@ -347,3 +347,21 @@ There is no Local Agora product splash, no intermediate tagline screen, and no m
 
 **Consequence:** Document Android live vs web demo honestly. Treat the local Boolean as a contest UX/cost guard, not production abuse prevention.
 
+## ADR-043 — Public plain language and CRT-first event actions (Pass 03.2)
+
+**Status:** Accepted (implementation; awaiting physical/web re-review; do not merge yet)  
+**Date:** 2026-07-12  
+**Decision:**
+
+1. **Mythology vs operations** — THE LOCAL AGORA remains the product name and brand mythology. Ordinary search/results/empty/error UI uses plain event-search language (UPCOMING EVENTS, SCAN FOR EVENTS, TIME FRAME, EVENT TYPE). Do not expose Keryx or “signal” jargon on those surfaces.
+
+2. **CRT-first** — Event facts and actions live inside CRT result entries. Ordinary Open Record navigation is removed. Each entry offers CHECK SOURCE (when a URL exists) and disabled ADD TO CALENDAR // SOON.
+
+3. **Search control** — One primary SEARCH FOR AN EVENT control opens a modal overlay (CANCEL / SCAN FOR EVENTS). No location/time/type presets on the opening CRT. Welcome CRT copy: SEARCH FOR AN EVENT NEAR YOU / USING THE CONTROL BELOW.
+
+4. **Searching** — Long live scans show a continuous non-deceptive CRT animation (scan line, cycling dots, rotating status). Reduced-motion falls back to blinking cursor + status text.
+
+5. **One-scan interaction** — After beta allowance is consumed, SEARCH FOR AN EVENT shows `ERR // ONLY ONE SCAN ALLOWED FOR BETA` without opening a misleading editable form; prior CRT results remain.
+
+**Consequence:** Keep Keryx naming in code, docs, debug gallery, and technical credits. Do not implement calendar integration in this pass.
+

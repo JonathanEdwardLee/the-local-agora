@@ -2,31 +2,41 @@ import 'package:flutter/material.dart';
 
 import '../features/scan_control/scan_control_state.dart';
 import 'jf_device_button.dart';
-import 'jf_dial_selector.dart';
 import 'jf_machine_field.dart';
 import 'junkfeathers_tokens.dart';
 
-/// Machine-style Search Parameter dialog — location + WHEN + WHAT.
-///
-/// Keyboard-safe: [Dialog] already pads for [MediaQuery.viewInsets]; this body
-/// sizes to the remaining height above the keyboard and scrolls the active
-/// location field into view on focus (same inset-aware scroll principle as the
-/// main Scan Control deck).
-Future<void> showJfSearchParameterDialog({
+/// Result of the Pass 03.2 search overlay.
+enum SearchOverlayAction { cancelled, scan }
+
+class SearchOverlayResult {
+  const SearchOverlayResult({
+    required this.action,
+    this.location = '',
+    this.timeWindow,
+    this.category,
+  });
+
+  final SearchOverlayAction action;
+  final String location;
+  final TimeWindow? timeWindow;
+  final EventCategory? category;
+}
+
+/// Modal search overlay — LOCATION + TIME FRAME + EVENT TYPE.
+Future<SearchOverlayResult?> showJfSearchParameterDialog({
   required BuildContext context,
   required TextEditingController locationController,
   FocusNode? locationFocus,
-  required TimeWindow timeWindow,
-  required EventCategory category,
-  required ValueChanged<String> onLocationChanged,
-  required ValueChanged<TimeWindow> onTimeChanged,
-  required ValueChanged<EventCategory> onCategoryChanged,
+  TimeWindow? timeWindow,
+  EventCategory? category,
   String? locationError,
+  String? timeWindowError,
+  String? categoryError,
   ValueChanged<bool>? onFocusChange,
 }) {
-  return showDialog<void>(
+  return showDialog<SearchOverlayResult>(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: false,
     barrierColor: JfColors.black.withValues(alpha: 0.72),
     builder: (ctx) {
       return _JfSearchParameterDialogBody(
@@ -34,10 +44,9 @@ Future<void> showJfSearchParameterDialog({
         locationFocus: locationFocus,
         timeWindow: timeWindow,
         category: category,
-        onLocationChanged: onLocationChanged,
-        onTimeChanged: onTimeChanged,
-        onCategoryChanged: onCategoryChanged,
         locationError: locationError,
+        timeWindowError: timeWindowError,
+        categoryError: categoryError,
         onFocusChange: onFocusChange,
       );
     },
@@ -47,24 +56,22 @@ Future<void> showJfSearchParameterDialog({
 class _JfSearchParameterDialogBody extends StatefulWidget {
   const _JfSearchParameterDialogBody({
     required this.locationController,
-    required this.timeWindow,
-    required this.category,
-    required this.onLocationChanged,
-    required this.onTimeChanged,
-    required this.onCategoryChanged,
     this.locationFocus,
+    this.timeWindow,
+    this.category,
     this.locationError,
+    this.timeWindowError,
+    this.categoryError,
     this.onFocusChange,
   });
 
   final TextEditingController locationController;
   final FocusNode? locationFocus;
-  final TimeWindow timeWindow;
-  final EventCategory category;
-  final ValueChanged<String> onLocationChanged;
-  final ValueChanged<TimeWindow> onTimeChanged;
-  final ValueChanged<EventCategory> onCategoryChanged;
+  final TimeWindow? timeWindow;
+  final EventCategory? category;
   final String? locationError;
+  final String? timeWindowError;
+  final String? categoryError;
   final ValueChanged<bool>? onFocusChange;
 
   @override
@@ -74,9 +81,11 @@ class _JfSearchParameterDialogBody extends StatefulWidget {
 
 class _JfSearchParameterDialogBodyState
     extends State<_JfSearchParameterDialogBody> {
-  late TimeWindow _when;
-  late EventCategory _what;
-  String? _error;
+  TimeWindow? _when;
+  EventCategory? _what;
+  String? _locationError;
+  String? _timeError;
+  String? _typeError;
   late final ScrollController _scrollController;
   final GlobalKey _locationFieldKey = GlobalKey();
 
@@ -85,27 +94,11 @@ class _JfSearchParameterDialogBodyState
     super.initState();
     _when = widget.timeWindow;
     _what = widget.category;
-    _error = widget.locationError;
+    _locationError = widget.locationError;
+    _timeError = widget.timeWindowError;
+    _typeError = widget.categoryError;
     _scrollController = ScrollController();
     widget.locationFocus?.addListener(_onLocationFocusChanged);
-  }
-
-  @override
-  void didUpdateWidget(covariant _JfSearchParameterDialogBody oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.locationFocus != widget.locationFocus) {
-      oldWidget.locationFocus?.removeListener(_onLocationFocusChanged);
-      widget.locationFocus?.addListener(_onLocationFocusChanged);
-    }
-    if (oldWidget.locationError != widget.locationError) {
-      _error = widget.locationError;
-    }
-    if (oldWidget.timeWindow != widget.timeWindow) {
-      _when = widget.timeWindow;
-    }
-    if (oldWidget.category != widget.category) {
-      _what = widget.category;
-    }
   }
 
   @override
@@ -123,9 +116,7 @@ class _JfSearchParameterDialogBodyState
 
   void _onFieldFocusChange(bool focused) {
     widget.onFocusChange?.call(focused);
-    if (focused) {
-      _ensureLocationVisible();
-    }
+    if (focused) _ensureLocationVisible();
   }
 
   void _ensureLocationVisible() {
@@ -141,8 +132,6 @@ class _JfSearchParameterDialogBodyState
       );
     }
 
-    // Dialog already animates for viewInsets; reveal after the next frames
-    // so the field stays in the visible viewport above the keyboard.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       reveal();
       WidgetsBinding.instance.addPostFrameCallback((_) => reveal());
@@ -154,19 +143,53 @@ class _JfSearchParameterDialogBodyState
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  /// Raw keyboard inset — [Dialog] strips viewInsets from child MediaQuery.
   double _keyboardBottom(BuildContext context) {
     return MediaQueryData.fromView(View.of(context)).viewInsets.bottom;
   }
 
-  /// Height available for the dialog face above the keyboard.
   double _maxDialogHeight(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final keyboard = _keyboardBottom(context);
-    // Match Dialog insetPadding vertical (md top + md bottom).
     const verticalChrome = JfSpacing.md * 2;
     final available = size.height - keyboard - verticalChrome;
     return available.clamp(240.0, size.height * 0.86);
+  }
+
+  bool _validate() {
+    final loc = widget.locationController.text.trim();
+    var ok = true;
+    setState(() {
+      _locationError = loc.isEmpty
+          ? 'LOCATION REQUIRED — enter a city or ZIP code.'
+          : null;
+      _timeError = _when == null ? 'TIME FRAME REQUIRED' : null;
+      _typeError = _what == null ? 'EVENT TYPE REQUIRED' : null;
+      ok = _locationError == null && _timeError == null && _typeError == null;
+    });
+    return ok;
+  }
+
+  void _cancel() {
+    Navigator.of(context, rootNavigator: true).pop(
+      SearchOverlayResult(
+        action: SearchOverlayAction.cancelled,
+        location: widget.locationController.text.trim(),
+        timeWindow: _when,
+        category: _what,
+      ),
+    );
+  }
+
+  void _scan() {
+    if (!_validate()) return;
+    Navigator.of(context, rootNavigator: true).pop(
+      SearchOverlayResult(
+        action: SearchOverlayAction.scan,
+        location: widget.locationController.text.trim(),
+        timeWindow: _when,
+        category: _what,
+      ),
+    );
   }
 
   @override
@@ -191,13 +214,8 @@ class _JfSearchParameterDialogBodyState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'SEARCH PARAMETERS',
+                'SEARCH FOR AN EVENT',
                 style: JfTypography.controlLabel.copyWith(fontSize: 13),
-              ),
-              const SizedBox(height: JfSpacing.sm),
-              const Text(
-                'Choose a city or ZIP code, then set WHEN and WHAT.',
-                style: JfTypography.supporting,
               ),
               const SizedBox(height: JfSpacing.md),
               Expanded(
@@ -212,14 +230,13 @@ class _JfSearchParameterDialogBodyState
                         key: _locationFieldKey,
                         child: JfMachineField(
                           key: const ValueKey('jf-param-location'),
-                          label: 'CITY OR ZIP CODE',
+                          label: 'LOCATION',
                           controller: widget.locationController,
                           focusNode: widget.locationFocus,
-                          hintText: 'Springfield, Missouri',
-                          errorText: _error,
-                          onChanged: (value) {
-                            setState(() => _error = null);
-                            widget.onLocationChanged(value);
+                          hintText: 'City and state, or ZIP code',
+                          errorText: _locationError,
+                          onChanged: (_) {
+                            setState(() => _locationError = null);
                           },
                           onFocusChange: _onFieldFocusChange,
                           textInputAction: TextInputAction.done,
@@ -227,33 +244,77 @@ class _JfSearchParameterDialogBodyState
                         ),
                       ),
                       const SizedBox(height: JfSpacing.md),
-                      JfDialSelector<TimeWindow>(
-                        key: const ValueKey('jf-when-dial'),
-                        label: 'WHEN',
-                        values: TimeWindow.values,
-                        value: _when,
-                        labelOf: (v) => v.label,
-                        onChanged: (v) {
-                          setState(() => _when = v);
-                          widget.onTimeChanged(v);
-                        },
-                        semanticPrefix: 'When',
+                      Text(
+                        _when == null
+                            ? 'TIME FRAME // SELECT'
+                            : 'TIME FRAME // ${_when!.label}',
+                        style: JfTypography.micro.copyWith(
+                          color: _timeError != null
+                              ? JfColors.validationPhosphor
+                              : JfColors.white70,
+                        ),
+                      ),
+                      if (_timeError != null)
+                        Text(_timeError!, style: JfTypography.validationError),
+                      const SizedBox(height: JfSpacing.xs),
+                      Wrap(
+                        key: const ValueKey('jf-when-options'),
+                        spacing: JfSpacing.xs,
+                        runSpacing: JfSpacing.xs,
+                        children: [
+                          for (final w in TimeWindow.values)
+                            JfDeviceButton(
+                              key: ValueKey('jf-when-${w.name}'),
+                              label: w.label,
+                              selected: _when == w,
+                              variant: JfButtonVariant.compact,
+                              expanded: false,
+                              semanticLabel: 'Time frame ${w.label}',
+                              onPressed: () {
+                                setState(() {
+                                  _when = w;
+                                  _timeError = null;
+                                });
+                              },
+                            ),
+                        ],
                       ),
                       const SizedBox(height: JfSpacing.md),
-                      JfDialSelector<EventCategory>(
-                        key: const ValueKey('jf-what-dial'),
-                        label: 'WHAT',
-                        values: kV01EventCategories,
-                        value: _what,
-                        labelOf: (v) => v.label,
-                        onChanged: (v) {
-                          setState(() => _what = v);
-                          widget.onCategoryChanged(v);
-                        },
-                        semanticPrefix: 'What',
+                      Text(
+                        _what == null
+                            ? 'EVENT TYPE // SELECT'
+                            : 'EVENT TYPE // ${_what!.label}',
+                        style: JfTypography.micro.copyWith(
+                          color: _typeError != null
+                              ? JfColors.validationPhosphor
+                              : JfColors.white70,
+                        ),
                       ),
-                      // Extra scroll room so CLOSE stays reachable while
-                      // the keyboard is open and the field stays focused.
+                      if (_typeError != null)
+                        Text(_typeError!, style: JfTypography.validationError),
+                      const SizedBox(height: JfSpacing.xs),
+                      Wrap(
+                        key: const ValueKey('jf-what-options'),
+                        spacing: JfSpacing.xs,
+                        runSpacing: JfSpacing.xs,
+                        children: [
+                          for (final c in kV01EventCategories)
+                            JfDeviceButton(
+                              key: ValueKey('jf-what-${c.name}'),
+                              label: c.label,
+                              selected: _what == c,
+                              variant: JfButtonVariant.compact,
+                              expanded: false,
+                              semanticLabel: 'Event type ${c.label}',
+                              onPressed: () {
+                                setState(() {
+                                  _what = c;
+                                  _typeError = null;
+                                });
+                              },
+                            ),
+                        ],
+                      ),
                       const SizedBox(height: JfSpacing.xl),
                     ],
                   ),
@@ -261,11 +322,18 @@ class _JfSearchParameterDialogBodyState
               ),
               const SizedBox(height: JfSpacing.lg),
               JfDeviceButton(
+                key: const ValueKey('jf-param-scan'),
+                label: 'SCAN FOR EVENTS',
+                semanticLabel: 'Scan for events',
+                onPressed: _scan,
+              ),
+              const SizedBox(height: JfSpacing.sm),
+              JfDeviceButton(
                 key: const ValueKey('jf-param-close'),
-                label: 'CLOSE',
-                semanticLabel: 'Close search parameters',
-                onPressed: () =>
-                    Navigator.of(context, rootNavigator: true).pop(),
+                label: 'CANCEL',
+                semanticLabel: 'Cancel search',
+                variant: JfButtonVariant.compact,
+                onPressed: _cancel,
               ),
             ],
           ),

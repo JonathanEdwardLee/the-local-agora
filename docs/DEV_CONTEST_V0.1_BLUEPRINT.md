@@ -10,7 +10,7 @@ Build method: Cursor-assisted Flutter and Dart development; Antigravity may cont
 Primary prize category: Best Use of Google AI  
 Contest deadline: Monday, July 13, 2026 at 1:59 AM Central Daylight Time  
 Internal finish line: Sunday, July 12, 2026 at 9:00 PM Central Daylight Time  
-Last revised: July 12, 2026 — Pass 03 contest-safe DemoKeryx discovery slice (ADR-041); July 10, 2026 — post-contest shared-platform continuity approved; Pass 02B.1A merged against repository history
+Last revised: July 12, 2026 — Pass 03.2 public plain language + search overlay (ADR-043); Pass 03.1 CRT/one-scan; July 10, 2026 — post-contest shared-platform continuity approved; Pass 02B.1A merged against repository history
 
 
 # ZEUS DECISION

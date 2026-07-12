@@ -112,7 +112,7 @@ void main() {
     await _pumpScanControl(tester);
     expect(find.byType(JfMonitorModule), findsOneWidget);
     expect(find.byType(JfCrtMonitor), findsOneWidget);
-    expect(find.byType(JfWaitingScanPrompt), findsOneWidget);
+    expect(find.text('WELCOME'), findsOneWidget);
     expect(find.byType(JfSignalCoil), findsOneWidget);
     expect(find.byType(JfIndicatorBoard), findsOneWidget);
     expect(find.byType(JfMachineScrollbar), findsOneWidget);
@@ -127,79 +127,70 @@ void main() {
 
   testWidgets('main panel 04 is compact search deck', (tester) async {
     await _pumpScanControl(tester);
-    expect(find.text('Search for an event'), findsOneWidget);
-    expect(find.text('INPUT SEARCH PARAMETERS'), findsOneWidget);
-    expect(find.text('SCAN THE AGORA'), findsOneWidget);
+    expect(find.text('WELCOME'), findsOneWidget);
+    expect(find.text('SEARCH FOR AN EVENT'), findsOneWidget);
+    expect(find.text('SCAN THE AGORA'), findsNothing);
     expect(find.byType(TextField), findsNothing);
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsNothing);
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsNothing);
+    expect(find.byKey(const ValueKey('jf-when-options')), findsNothing);
+    expect(find.byKey(const ValueKey('jf-what-options')), findsNothing);
   });
 
-  testWidgets('parameter dialog opens with location WHEN WHAT and Close', (
+  testWidgets('search overlay opens with location time frame and event type', (
     tester,
   ) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
-    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
-    expect(
-      find.text('Choose a city or ZIP code, then set WHEN and WHAT.'),
-      findsOneWidget,
-    );
+    expect(find.text('SEARCH FOR AN EVENT'), findsWidgets);
     expect(find.byKey(const ValueKey('jf-param-location')), findsOneWidget);
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-when-options')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-what-options')), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-param-scan')), findsOneWidget);
     expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
+    expect(find.text('TIME FRAME // SELECT'), findsOneWidget);
+    expect(find.text('EVENT TYPE // SELECT'), findsOneWidget);
   });
 
-  testWidgets('parameter state persists and updates monitor', (tester) async {
+  testWidgets('search overlay selections persist when reopened after cancel', (
+    tester,
+  ) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
-    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHEN')));
-    // WHAT defaults to MUSIC in V0.1 (art/gatherings/all-signals deferred).
-    expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
-    expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
-    await _closeParams(tester);
-    expect(find.text('SEARCH PARAMETERS'), findsNothing);
-    expect(find.textContaining('WINDOW // NEXT 7 DAYS'), findsOneWidget);
-    expect(find.textContaining('SIGNAL TYPE // MUSIC'), findsOneWidget);
-    expect(
-      find.textContaining('SPRINGFIELD, MISSOURI // NEXT 7 DAYS // MUSIC'),
-      findsOneWidget,
+    await _tapControl(
+      tester,
+      find.byKey(const ValueKey('jf-when-nextSevenDays')),
     );
+    await _tapControl(tester, find.byKey(const ValueKey('jf-what-music')));
+    await _closeParams(tester);
+    expect(find.text('WELCOME'), findsOneWidget);
     await _openParams(tester);
     expect(find.text('Springfield, Missouri'), findsWidgets);
-    expect(find.text('NEXT 7 DAYS'), findsWidgets);
-    expect(find.text('MUSIC'), findsWidgets);
+    expect(find.text('TIME FRAME // NEXT 7 DAYS'), findsOneWidget);
+    expect(find.text('EVENT TYPE // MUSIC'), findsOneWidget);
     expect(find.text('ALL SIGNALS'), findsNothing);
     expect(find.text('ART'), findsNothing);
     expect(find.text('GATHERINGS'), findsNothing);
-    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
-    await _tapControl(tester, find.byKey(const ValueKey('jf-dial-next-WHAT')));
-    expect(find.text('THEATER'), findsWidgets);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-what-stage')));
+    expect(find.text('EVENT TYPE // THEATER'), findsOneWidget);
     await _closeParams(tester);
   });
 
-  testWidgets('only one parameter dialog at a time', (tester) async {
+  testWidgets('only one search overlay at a time', (tester) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
-    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
     expect(find.byType(Dialog), findsOneWidget);
   });
 
-  testWidgets('empty Scan shows phosphor validation dialog', (tester) async {
+  testWidgets('empty scan keeps overlay open with validation', (tester) async {
     await _pumpScanControl(tester);
-    await _tapControl(tester, find.text('SCAN THE AGORA'));
-    expect(find.text('LOCATION REQUIRED'), findsWidgets);
-    expect(
-      find.text('Enter a city or ZIP code before scanning the Agora.'),
-      findsOneWidget,
-    );
-    final dialog = tester.widget<Dialog>(find.byType(Dialog));
-    final shape = dialog.shape! as Border;
-    expect(shape.top.color, JfColors.validationPhosphor);
-    expect(find.text('SCAN CONTROL READY'), findsNothing);
+    await _openParams(tester);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-param-scan')));
+    await tester.pump();
+    expect(find.textContaining('LOCATION REQUIRED'), findsWidgets);
+    expect(find.text('TIME FRAME REQUIRED'), findsOneWidget);
+    expect(find.text('EVENT TYPE REQUIRED'), findsOneWidget);
+    expect(find.byKey(const ValueKey('jf-param-scan')), findsOneWidget);
   });
 
   testWidgets('valid Scan shows results inside CRT monitor', (tester) async {
@@ -207,25 +198,30 @@ void main() {
     await _openParams(tester);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
-    await _closeParams(tester);
-    await _tapControl(tester, find.text('SCAN THE AGORA'));
+    await _tapControl(
+      tester,
+      find.byKey(const ValueKey('jf-when-nextSevenDays')),
+    );
+    await _tapControl(tester, find.byKey(const ValueKey('jf-what-music')));
+    await _tapControl(tester, find.byKey(const ValueKey('jf-param-scan')));
+    await _pumpDialogTransition(tester);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
     await tester.pump();
     expect(find.text('CITY INDEX'), findsNothing);
-    expect(find.textContaining('SIGNALS FOUND'), findsOneWidget);
-    expect(find.textContaining('VERIFIED KERYX SIGNALS'), findsOneWidget);
-    expect(find.text('OPEN RECORD'), findsWidgets);
-    expect(find.text('SCAN THE AGORA'), findsOneWidget);
+    expect(find.textContaining('EVENTS FOUND'), findsOneWidget);
+    expect(find.textContaining('VERIFIED DEMO RESULTS'), findsOneWidget);
+    expect(find.text('OPEN RECORD'), findsNothing);
+    expect(find.text('UPCOMING EVENTS'), findsOneWidget);
+    expect(find.text('SEARCH FOR AN EVENT'), findsOneWidget);
   });
 
-  testWidgets('valid location clears invalid state', (tester) async {
+  testWidgets('location validation clears when typing', (tester) async {
     await _pumpScanControl(tester);
-    await _tapControl(tester, find.text('SCAN THE AGORA'));
-    expect(find.text('LOCATION REQUIRED'), findsWidgets);
-    await _tapControl(tester, find.text('ACKNOWLEDGE'));
-    await _pumpDialogTransition(tester);
     await _openParams(tester);
+    await _tapControl(tester, find.byKey(const ValueKey('jf-param-scan')));
+    await tester.pump();
+    expect(find.textContaining('LOCATION REQUIRED'), findsWidgets);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
     expect(
@@ -299,7 +295,7 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
-    await tester.ensureVisible(find.text('SCAN THE AGORA'));
+    await tester.ensureVisible(find.text('SEARCH FOR AN EVENT'));
   });
 
   testWidgets('parameter dialog keeps location visible under keyboard inset', (
@@ -334,23 +330,24 @@ void main() {
     final keyboardTop = screen.height - 320;
     expect(fieldRect.top, greaterThanOrEqualTo(0));
     expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
-    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+    expect(find.text('SEARCH FOR AN EVENT'), findsWidgets);
+    expect(find.byType(Dialog), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
     expect(find.text('Springfield, Missouri'), findsWidgets);
     expect(fieldRect.bottom, lessThanOrEqualTo(keyboardTop + 1));
 
-    await tester.ensureVisible(find.byKey(const ValueKey('jf-when-dial')));
-    expect(find.byKey(const ValueKey('jf-when-dial')), findsOneWidget);
-    await tester.ensureVisible(find.byKey(const ValueKey('jf-what-dial')));
-    expect(find.byKey(const ValueKey('jf-what-dial')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('jf-when-options')));
+    expect(find.byKey(const ValueKey('jf-when-options')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('jf-what-options')));
+    expect(find.byKey(const ValueKey('jf-what-options')), findsOneWidget);
     await tester.ensureVisible(find.byKey(const ValueKey('jf-param-close')));
     expect(find.byKey(const ValueKey('jf-param-close')), findsOneWidget);
 
     tester.view.viewInsets = FakeViewPadding.zero;
     await tester.pump(const Duration(milliseconds: 120));
-    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+    expect(find.byType(Dialog), findsOneWidget);
   });
 
   testWidgets(
@@ -402,7 +399,7 @@ void main() {
     FocusManager.instance.primaryFocus?.unfocus();
     tester.view.viewInsets = FakeViewPadding.zero;
     await tester.pump(const Duration(milliseconds: 100));
-    expect(find.text('SEARCH PARAMETERS'), findsOneWidget);
+    expect(find.byType(Dialog), findsOneWidget);
     addTearDown(tester.view.resetViewInsets);
   });
 
@@ -493,12 +490,12 @@ void main() {
   });
 
   test('empty-location validation path avoids amber', () {
-    final scan = File(
-      'lib/features/scan_control/scan_control_screen.dart',
+    final overlay = File(
+      'lib/design/jf_search_parameter_dialog.dart',
     ).readAsStringSync();
-    expect(scan.contains('warning: true'), isFalse);
-    expect(scan.contains('validationError: true'), isTrue);
-    expect(scan.contains('JfColors.amber'), isFalse);
+    expect(overlay.contains('JfColors.amber'), isFalse);
+    expect(overlay.contains('JfTypography.validationError'), isTrue);
+    expect(overlay.contains('LOCATION REQUIRED'), isTrue);
   });
 
   test('only approved Flutter Firebase packages are present', () {

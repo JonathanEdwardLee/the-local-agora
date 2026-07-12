@@ -34,7 +34,7 @@ void main() {
     expect(result.signalCount, greaterThan(0));
     expect(result.isDemo, isTrue);
     expect(result.origin, KeryxResultOrigin.verifiedDemo);
-    expect(result.provenanceLines.first, contains('VERIFIED KERYX SIGNALS'));
+    expect(result.provenanceLines.first, contains('VERIFIED DEMO RESULTS'));
     expect(result.signals.every((s) => s.category == 'MUSIC'), isTrue);
     // Stable chronological order
     final again = await svc.scan(

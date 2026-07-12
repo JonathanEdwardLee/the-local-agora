@@ -1,22 +1,44 @@
 import 'package:flutter/material.dart';
 
 import '../../design/jf_device_button.dart';
+import '../../design/jf_oled_toast.dart';
 import '../../design/junkfeathers_tokens.dart';
 import '../../services/keryx/agora_event_signal.dart';
+import '../../services/source_launch.dart';
 
-/// Compact chronological signal row for the CRT result index.
+/// Compact chronological event row for the CRT result index.
 class CrtSignalRecord extends StatelessWidget {
-  const CrtSignalRecord({
-    super.key,
-    required this.signal,
-    required this.onOpenRecord,
-  });
+  const CrtSignalRecord({super.key, required this.signal});
 
   final AgoraEventSignal signal;
-  final VoidCallback onOpenRecord;
+
+  Future<void> _checkSource(BuildContext context) async {
+    final result = await openOriginalSource(signal.sourceUrl);
+    if (!context.mounted) return;
+    switch (result) {
+      case SourceLaunchResult.opened:
+        break;
+      case SourceLaunchResult.invalid:
+        showJfOledToast(
+          context,
+          'SOURCE NOT AVAILABLE',
+          detail: 'This event has no valid public source URL.',
+          warning: true,
+        );
+      case SourceLaunchResult.failed:
+        showJfOledToast(
+          context,
+          'SOURCE NOT AVAILABLE',
+          detail: 'Could not open the public source in an external browser.',
+          warning: true,
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final hasSource = signal.hasLaunchableSource;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: JfSpacing.sm),
       child: DecoratedBox(
@@ -46,9 +68,19 @@ class CrtSignalRecord extends StatelessWidget {
                 style: JfTypography.micro.copyWith(color: JfColors.white70),
               ),
               if (signal.category != null)
-                Text('TYPE // ${signal.category}', style: JfTypography.micro),
+                Text(
+                  'EVENT TYPE // ${signal.category}',
+                  style: JfTypography.micro,
+                ),
+              if (signal.summary != null && signal.summary!.trim().isNotEmpty)
+                Text(
+                  signal.summary!,
+                  style: JfTypography.supporting.copyWith(fontSize: 10),
+                ),
               Text(
-                'SOURCE // ${signal.sourceLabel}',
+                hasSource
+                    ? 'SOURCE // ${signal.sourceLabel}'
+                    : 'SOURCE NOT AVAILABLE',
                 style: JfTypography.micro.copyWith(color: JfColors.white54),
               ),
               if (signal.uncertainties.isNotEmpty)
@@ -57,12 +89,26 @@ class CrtSignalRecord extends StatelessWidget {
                   style: JfTypography.micro.copyWith(color: JfColors.white70),
                 ),
               const SizedBox(height: JfSpacing.xs),
-              JfDeviceButton(
-                key: ValueKey('crt-open-record-${signal.id}'),
-                label: 'OPEN RECORD',
-                semanticLabel: 'Open record ${signal.title}',
+              if (hasSource)
+                JfDeviceButton(
+                  key: ValueKey('crt-check-source-${signal.id}'),
+                  label: 'CHECK SOURCE',
+                  semanticLabel: 'Check source for ${signal.title}',
+                  variant: JfButtonVariant.compact,
+                  onPressed: () => _checkSource(context),
+                )
+              else
+                Text(
+                  'SOURCE NOT AVAILABLE',
+                  key: ValueKey('crt-source-unavailable-${signal.id}'),
+                  style: JfTypography.micro.copyWith(color: JfColors.white38),
+                ),
+              const SizedBox(height: JfSpacing.xs),
+              const JfDeviceButton(
+                label: 'ADD TO CALENDAR // SOON',
+                semanticLabel: 'Add to calendar — coming soon, unavailable',
                 variant: JfButtonVariant.compact,
-                onPressed: onOpenRecord,
+                onPressed: null,
               ),
             ],
           ),

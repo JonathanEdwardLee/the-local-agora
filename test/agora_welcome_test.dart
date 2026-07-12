@@ -42,7 +42,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('art, and creative'), findsNothing);
-    expect(find.text('SCAN THE AGORA'), findsOneWidget);
+    expect(find.text('SEARCH FOR AN EVENT'), findsOneWidget);
     expect(find.text('ABOUT'), findsOneWidget);
     expect(find.text('ADD EVENT'), findsOneWidget);
   });
@@ -211,7 +211,9 @@ void main() {
     expect(await store.isPermanentlyDismissed(), isTrue);
   });
 
-  testWidgets('ADD EVENT and ABOUT sit beneath SCAN THE AGORA', (tester) async {
+  testWidgets('ADD EVENT and ABOUT sit beneath SEARCH FOR AN EVENT', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(400, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -227,7 +229,7 @@ void main() {
     );
     await tester.pump();
 
-    final scanY = tester.getTopLeft(find.text('SCAN THE AGORA')).dy;
+    final scanY = tester.getTopLeft(find.text('SEARCH FOR AN EVENT')).dy;
     final addY = tester.getTopLeft(find.text('ADD EVENT')).dy;
     final aboutY = tester.getTopLeft(find.text('ABOUT')).dy;
     expect(addY, greaterThan(scanY));

@@ -15,6 +15,9 @@ class OneScanBetaKeryxService implements KeryxService {
   int callCount = 0;
 
   @override
+  Future<bool> hasConsumedBetaAllowance() => allowance.hasUsedBetaScan();
+
+  @override
   Future<KeryxScanResult> scan(KeryxScanRequest request) async {
     callCount += 1;
     if (await allowance.hasUsedBetaScan()) {
@@ -24,7 +27,7 @@ class OneScanBetaKeryxService implements KeryxService {
         errorKind: KeryxScanErrorKind.betaScanConsumed,
         machineTitle: 'ERR // ONLY ONE SCAN ALLOWED FOR BETA',
         supportText:
-            'This installation has already used its contest beta Keryx scan.',
+            'This installation has already used its contest beta event search.',
         origin: KeryxResultOrigin.none,
       );
     }

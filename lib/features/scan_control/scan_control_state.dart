@@ -44,35 +44,57 @@ extension EventCategoryLabel on EventCategory {
 }
 
 /// Typed Scan Control state — no nested business logic in widgets.
+///
+/// Pass 03.2: no presets — location empty; time frame / event type unselected
+/// until the user chooses them in the search overlay.
 class ScanControlState {
   const ScanControlState({
     this.locationText = '',
-    this.timeWindow = TimeWindow.thisWeekend,
-    this.category = EventCategory.music,
+    this.timeWindow,
+    this.category,
     this.locationError,
+    this.timeWindowError,
+    this.categoryError,
   });
 
   final String locationText;
-  final TimeWindow timeWindow;
-  final EventCategory category;
+  final TimeWindow? timeWindow;
+  final EventCategory? category;
   final String? locationError;
+  final String? timeWindowError;
+  final String? categoryError;
 
   bool get hasLocation => locationText.trim().isNotEmpty;
+  bool get hasTimeWindow => timeWindow != null;
+  bool get hasCategory => category != null;
+  bool get isReadyToScan => hasLocation && hasTimeWindow && hasCategory;
 
   ScanControlState copyWith({
     String? locationText,
     TimeWindow? timeWindow,
     EventCategory? category,
     String? locationError,
+    String? timeWindowError,
+    String? categoryError,
     bool clearLocationError = false,
+    bool clearTimeWindowError = false,
+    bool clearCategoryError = false,
+    bool clearTimeWindow = false,
+    bool clearCategory = false,
   }) {
     return ScanControlState(
       locationText: locationText ?? this.locationText,
-      timeWindow: timeWindow ?? this.timeWindow,
-      category: category ?? this.category,
+      timeWindow: clearTimeWindow ? null : (timeWindow ?? this.timeWindow),
+      category: clearCategory ? null : (category ?? this.category),
       locationError: clearLocationError
           ? null
           : (locationError ?? this.locationError),
+      timeWindowError: clearTimeWindowError
+          ? null
+          : (timeWindowError ?? this.timeWindowError),
+      categoryError: clearCategoryError
+          ? null
+          : (categoryError ?? this.categoryError),
     );
   }
 }

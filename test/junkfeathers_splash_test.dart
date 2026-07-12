@@ -187,15 +187,15 @@ void main() {
 
     expect(find.byType(JunkfeathersSplash), findsOneWidget);
     expect(find.text('LA_TIP'), findsOneWidget);
-    expect(find.text('SCAN THE AGORA'), findsNothing);
+    expect(find.text('SEARCH FOR AN EVENT'), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 2860));
-    expect(find.text('SCAN THE AGORA'), findsNothing);
+    expect(find.text('SEARCH FOR AN EVENT'), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 20));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
-    expect(find.text('SCAN THE AGORA'), findsOneWidget);
+    expect(find.text('SEARCH FOR AN EVENT'), findsOneWidget);
     expect(find.byType(JunkfeathersSplash), findsNothing);
   });
 }

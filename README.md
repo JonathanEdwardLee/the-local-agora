@@ -8,9 +8,9 @@ This repository is the DEV Passion Challenge Version 0.1 codebase for The Local 
 
 Operational scan workflow (machine instruction, not the public tagline): **Choose a place. Choose a time. Scan the Agora.**
 
-## Pass 03 / 03.1 status
+## Pass 03 / 03.1 / 03.2 status
 
-Contest discovery on branch `pass-03-agora-discovery-vertical-slice`: Scan results appear inside the CRT monitor; Open Record is a dedicated route. Android (App Check ready) allows one live beta Keryx scan; Flutter web uses verified demo fixture fallback. See ADR-041 / ADR-042 and `lib/data/fixtures/FIXTURE_PROVENANCE.md`.
+Contest discovery on branch `pass-03-agora-discovery-vertical-slice`: CRT-hosted upcoming events, SEARCH FOR AN EVENT overlay, plain public language (ADR-043). Android one live beta scan; web verified demo fallback. See ADR-041–043.
 
 ## Locked identity
 

@@ -100,34 +100,29 @@ class KeryxScanResult {
   bool get isDemo => origin == KeryxResultOrigin.verifiedDemo;
   bool get isLive => origin == KeryxResultOrigin.live;
 
-  /// Restrained CRT provenance lines (no internal architecture jargon).
+  /// Restrained CRT provenance lines — plain public language (ADR-043).
   List<String> get provenanceLines {
     switch (origin) {
       case KeryxResultOrigin.live:
-        return [
-          'LIVE KERYX SIGNALS',
-          if (lastCheckedAt != null) 'LAST CHECKED ${_fmt(lastCheckedAt!)}',
-        ];
+        return const ['LIVE RESULTS'];
       case KeryxResultOrigin.verifiedDemo:
-        return [
-          'VERIFIED KERYX SIGNALS',
-          if (lastCheckedAt != null) 'LAST CHECKED ${_fmt(lastCheckedAt!)}',
-        ];
+        return const ['VERIFIED DEMO RESULTS'];
       case KeryxResultOrigin.none:
         return const [];
     }
   }
 
-  static String _fmt(DateTime d) {
-    final l = d.toUtc();
-    final y = l.year.toString().padLeft(4, '0');
-    final m = l.month.toString().padLeft(2, '0');
-    final day = l.day.toString().padLeft(2, '0');
-    return '$y.$m.$day';
+  String eventsFoundLabel() {
+    final n = signalCount;
+    if (n == 1) return '1 EVENT FOUND';
+    return '$n EVENTS FOUND';
   }
 }
 
-/// Contest discovery service boundary (ADR-041 / ADR-042).
+/// Contest discovery service boundary (ADR-041 / ADR-042 / ADR-043).
 abstract interface class KeryxService {
   Future<KeryxScanResult> scan(KeryxScanRequest request);
+
+  /// True when the one-scan beta allowance is already consumed (Android live).
+  Future<bool> hasConsumedBetaAllowance();
 }

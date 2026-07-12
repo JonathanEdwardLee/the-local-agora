@@ -4,25 +4,22 @@ import 'package:flutter/material.dart';
 import '../../design/jf_device_button.dart';
 import '../../design/jf_machine_identity_panel.dart';
 import '../../design/jf_monitor_module.dart';
-import '../../design/jf_oled_dialog.dart';
 import '../../design/jf_panel.dart';
 import '../../design/jf_search_parameter_dialog.dart';
 import '../../design/jf_signal_coil.dart';
 import '../../design/junkfeathers_tokens.dart';
-import '../../services/keryx/agora_event_signal.dart';
 import '../../services/keryx/demo_keryx_service.dart';
 import '../../services/keryx/keryx_link_service.dart';
 import '../../services/keryx/keryx_live_scan_service.dart';
 import '../../services/keryx/keryx_service.dart';
 import '../debug/debug_component_gallery.dart';
 import '../discovery/agora_scan_phase.dart';
+import '../discovery/crt_searching_animation.dart';
 import '../discovery/crt_signal_record.dart';
-import '../discovery/open_record_screen.dart';
 import 'scan_control_state.dart';
 
 /// SCREEN 1 — SCAN CONTROL
-/// Compact Panel 04 + Search Parameter dialog.
-/// Pass 03.1: CRT hosts idle / searching / results / empty / error.
+/// Pass 03.2: welcome CRT, SEARCH FOR AN EVENT overlay, CRT-hosted results.
 class ScanControlScreen extends StatefulWidget {
   const ScanControlScreen({
     super.key,
@@ -38,11 +35,7 @@ class ScanControlScreen extends StatefulWidget {
   final bool appCheckReady;
   final KeryxLinkService? keryxLinkService;
   final KeryxLiveScanService? keryxLiveScanService;
-
-  /// Contest discovery path (injected by [main] / tests).
   final KeryxService? keryxService;
-
-  /// Opens the About surface (not Welcome).
   final Future<void> Function()? onOpenAbout;
 
   @override
@@ -87,127 +80,105 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
     return JfSignalCoilMode.idle;
   }
 
-  List<String> get _idleMonitorLines {
-    final lines = <String>[
-      _state.hasLocation
-          ? 'LOCATION // ${_state.locationText.trim().toUpperCase()}'
-          : 'AWAITING LOCATION INPUT',
-      'WINDOW // ${_state.timeWindow.label}',
-      'SIGNAL TYPE // ${_state.category.label}',
-      if (_keryx is DemoKeryxService)
-        'MODE // VERIFIED DEMO SIGNALS'
-      else
-        'MODE // LIVE KERYX SCAN',
-    ];
-    if (_state.locationError != null) {
-      lines.add('ERR // LOCATION REQUIRED');
+  Future<void> _openSearchOverlay() async {
+    if (_paramDialogOpen || _scanInFlight) return;
+
+    if (await _keryx.hasConsumedBetaAllowance()) {
+      if (!mounted) return;
+      setState(() {
+        _phase = AgoraScanPhase.error;
+        _lastResult = KeryxScanResult(
+          outcome: KeryxScanOutcome.error,
+          request: KeryxScanRequest(
+            location: _state.locationText,
+            timeWindow: _state.timeWindow ?? TimeWindow.nextSevenDays,
+            category: _state.category ?? EventCategory.music,
+          ),
+          errorKind: KeryxScanErrorKind.betaScanConsumed,
+          machineTitle: 'ERR // ONLY ONE SCAN ALLOWED FOR BETA',
+          supportText:
+              'This installation has already used its contest beta event search.',
+        );
+      });
+      return;
     }
-    return lines;
-  }
 
-  String? get _parameterSummary {
-    final loc = _state.locationText.trim();
-    if (loc.isEmpty) return null;
-    return '${loc.toUpperCase()} // ${_state.timeWindow.label} // '
-        '${_state.category.label}';
-  }
-
-  void _onLocationChanged(String value) {
-    setState(() {
-      _state = _state.copyWith(locationText: value, clearLocationError: true);
-    });
-  }
-
-  void _selectTime(TimeWindow window) {
-    setState(() => _state = _state.copyWith(timeWindow: window));
-  }
-
-  void _selectCategory(EventCategory category) {
-    setState(() => _state = _state.copyWith(category: category));
-  }
-
-  Future<void> _openParameterDialog() async {
-    if (_paramDialogOpen) return;
+    if (!mounted) return;
     _paramDialogOpen = true;
-    await showJfSearchParameterDialog(
+    final result = await showJfSearchParameterDialog(
       context: context,
       locationController: _locationController,
       locationFocus: _locationFocus,
       timeWindow: _state.timeWindow,
       category: _state.category,
       locationError: _state.locationError,
-      onLocationChanged: _onLocationChanged,
-      onTimeChanged: _selectTime,
-      onCategoryChanged: _selectCategory,
+      timeWindowError: _state.timeWindowError,
+      categoryError: _state.categoryError,
       onFocusChange: (focused) {
         setState(() => _fieldFocused = focused);
       },
     );
-    if (mounted) {
+    _paramDialogOpen = false;
+    if (!mounted) return;
+
+    if (result == null) {
       setState(() {});
-      _paramDialogOpen = false;
-    } else {
-      _paramDialogOpen = false;
-    }
-  }
-
-  Future<void> _openRecord(AgoraEventSignal signal) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => OpenRecordScreen(signal: signal)),
-    );
-    // Results + scroll remain; do not re-run scan.
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _onScanPressed() async {
-    if (_scanInFlight) return;
-
-    final trimmed = _locationController.text.trim();
-    if (trimmed.isEmpty) {
-      setState(() {
-        _phase = AgoraScanPhase.validating;
-        _state = _state.copyWith(
-          locationText: '',
-          locationError: 'LOCATION REQUIRED — enter a city or ZIP code.',
-        );
-      });
-      await showJfOledDialog<void>(
-        context: context,
-        title: 'LOCATION REQUIRED',
-        body: 'Enter a city or ZIP code before scanning the Agora.',
-        confirmLabel: 'ACKNOWLEDGE',
-        validationError: true,
-        secondaryLabel: 'INPUT SEARCH PARAMETERS',
-        onSecondary: () {
-          _openParameterDialog();
-        },
-      );
-      if (mounted) {
-        setState(() => _phase = AgoraScanPhase.idle);
-      }
       return;
     }
 
     setState(() {
-      _state = _state.copyWith(locationText: trimmed, clearLocationError: true);
+      _state = _state.copyWith(
+        locationText: result.location.isNotEmpty
+            ? result.location
+            : _locationController.text,
+        timeWindow: result.timeWindow,
+        category: result.category,
+        clearLocationError: true,
+        clearTimeWindowError: true,
+        clearCategoryError: true,
+        clearTimeWindow: result.timeWindow == null,
+        clearCategory: result.category == null,
+      );
+    });
+
+    if (result.action == SearchOverlayAction.cancelled) {
+      return;
+    }
+
+    await _runScan(
+      location: result.location,
+      timeWindow: result.timeWindow!,
+      category: result.category!,
+    );
+  }
+
+  Future<void> _runScan({
+    required String location,
+    required TimeWindow timeWindow,
+    required EventCategory category,
+  }) async {
+    if (_scanInFlight) return;
+
+    setState(() {
       _scanInFlight = true;
       _phase = AgoraScanPhase.searching;
+      // Keep prior results visible only until searching replaces CRT body.
       _lastResult = null;
     });
 
     final request = KeryxScanRequest(
-      location: trimmed,
-      timeWindow: _state.timeWindow,
-      category: _state.category,
+      location: location,
+      timeWindow: timeWindow,
+      category: category,
     );
 
-    final result = await _keryx.scan(request);
+    final scanResult = await _keryx.scan(request);
     if (!mounted) return;
 
     setState(() {
       _scanInFlight = false;
-      _lastResult = result;
-      switch (result.outcome) {
+      _lastResult = scanResult;
+      switch (scanResult.outcome) {
         case KeryxScanOutcome.results:
           _phase = AgoraScanPhase.results;
         case KeryxScanOutcome.empty:
@@ -217,44 +188,48 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
       }
     });
 
-    // Preserve prior scroll only when still on results; reset for new payload.
     if (_crtScroll.hasClients) {
       _crtScroll.jumpTo(0);
     }
   }
 
-  Widget? _crtBody() {
+  Widget _crtBody() {
     switch (_phase) {
       case AgoraScanPhase.idle:
       case AgoraScanPhase.validating:
-        return null;
+        return const _WelcomeCrtBody();
       case AgoraScanPhase.searching:
-        return _SearchingCrtBody(
+        return CrtSearchingAnimation(
           location: _state.locationText.trim(),
-          windowLabel: _state.timeWindow.label,
-          categoryLabel: _state.category.label,
+          timeFrameLabel: _state.timeWindow?.label ?? '',
+          eventTypeLabel: _state.category?.label ?? '',
         );
       case AgoraScanPhase.results:
         final result = _lastResult;
-        if (result == null) return null;
-        return _ResultsCrtBody(result: result, onOpenRecord: _openRecord);
+        if (result == null) return const _WelcomeCrtBody();
+        return _ResultsCrtBody(result: result);
       case AgoraScanPhase.empty:
         final result = _lastResult;
         return _StatusCrtBody(
-          title: result?.machineTitle.isNotEmpty == true
-              ? result!.machineTitle
-              : 'NO SUPPORTED SIGNALS FOUND',
-          support: result?.supportText ?? '',
+          title: 'NO SUPPORTED EVENTS FOUND',
+          support: result?.supportText.isNotEmpty == true
+              ? result!.supportText
+              : 'TRY ANOTHER TIME FRAME OR EVENT TYPE.',
           provenance: result?.provenanceLines ?? const [],
         );
       case AgoraScanPhase.error:
         final result = _lastResult;
-        final title = result?.machineTitle.isNotEmpty == true
-            ? result!.machineTitle
-            : 'ERR // SCAN ERROR';
+        final raw = result?.machineTitle ?? '';
+        final title = raw.contains('ONLY ONE SCAN ALLOWED FOR BETA')
+            ? 'ERR // ONLY ONE SCAN ALLOWED FOR BETA'
+            : (raw.startsWith('ERR //')
+                  ? raw
+                  : (raw.isEmpty ? 'EVENT SEARCH FAILED' : raw));
         return _StatusCrtBody(
-          title: title.startsWith('ERR //') ? title : 'ERR // $title',
-          support: result?.supportText ?? 'The Agora scan could not complete.',
+          title: title,
+          support: result?.errorKind == KeryxScanErrorKind.betaScanConsumed
+              ? (result?.supportText ?? '')
+              : '',
           provenance: const [],
           emphasizeError: true,
         );
@@ -265,8 +240,6 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final monitorHeight = JfMonitorModule.resolveMonitorHeight(context);
-    final summary = _parameterSummary;
-    final crtBody = _crtBody();
     final warning =
         _phase == AgoraScanPhase.error || _state.locationError != null;
 
@@ -292,8 +265,8 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                     const JfMachineIdentityPanel(),
                     const SizedBox(height: JfSpacing.sm),
                     JfMonitorModule(
-                      lines: crtBody == null ? _idleMonitorLines : const [],
-                      crtBody: crtBody,
+                      lines: const [],
+                      crtBody: _crtBody(),
                       monitorHeight: monitorHeight,
                       bandHeight: JfMonitorModule.defaultBandHeight,
                       coilMode: _coilMode,
@@ -315,35 +288,13 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Text(
-                              'Search for an event',
-                              style: JfTypography.supporting,
-                            ),
-                            if (summary != null) ...[
-                              const SizedBox(height: JfSpacing.sm),
-                              Text(
-                                summary,
-                                style: JfTypography.micro.copyWith(
-                                  color: JfColors.white70,
-                                  fontSize: 9,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: JfSpacing.md),
                             JfDeviceButton(
                               key: const ValueKey('jf-open-params'),
-                              label: 'INPUT SEARCH PARAMETERS',
-                              semanticLabel: 'Input search parameters',
+                              label: 'SEARCH FOR AN EVENT',
+                              semanticLabel: 'Search for an event',
                               onPressed: _scanInFlight
                                   ? null
-                                  : _openParameterDialog,
-                            ),
-                            const SizedBox(height: JfSpacing.sm),
-                            JfDeviceButton(
-                              key: const ValueKey('jf-scan-agora'),
-                              label: 'SCAN THE AGORA',
-                              semanticLabel: 'Scan the Agora',
-                              onPressed: _scanInFlight ? null : _onScanPressed,
+                                  : _openSearchOverlay,
                             ),
                             const SizedBox(height: JfSpacing.sm),
                             Row(
@@ -412,46 +363,67 @@ class _ScanControlScreenState extends State<ScanControlScreen> {
   }
 }
 
-class _SearchingCrtBody extends StatelessWidget {
-  const _SearchingCrtBody({
-    required this.location,
-    required this.windowLabel,
-    required this.categoryLabel,
-  });
+class _WelcomeCrtBody extends StatefulWidget {
+  const _WelcomeCrtBody();
 
-  final String location;
-  final String windowLabel;
-  final String categoryLabel;
+  @override
+  State<_WelcomeCrtBody> createState() => _WelcomeCrtBodyState();
+}
+
+class _WelcomeCrtBodyState extends State<_WelcomeCrtBody>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _cursor;
+
+  @override
+  void initState() {
+    super.initState();
+    _cursor = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _cursor.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final reduce = MediaQuery.disableAnimationsOf(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'SEARCHING THE AGORA',
+          'WELCOME',
           style: JfTypography.controlLabel.copyWith(
             color: JfColors.signalGreen,
-            fontSize: 12,
+            fontSize: 13,
           ),
         ),
         const SizedBox(height: JfSpacing.sm),
         Text(
-          'LOCATION // ${location.toUpperCase()}',
-          style: JfTypography.supporting.copyWith(fontSize: 11),
+          'SEARCH FOR AN EVENT NEAR YOU',
+          style: JfTypography.supporting.copyWith(fontSize: 12),
         ),
         Text(
-          'WINDOW // $windowLabel',
-          style: JfTypography.supporting.copyWith(fontSize: 11),
+          'USING THE CONTROL BELOW.',
+          style: JfTypography.supporting.copyWith(fontSize: 12),
         ),
-        Text(
-          'SIGNAL TYPE // $categoryLabel',
-          style: JfTypography.supporting.copyWith(fontSize: 11),
-        ),
-        const SizedBox(height: JfSpacing.sm),
-        Text(
-          'STATUS // SCANNING PUBLIC SIGNALS',
-          style: JfTypography.micro.copyWith(color: JfColors.signalGreen),
+        const SizedBox(height: JfSpacing.md),
+        AnimatedBuilder(
+          animation: _cursor,
+          builder: (context, _) {
+            final opacity = reduce ? 1.0 : _cursor.value;
+            return Text(
+              '█',
+              style: JfTypography.supporting.copyWith(
+                color: JfColors.signalGreen.withValues(alpha: opacity),
+                fontSize: 14,
+              ),
+            );
+          },
         ),
       ],
     );
@@ -459,30 +431,32 @@ class _SearchingCrtBody extends StatelessWidget {
 }
 
 class _ResultsCrtBody extends StatelessWidget {
-  const _ResultsCrtBody({required this.result, required this.onOpenRecord});
+  const _ResultsCrtBody({required this.result});
 
   final KeryxScanResult result;
-  final Future<void> Function(AgoraEventSignal signal) onOpenRecord;
 
   @override
   Widget build(BuildContext context) {
-    final count = result.signalCount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Text(
+          'UPCOMING EVENTS',
+          style: JfTypography.controlLabel.copyWith(
+            color: JfColors.signalGreen,
+            fontSize: 12,
+          ),
+        ),
         for (final line in result.provenanceLines)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 2),
-            child: Text(
-              line,
-              style: JfTypography.micro.copyWith(
-                color: JfColors.signalGreen,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            line,
+            style: JfTypography.micro.copyWith(
+              color: JfColors.signalGreen,
+              fontWeight: FontWeight.bold,
             ),
           ),
         Text(
-          '$count SIGNAL${count == 1 ? '' : 'S'} FOUND',
+          result.eventsFoundLabel(),
           style: JfTypography.controlLabel.copyWith(fontSize: 12),
         ),
         Text(
@@ -494,13 +468,7 @@ class _ResultsCrtBody extends StatelessWidget {
           style: JfTypography.micro.copyWith(color: JfColors.white54),
         ),
         const SizedBox(height: JfSpacing.sm),
-        for (final signal in result.signals)
-          CrtSignalRecord(
-            signal: signal,
-            onOpenRecord: () {
-              onOpenRecord(signal);
-            },
-          ),
+        for (final signal in result.signals) CrtSignalRecord(signal: signal),
       ],
     );
   }
