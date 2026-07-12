@@ -5,7 +5,7 @@
 - Status: **READY FOR PHYSICAL + WEB REVIEW** — not merge-approved
 - Branch: `pass-03-agora-discovery-vertical-slice`
 - Starting approved commit: `4ae055ff5bf06c4ba3dc74fff324905fa2b265ab`
-- Ending commit: *(filled after tip commit)*
+- Ending commit: `2e8bb51f987d115e1b198c15f950a7589e04479f`
 - No paid live Gemini scan run in this pass
 
 ## 2. Architecture
