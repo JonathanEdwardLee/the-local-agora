@@ -296,7 +296,7 @@ There is no Local Agora product splash, no intermediate tagline screen, and no m
 
 ## ADR-040 — Pass 02C.1 physical-test splash, Welcome copy, and About repairs
 
-**Status:** Accepted (awaiting physical re-review; not merge-approved)  
+**Status:** Accepted — **PASS 02C.1 PHYSICALLY APPROVED** (2026-07-12); do not merge to `main` until founder/council directs  
 **Date:** 2026-07-11  
 **Decision:** Founder physical review of Pass 02C required:
 
@@ -305,4 +305,4 @@ There is no Local Agora product splash, no intermediate tagline screen, and no m
 3. **About placement** — Remove About from identity/status area 01. Place a secondary row directly under `SCAN THE AGORA`: `ADD EVENT` | `ABOUT` (balanced, compact, subordinate).
 4. **About surface** — About is a real product-information dialog including product title, tagline, approved About statement, `SHOW WELCOME ON STARTUP` ON/OFF (same `hasDismissedAgoraWelcomePermanently` preference), and `CLOSE`. It must not merely reopen Welcome.
 
-**Consequence:** Do not restore the identity-panel About control. Do not reintroduce a clean splash hold for normal motion. Do not merge Pass 02C/02C.1 until founder physical approval.
+**Consequence:** Do not restore the identity-panel About control. Do not reintroduce a clean splash hold for normal motion. Physical Android approval recorded 2026-07-12 (`PASS 02C.1 PHYSICALLY APPROVED — COMMIT AND PUSH`). Do not merge to `main` until founder/council explicitly directs.

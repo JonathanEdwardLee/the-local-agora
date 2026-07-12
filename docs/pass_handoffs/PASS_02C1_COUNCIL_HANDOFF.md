@@ -2,12 +2,14 @@
 
 ## 1. Pass identity
 - Objective: Physical-test repairs for Pass 02C (splash progression, Welcome copy, About)
-- Status: **READY FOR PHYSICAL ANDROID RE-REVIEW** — **not physically approved; do not merge**
+- Status: **PASS 02C.1 PHYSICALLY APPROVED**
+- Founder phrase: `PASS 02C.1 PHYSICALLY APPROVED — COMMIT AND PUSH`
 - Branch: `pass-02c-universal-splash-welcome`
 - Starting HEAD: `a7421ccac97bd0f892e0e7e8f71d7767d99aa11c`
-- Ending HEAD: *f1ef31d3b7d71fc56f5a5a3566336436b7860905*
-- Prior Pass 02C tip remained unapproved
-
+- Implementation repair commit: `f1ef31d3b7d71fc56f5a5a3566336436b7860905`
+- Approval recorded at tip (this commit sequence) — see git tip after push
+- Prior Pass 02C tip was not approved until 02C.1 repairs passed physical review
+- **Do not merge to `main` yet** (founder direction)
 ## 2. Repairs shipped
 
 ### Splash progression
@@ -68,4 +70,6 @@ Untouched — no live scans, no redeploy, no main Scan wiring to live callable.
 ADR-040; updated Welcome dialog doc, DECISIONS, MASTER, DEV_CONTEST, AI_CODING, README.
 
 ## Founder next
-Physical re-review. Do not merge until approval phrase.
+1. Upload refreshed Drive sync ZIP if council needs the approval commit
+2. Do **not** merge to `main` until founder/council directs
+3. Next product pass starts from the approval tip commit on this branch
