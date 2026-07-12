@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../../design/jf_device_button.dart';
 import '../../design/jf_panel.dart';
 import '../../design/junkfeathers_tokens.dart';
-import '../../services/keryx/agora_event_signal.dart';
 import '../../services/keryx/keryx_service.dart';
 import 'open_record_screen.dart';
 import 'signal_record_tile.dart';
 
-/// SCREEN 3 — CITY INDEX (chronological Agora results).
+/// Legacy full-page City Index — retained for component-gallery / tests only.
+/// Pass 03.1 ordinary Scan shows results inside the CRT monitor instead.
 class CityIndexScreen extends StatelessWidget {
   const CityIndexScreen({super.key, required this.result, this.empty = false});
 
@@ -42,33 +42,32 @@ class CityIndexScreen extends StatelessWidget {
                       style: JfTypography.controlLabel.copyWith(fontSize: 13),
                     ),
                     const SizedBox(height: JfSpacing.sm),
+                    for (final line in result.provenanceLines)
+                      Text(
+                        line,
+                        style: JfTypography.micro.copyWith(
+                          color: JfColors.signalGreen,
+                        ),
+                      ),
                     Text(
                       header,
                       style: JfTypography.deviceTitle.copyWith(fontSize: 16),
                     ),
                     Text(
                       req.location.trim().toUpperCase(),
-                      style: JfTypography.supporting,
-                    ),
-                    Text(
-                      '${req.timeWindowLabel} // ${req.categoryLabel}',
                       style: JfTypography.micro.copyWith(
                         color: JfColors.white70,
                       ),
                     ),
-                    if (result.demoProvenanceBanner != null) ...[
-                      const SizedBox(height: JfSpacing.xs),
-                      Text(
-                        result.demoProvenanceBanner!,
-                        style: JfTypography.micro.copyWith(
-                          color: JfColors.white54,
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: JfSpacing.md),
                     Expanded(
                       child: empty
-                          ? _EmptyBody(supportText: result.supportText)
+                          ? Text(
+                              result.supportText.isEmpty
+                                  ? 'NO SUPPORTED SIGNALS FOUND'
+                                  : result.supportText,
+                              style: JfTypography.supporting,
+                            )
                           : ListView.separated(
                               itemCount: result.signals.length,
                               separatorBuilder: (_, _) =>
@@ -76,18 +75,23 @@ class CityIndexScreen extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final signal = result.signals[index];
                                 return SignalRecordTile(
-                                  key: ValueKey(signal.id),
                                   signal: signal,
-                                  onOpen: () => _openRecord(context, signal),
+                                  onOpen: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (_) =>
+                                            OpenRecordScreen(signal: signal),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             ),
                     ),
                     const SizedBox(height: JfSpacing.md),
                     JfDeviceButton(
-                      key: const ValueKey('agora-index-back'),
-                      label: 'BACK TO SCAN CONTROL',
-                      semanticLabel: 'Back to scan control',
+                      label: 'BACK',
+                      semanticLabel: 'Back',
                       variant: JfButtonVariant.compact,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
@@ -98,39 +102,6 @@ class CityIndexScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  void _openRecord(BuildContext context, AgoraEventSignal signal) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => OpenRecordScreen(signal: signal)),
-    );
-  }
-}
-
-class _EmptyBody extends StatelessWidget {
-  const _EmptyBody({required this.supportText});
-
-  final String supportText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'NO SUPPORTED SIGNALS FOUND',
-          style: JfTypography.controlLabel.copyWith(fontSize: 12),
-        ),
-        const SizedBox(height: JfSpacing.sm),
-        Text(
-          supportText.isEmpty
-              ? 'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
-                    'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.'
-              : supportText,
-          style: JfTypography.supporting,
-        ),
-      ],
     );
   }
 }

@@ -33,7 +33,8 @@ void main() {
     expect(result.outcome, KeryxScanOutcome.results);
     expect(result.signalCount, greaterThan(0));
     expect(result.isDemo, isTrue);
-    expect(result.demoProvenanceBanner, contains('VERIFIED KERYX SIGNALS'));
+    expect(result.origin, KeryxResultOrigin.verifiedDemo);
+    expect(result.provenanceLines.first, contains('VERIFIED KERYX SIGNALS'));
     expect(result.signals.every((s) => s.category == 'MUSIC'), isTrue);
     // Stable chronological order
     final again = await svc.scan(
@@ -93,24 +94,18 @@ void main() {
       ),
     );
     expect(second.outcome, KeryxScanOutcome.error);
-    expect(second.machineTitle, 'SCAN ALREADY IN PROGRESS');
+    expect(second.machineTitle, 'ERR // SCAN ALREADY IN PROGRESS');
     await first;
     expect(svc.callCount, 1);
   });
 
   test('sort puts known starts before unknown times before unknown dates', () {
     final sorted = sortAgoraSignalsChronologically([
-      AgoraEventSignal(
-        id: 'u',
-        title: 'Unknown',
-        sourceUrl: Uri.parse('https://example.com/u'),
-        sourceLabel: 'A',
-      ),
+      AgoraEventSignal(id: 'u', title: 'Unknown', sourceLabel: 'A'),
       AgoraEventSignal(
         id: 'd',
         title: 'Date only',
         displayedDate: '2026-07-12',
-        sourceUrl: Uri.parse('https://example.com/d'),
         sourceLabel: 'A',
       ),
       AgoraEventSignal(
@@ -119,11 +114,18 @@ void main() {
         startsAt: DateTime(2026, 7, 11, 20),
         displayedDate: '2026-07-11',
         displayedTime: '20:00',
-        sourceUrl: Uri.parse('https://example.com/t'),
         sourceLabel: 'A',
       ),
     ]);
     expect(sorted.map((s) => s.id).toList(), ['t', 'd', 'u']);
+  });
+
+  test('fixture has no example.com placeholder sources', () {
+    for (final s in springfieldDemoSignalsWithLastChecked()) {
+      expect(s.sourceUrl, isNull);
+      expect(s.sourceLabel, 'SOURCE NOT AVAILABLE IN THIS RECORD');
+      expect(s.hasLaunchableSource, isFalse);
+    }
   });
 
   test('fixture does not invent ticket prices', () {

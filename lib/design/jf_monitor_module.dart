@@ -9,22 +9,29 @@ import 'junkfeathers_tokens.dart';
 class JfMonitorModule extends StatelessWidget {
   const JfMonitorModule({
     super.key,
-    required this.lines,
+    this.lines = const [],
+    this.crtBody,
     this.monitorHeight = 220,
     this.bandHeight = 72,
     this.warning = false,
     this.coilMode = JfSignalCoilMode.idle,
     this.forceStatic,
     this.showWaitingPrompt = true,
+    this.crtScrollController,
   });
 
   final List<String> lines;
+
+  /// When set, replaces CRT text lines (e.g. chronological results).
+  final Widget? crtBody;
+
   final double monitorHeight;
   final double bandHeight;
   final bool warning;
   final JfSignalCoilMode coilMode;
   final bool? forceStatic;
   final bool showWaitingPrompt;
+  final ScrollController? crtScrollController;
 
   /// Default CRT height after Panel 04 compact deck recovers vertical space.
   static const double defaultMonitorHeight = 300;
@@ -40,7 +47,7 @@ class JfMonitorModule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = warning ? JfColors.amber : JfColors.white;
+    final borderColor = JfColors.white;
 
     return Semantics(
       label: 'Machine monitor module',
@@ -57,11 +64,13 @@ class JfMonitorModule extends StatelessWidget {
             children: [
               JfCrtMonitor(
                 lines: lines,
+                body: crtBody,
                 height: monitorHeight,
                 warning: warning,
-                showWaitingPrompt: showWaitingPrompt,
+                showWaitingPrompt: showWaitingPrompt && crtBody == null,
                 forceStaticPrompt: forceStatic,
                 framed: false,
+                scrollController: crtScrollController,
               ),
               const SizedBox(height: JfSpacing.sm),
               SizedBox(

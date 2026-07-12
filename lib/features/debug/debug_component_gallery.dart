@@ -166,7 +166,8 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final canTest = widget.firebaseReady && widget.keryxLinkService != null;
-    final canLive = widget.firebaseReady &&
+    final canLive =
+        widget.firebaseReady &&
         widget.appCheckReady &&
         widget.keryxLiveScanService != null;
 
@@ -201,10 +202,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   style: JfTypography.controlLabel,
                 ),
                 const SizedBox(height: JfSpacing.xs),
-                Text(
-                  _linkResult.supportText,
-                  style: JfTypography.supporting,
-                ),
+                Text(_linkResult.supportText, style: JfTypography.supporting),
                 const SizedBox(height: JfSpacing.sm),
                 JfDeviceButton(
                   label: 'TEST KERYX LINK',
@@ -226,10 +224,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   style: JfTypography.controlLabel,
                 ),
                 const SizedBox(height: JfSpacing.xs),
-                Text(
-                  _liveResult.supportText,
-                  style: JfTypography.supporting,
-                ),
+                Text(_liveResult.supportText, style: JfTypography.supporting),
                 if (_liveResult.elapsedMs != null) ...[
                   const SizedBox(height: JfSpacing.xs),
                   Text(
@@ -261,10 +256,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   ),
                   const SizedBox(height: JfSpacing.sm),
                   for (final event in _liveResult.events) ...[
-                    Text(
-                      event.title,
-                      style: JfTypography.supporting,
-                    ),
+                    Text(event.title, style: JfTypography.supporting),
                     Text(
                       [
                         if (event.date != null) event.date!,
@@ -321,7 +313,10 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('PANEL 04 COMPACT DECK'),
                 const SizedBox(height: JfSpacing.sm),
-                const Text('Search for an event', style: JfTypography.supporting),
+                const Text(
+                  'Search for an event',
+                  style: JfTypography.supporting,
+                ),
                 const SizedBox(height: JfSpacing.md),
                 JfDeviceButton(
                   label: 'INPUT SEARCH PARAMETERS',
@@ -336,10 +331,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   ),
                 ),
                 const SizedBox(height: JfSpacing.sm),
-                const JfDeviceButton(
-                  label: 'SCAN THE AGORA',
-                  onPressed: null,
-                ),
+                const JfDeviceButton(label: 'SCAN THE AGORA', onPressed: null),
                 const SizedBox(height: JfSpacing.lg),
                 const JfSectionLabel('VALIDATION FIELD + ERROR DIALOG'),
                 const SizedBox(height: JfSpacing.sm),
@@ -355,8 +347,7 @@ class _DebugComponentGalleryState extends State<DebugComponentGallery> {
                   onPressed: () => showJfOledDialog<void>(
                     context: context,
                     title: 'LOCATION REQUIRED',
-                    body:
-                        'Enter a city or ZIP code before scanning the Agora.',
+                    body: 'Enter a city or ZIP code before scanning the Agora.',
                     validationError: true,
                   ),
                 ),

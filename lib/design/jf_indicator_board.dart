@@ -74,7 +74,8 @@ class _JfIndicatorBoardState extends State<JfIndicatorBoard>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _appActive = state == AppLifecycleState.resumed ||
+    _appActive =
+        state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive;
     if (mounted) _sync();
   }

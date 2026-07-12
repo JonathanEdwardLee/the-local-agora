@@ -174,7 +174,8 @@ void main() {
     await tester.pump();
     await tester.pump();
     expect(fake.probeCount, 0);
-    expect(find.text('CITY INDEX'), findsOneWidget);
+    expect(find.textContaining('SIGNALS FOUND'), findsOneWidget);
+    expect(find.text('CITY INDEX'), findsNothing);
     dismissJfOledToastForTest();
     await tester.pump();
   });

@@ -10,11 +10,15 @@ abstract final class JfColors {
   static const Color white24 = Colors.white24;
   static const Color white12 = Colors.white12;
 
-  /// Restrained amber — warnings, uncertainty, missing info, review only.
+  /// Legacy company amber token — **not used** in Local Agora UI (ADR-042).
+  /// Local Agora surfaces are black / white / occasional green only.
   static const Color amber = Color(0xFFC9A227);
 
-  /// Retro faded phosphor green — search-parameter validation errors only.
-  static const Color validationPhosphor = Color(0xFF6B9B6E);
+  /// Occasional Local Agora signal green — active status / provenance emphasis.
+  static const Color signalGreen = Color(0xFF6B9B6E);
+
+  /// Retro faded phosphor green — search-parameter validation errors.
+  static const Color validationPhosphor = signalGreen;
 }
 
 abstract final class JfTypography {
@@ -88,7 +92,7 @@ abstract final class JfTypography {
     fontSize: 11,
     fontWeight: FontWeight.bold,
     letterSpacing: 0.6,
-    color: JfColors.amber,
+    color: JfColors.white,
     height: 1.3,
   );
 

@@ -14,8 +14,7 @@ Future<T?> showJfOledDialog<T>({
   String? secondaryLabel,
   VoidCallback? onSecondary,
 }) {
-  final accent =
-      validationError ? JfColors.validationPhosphor : JfColors.white;
+  final accent = validationError ? JfColors.validationPhosphor : JfColors.white;
   final bodyStyle = validationError
       ? JfTypography.validationError
       : JfTypography.supporting;
@@ -32,9 +31,7 @@ Future<T?> showJfOledDialog<T>({
         backgroundColor: JfColors.black,
         elevation: 0,
         insetPadding: const EdgeInsets.all(JfSpacing.xl),
-        shape: Border.fromBorderSide(
-          BorderSide(color: accent, width: 2),
-        ),
+        shape: Border.fromBorderSide(BorderSide(color: accent, width: 2)),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 440),
           child: Padding(

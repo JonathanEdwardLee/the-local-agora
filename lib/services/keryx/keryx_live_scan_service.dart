@@ -125,8 +125,8 @@ class FirebaseKeryxLiveScanService implements KeryxLiveScanService {
   FirebaseKeryxLiveScanService({
     FirebaseFunctions? functions,
     this.timeout = const Duration(seconds: 360),
-  }) : _functions = functions ??
-            FirebaseFunctions.instanceFor(region: 'us-central1');
+  }) : _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   final FirebaseFunctions _functions;
   final Duration timeout;
@@ -186,10 +186,7 @@ String _sanitizeUserMessage(String raw) {
       .trim();
 }
 
-KeryxLiveScanResult parseKeryxLiveScanPayload(
-  Object? raw, {
-  int? elapsedMs,
-}) {
+KeryxLiveScanResult parseKeryxLiveScanPayload(Object? raw, {int? elapsedMs}) {
   if (raw is! Map) {
     return const KeryxLiveScanResult(
       ok: false,

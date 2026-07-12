@@ -20,8 +20,7 @@ abstract final class AgoraMachineIdentity {
   }
 
   static String compactSpecLine({bool includeDev = false}) {
-    final base =
-        '$model // $versionLabel // $accessTier // $engine';
+    final base = '$model // $versionLabel // $accessTier // $engine';
     if (includeDev) return '$base // DEV';
     return base;
   }
@@ -66,11 +65,7 @@ class JfRetroDateDisplay extends StatelessWidget {
 
 /// 01 — compact identity plate: title + date on top, specs on bottom.
 class JfMachineIdentityPanel extends StatelessWidget {
-  const JfMachineIdentityPanel({
-    super.key,
-    this.now,
-    this.forceDevIndicator,
-  });
+  const JfMachineIdentityPanel({super.key, this.now, this.forceDevIndicator});
 
   final DateTime? now;
   final bool? forceDevIndicator;

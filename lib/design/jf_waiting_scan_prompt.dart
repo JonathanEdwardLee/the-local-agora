@@ -46,7 +46,8 @@ class _JfWaitingScanPromptState extends State<JfWaitingScanPrompt>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _appActive = state == AppLifecycleState.resumed ||
+    _appActive =
+        state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive;
     if (mounted) _sync();
   }
@@ -76,7 +77,7 @@ class _JfWaitingScanPromptState extends State<JfWaitingScanPrompt>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.warning ? JfColors.amber : JfColors.white70;
+    final color = widget.warning ? JfColors.white : JfColors.white70;
     return Semantics(
       label: 'Waiting for scan',
       child: AnimatedBuilder(
@@ -94,7 +95,9 @@ class _JfWaitingScanPromptState extends State<JfWaitingScanPrompt>
                 const TextSpan(text: '> WAITING FOR SCAN... '),
                 TextSpan(
                   text: '█',
-                  style: TextStyle(color: color.withValues(alpha: cursorOpacity)),
+                  style: TextStyle(
+                    color: color.withValues(alpha: cursorOpacity),
+                  ),
                 ),
               ],
             ),

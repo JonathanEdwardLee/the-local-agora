@@ -3,7 +3,7 @@ import '../../features/scan_control/scan_control_state.dart';
 import 'event_signal_sort.dart';
 import 'keryx_service.dart';
 
-/// Default Pass 03 contest path — deterministic verified-fixture discovery.
+/// Deterministic verified-fixture discovery (tests / offline / web fallback).
 ///
 /// Springfield / ZIP 65806 location matching stays inside this service only.
 class DemoKeryxService implements KeryxService {
@@ -23,8 +23,9 @@ class DemoKeryxService implements KeryxService {
         outcome: KeryxScanOutcome.error,
         request: request,
         errorKind: KeryxScanErrorKind.serviceUnavailable,
-        machineTitle: 'SCAN ALREADY IN PROGRESS',
+        machineTitle: 'ERR // SCAN ALREADY IN PROGRESS',
         supportText: 'Wait for the current Agora scan to finish.',
+        origin: KeryxResultOrigin.none,
       );
     }
     _inFlight = true;
@@ -39,6 +40,7 @@ class DemoKeryxService implements KeryxService {
           errorKind: KeryxScanErrorKind.invalidPlace,
           machineTitle: 'LOCATION REQUIRED',
           supportText: 'Enter a city or ZIP code before scanning the Agora.',
+          origin: KeryxResultOrigin.none,
         );
       }
 
@@ -53,7 +55,7 @@ class DemoKeryxService implements KeryxService {
               'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
               'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.\n'
               'Demo fixture covers Springfield, Missouri / 65806.',
-          demoProvenanceBanner: 'VERIFIED KERYX SIGNALS // DEMO FIXTURE',
+          origin: KeryxResultOrigin.verifiedDemo,
           lastCheckedAt: kSpringfieldDemoLastChecked,
           elapsedMs: searchDelay.inMilliseconds,
         );
@@ -67,7 +69,7 @@ class DemoKeryxService implements KeryxService {
           supportText:
               'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
               'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.',
-          demoProvenanceBanner: 'VERIFIED KERYX SIGNALS // DEMO FIXTURE',
+          origin: KeryxResultOrigin.verifiedDemo,
           lastCheckedAt: kSpringfieldDemoLastChecked,
           elapsedMs: searchDelay.inMilliseconds,
         );
@@ -94,7 +96,7 @@ class DemoKeryxService implements KeryxService {
           supportText:
               'TRY ANOTHER TIME WINDOW OR CATEGORY.\n'
               'YOU CAN ALSO ADD A PUBLIC EVENT FLYER.',
-          demoProvenanceBanner: 'VERIFIED KERYX SIGNALS // DEMO FIXTURE',
+          origin: KeryxResultOrigin.verifiedDemo,
           lastCheckedAt: kSpringfieldDemoLastChecked,
           elapsedMs: searchDelay.inMilliseconds,
         );
@@ -106,9 +108,8 @@ class DemoKeryxService implements KeryxService {
         signals: sorted,
         machineTitle: 'AGORA SIGNALS READY',
         supportText:
-            'Demonstrationological index from verified Keryx demonstration signals.',
-        demoProvenanceBanner:
-            'VERIFIED KERYX SIGNALS // LAST CHECKED 2026.07.10',
+            'Chronological index from verified Keryx demonstration signals.',
+        origin: KeryxResultOrigin.verifiedDemo,
         lastCheckedAt: kSpringfieldDemoLastChecked,
         elapsedMs: searchDelay.inMilliseconds,
       );

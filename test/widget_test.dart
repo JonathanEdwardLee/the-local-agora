@@ -202,19 +202,21 @@ void main() {
     expect(find.text('SCAN CONTROL READY'), findsNothing);
   });
 
-  testWidgets('valid Scan opens City Index with demo signals', (tester) async {
+  testWidgets('valid Scan shows results inside CRT monitor', (tester) async {
     await _pumpScanControl(tester);
     await _openParams(tester);
     await tester.enterText(find.byType(TextField), 'Springfield, Missouri');
     await tester.pump();
     await _closeParams(tester);
     await _tapControl(tester, find.text('SCAN THE AGORA'));
-    await tester.pump(); // push searching
-    await tester.pump(); // complete zero-delay scan + pop/push index
-    expect(find.text('CITY INDEX'), findsOneWidget);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
+    expect(find.text('CITY INDEX'), findsNothing);
     expect(find.textContaining('SIGNALS FOUND'), findsOneWidget);
     expect(find.textContaining('VERIFIED KERYX SIGNALS'), findsOneWidget);
-    expect(find.text('SCAN CONTROL READY'), findsNothing);
+    expect(find.text('OPEN RECORD'), findsWidgets);
+    expect(find.text('SCAN THE AGORA'), findsOneWidget);
   });
 
   testWidgets('valid location clears invalid state', (tester) async {

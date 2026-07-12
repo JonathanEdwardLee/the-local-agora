@@ -8,7 +8,7 @@ import '../../services/keryx/agora_event_signal.dart';
 import '../../services/keryx/event_location_privacy.dart';
 import '../../services/source_launch.dart';
 
-/// SCREEN 4 — OPEN RECORD (dedicated route).
+/// Dedicated Open Record detail page (not a dialog).
 class OpenRecordScreen extends StatelessWidget {
   const OpenRecordScreen({super.key, required this.signal});
 
@@ -39,10 +39,7 @@ class OpenRecordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canLaunch =
-        signal.sourceUrl.hasScheme &&
-        (signal.sourceUrl.isScheme('https') ||
-            signal.sourceUrl.isScheme('http'));
+    final canLaunch = signal.hasLaunchableSource;
 
     return Scaffold(
       backgroundColor: JfColors.black,
@@ -83,7 +80,7 @@ class OpenRecordScreen extends StatelessWidget {
                               _line('TYPE', signal.category!),
                             if (signal.summary != null)
                               _line('SUMMARY', signal.summary!),
-                            _line('SOURCE', signal.sourceLabel),
+                            if (canLaunch) _line('SOURCE', signal.sourceLabel),
                             if (signal.lastCheckedAt != null)
                               _line(
                                 'LAST CHECKED',
@@ -94,16 +91,13 @@ class OpenRecordScreen extends StatelessWidget {
                               Text(
                                 'UNCERTAINTY',
                                 style: JfTypography.controlLabel.copyWith(
-                                  color: JfColors.amber,
                                   fontSize: 11,
                                 ),
                               ),
                               const SizedBox(height: JfSpacing.xs),
                               Text(
                                 signal.uncertainties.join('\n'),
-                                style: JfTypography.supporting.copyWith(
-                                  color: JfColors.amber,
-                                ),
+                                style: JfTypography.supporting,
                               ),
                             ],
                           ],
@@ -111,26 +105,26 @@ class OpenRecordScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: JfSpacing.md),
-                    JfDeviceButton(
-                      key: const ValueKey('agora-open-source'),
-                      label: 'OPEN ORIGINAL SOURCE',
-                      semanticLabel: 'Open original source',
-                      onPressed: canLaunch ? () => _openSource(context) : null,
-                    ),
-                    if (!canLaunch) ...[
-                      const SizedBox(height: JfSpacing.xs),
+                    if (canLaunch)
+                      JfDeviceButton(
+                        key: const ValueKey('agora-open-source'),
+                        label: 'OPEN ORIGINAL SOURCE',
+                        semanticLabel: 'Open original source',
+                        onPressed: () => _openSource(context),
+                      )
+                    else
                       Text(
-                        'SOURCE URL NOT AVAILABLE',
+                        'SOURCE NOT AVAILABLE IN THIS RECORD',
+                        key: const ValueKey('agora-source-unavailable'),
                         style: JfTypography.micro.copyWith(
-                          color: JfColors.amber,
+                          color: JfColors.white70,
                         ),
                       ),
-                    ],
                     const SizedBox(height: JfSpacing.sm),
                     JfDeviceButton(
                       key: const ValueKey('agora-record-back'),
-                      label: 'BACK TO INDEX',
-                      semanticLabel: 'Back to signal index',
+                      label: 'BACK',
+                      semanticLabel: 'Back to scan control',
                       variant: JfButtonVariant.compact,
                       onPressed: () => Navigator.of(context).pop(),
                     ),

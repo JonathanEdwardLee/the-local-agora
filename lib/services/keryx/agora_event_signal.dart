@@ -3,12 +3,13 @@ import 'event_location_privacy.dart';
 /// Source-supported Agora event signal for the contest discovery vertical slice.
 ///
 /// Unknown facts stay null / omitted — never invent ticket price, lineup, etc.
+/// [sourceUrl] is null when no verified public source is available.
 class AgoraEventSignal {
   const AgoraEventSignal({
     required this.id,
     required this.title,
-    required this.sourceUrl,
     required this.sourceLabel,
+    this.sourceUrl,
     this.startsAt,
     this.displayedDate,
     this.displayedTime,
@@ -30,11 +31,20 @@ class AgoraEventSignal {
   final String? city;
   final String? category;
   final String? summary;
-  final Uri sourceUrl;
+
+  /// Verified public HTTP(S) source, or null when unavailable.
+  final Uri? sourceUrl;
   final String sourceLabel;
   final DateTime? lastCheckedAt;
   final EventLocationPrivacy privacy;
   final List<String> uncertainties;
+
+  bool get hasLaunchableSource {
+    final url = sourceUrl;
+    if (url == null) return false;
+    return (url.isScheme('https') || url.isScheme('http')) &&
+        url.host.isNotEmpty;
+  }
 
   String get locationLine {
     final parts = <String>[];

@@ -505,7 +505,7 @@ Recommended logical modules:
 
 Keryx-specific code must sit behind a Keryx service interface. Flutter widgets must never call privileged model providers, grounded-search tools, or production write operations directly. Use protected callable or HTTPS endpoints for secret-bearing and expensive operations.
 
-Pass 03 contest lock (ADR-041): Ordinary `SCAN THE AGORA` uses app-owned `KeryxService.scan` with default `DemoKeryxService` (deterministic verified fixture). Do not wire the main Scan path to the paid live `keryxScanDebug` callable. Live path remains debug-gallery-only and confirmation-gated. Do not present fixture results as a fresh live scan.
+Pass 03.1 contest lock (ADR-041 / ADR-042): Ordinary `SCAN THE AGORA` uses app-owned `KeryxService.scan`. On Android with App Check ready, the contest path is one live beta scan (`OneScanBetaKeryxService` + `LiveCallableKeryxService`). Flutter web uses `DemoKeryxService` verified-fixture fallback (no reCAPTCHA site key configured). Do not invent App Check secrets. Do not present fixture results as a fresh live scan. Live `keryxScanDebug` debug gallery remains debug-only.
 
 
 Contest backend lock:  

@@ -4,12 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'junkfeathers_tokens.dart';
 
-enum JfSignalCoilMode {
-  idle,
-  focused,
-  ready,
-  warning,
-}
+enum JfSignalCoilMode { idle, focused, ready, warning }
 
 /// Compact triple-ring signal visual with ticks and scan line.
 class JfSignalCoil extends StatefulWidget {
@@ -57,7 +52,8 @@ class _JfSignalCoilState extends State<JfSignalCoil>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _appActive = state == AppLifecycleState.resumed ||
+    _appActive =
+        state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive;
     if (mounted) _syncAnimation();
   }
@@ -102,7 +98,7 @@ class _JfSignalCoilState extends State<JfSignalCoil>
           color: JfColors.black,
           border: Border.all(
             color: widget.mode == JfSignalCoilMode.warning
-                ? JfColors.amber
+                ? JfColors.white
                 : JfColors.white54,
             width: JfBorders.secondary,
           ),
@@ -146,7 +142,7 @@ class _TripleRingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final ink = Paint()
       ..color = mode == JfSignalCoilMode.warning
-          ? JfColors.amber
+          ? JfColors.white
           : JfColors.white70
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
@@ -196,7 +192,7 @@ class _TripleRingPainter extends CustomPainter {
     // Horizontal scan line moving vertically (triangle wave).
     final scanPaint = Paint()
       ..color = mode == JfSignalCoilMode.warning
-          ? JfColors.amber
+          ? JfColors.white
           : JfColors.white70
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;

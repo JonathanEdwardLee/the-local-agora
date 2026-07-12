@@ -10,11 +10,14 @@ import 'features/scan_control/scan_control_screen.dart';
 import 'features/startup/startup_gate.dart';
 import 'features/welcome/welcome_suppression_store.dart';
 import 'firebase_options.dart';
+import 'services/keryx/beta_scan_allowance_store.dart';
 import 'services/keryx/demo_keryx_service.dart';
 import 'services/keryx/firebase_keryx_link_service.dart';
 import 'services/keryx/keryx_link_service.dart';
 import 'services/keryx/keryx_live_scan_service.dart';
 import 'services/keryx/keryx_service.dart';
+import 'services/keryx/live_callable_keryx_service.dart';
+import 'services/keryx/one_scan_beta_keryx_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,24 +37,46 @@ Future<void> main() async {
     ),
   );
 
-  // Known limitation (Pass 02C): Firebase + App Check still initialize before
-  // runApp. The splash itself is network-independent; this may delay first
-  // paint until local SDK init finishes. Do not gate splash on network success.
+  // Known limitation: Firebase + App Check still initialize before runApp.
   final firebaseReady = await initializeFirebaseSafely();
   final appCheckReady = firebaseReady
       ? await initializeAppCheckSafely()
       : false;
+
+  final liveScan = firebaseReady && appCheckReady && !kIsWeb
+      ? FirebaseKeryxLiveScanService()
+      : null;
 
   runApp(
     TheLocalAgoraApp(
       firebaseReady: firebaseReady,
       appCheckReady: appCheckReady,
       keryxLinkService: firebaseReady ? FirebaseKeryxLinkService() : null,
-      keryxLiveScanService: firebaseReady && appCheckReady && !kIsWeb
-          ? FirebaseKeryxLiveScanService()
-          : null,
-      keryxService: DemoKeryxService(),
+      keryxLiveScanService: liveScan,
+      keryxService: resolveContestKeryxService(
+        liveScanService: liveScan,
+        isWeb: kIsWeb,
+      ),
     ),
+  );
+}
+
+/// Contest wiring (Pass 03.1):
+/// - Android + App Check ready → one live beta scan
+/// - Web / missing App Check → verified demo fixture (honest labeling)
+///
+/// Web App Check has no reCAPTCHA site key in this repo; do not invent one.
+KeryxService resolveContestKeryxService({
+  required KeryxLiveScanService? liveScanService,
+  required bool isWeb,
+  BetaScanAllowanceStore? allowanceStore,
+}) {
+  if (isWeb || liveScanService == null) {
+    return DemoKeryxService();
+  }
+  return OneScanBetaKeryxService(
+    inner: LiveCallableKeryxService(liveScan: liveScanService),
+    allowance: allowanceStore ?? SharedPreferencesBetaScanStore(),
   );
 }
 
@@ -72,11 +97,11 @@ Future<bool> initializeFirebaseSafely() async {
 Future<bool> initializeAppCheckSafely() async {
   try {
     await FirebaseAppCheck.instance.activate(
-      // Debug builds use the official debug provider. Release prepares Play Integrity.
       providerAndroid: kDebugMode
           ? const AndroidDebugProvider()
           : const AndroidPlayIntegrityProvider(),
-      // Web live scan stays disabled in this pass — no invented reCAPTCHA key.
+      // Web: no ReCaptchaV3Provider — site key not configured in this pass.
+      // Live web scan stays on verified demo fallback (ADR-042).
       providerApple: kDebugMode
           ? const AppleDebugProvider()
           : const AppleAppAttestProvider(),

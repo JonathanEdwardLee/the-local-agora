@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'junkfeathers_tokens.dart';
 import 'jf_waiting_scan_prompt.dart';
+import 'junkfeathers_tokens.dart';
 
 /// Custom machine scrollbar tied to a real [ScrollController].
 class JfMachineScrollbar extends StatelessWidget {
@@ -28,7 +28,9 @@ class JfMachineScrollbar extends StatelessWidget {
         }
 
         final hasMetrics =
-            position != null && position.hasContentDimensions && position.hasPixels;
+            position != null &&
+            position.hasContentDimensions &&
+            position.hasPixels;
         final max = hasMetrics ? position.maxScrollExtent : 0.0;
         final canScroll = max > 0.5;
         final extent = hasMetrics ? position.extentInside : trackHeight;
@@ -74,7 +76,10 @@ class JfMachineScrollbar extends StatelessWidget {
                           final delta =
                               details.delta.dy / travel * pos.maxScrollExtent;
                           controller.jumpTo(
-                            (pos.pixels + delta).clamp(0.0, pos.maxScrollExtent),
+                            (pos.pixels + delta).clamp(
+                              0.0,
+                              pos.maxScrollExtent,
+                            ),
                           );
                         },
                         child: Container(
@@ -118,18 +123,26 @@ class JfMachineScrollbar extends StatelessWidget {
 }
 
 /// 02 — retro CRT monitor assembly (square outer, rounded inner screen).
+///
+/// Pass 03.1: [body] replaces line list when non-null (results / searching UI).
 class JfCrtMonitor extends StatefulWidget {
   const JfCrtMonitor({
     super.key,
-    required this.lines,
+    this.lines = const [],
+    this.body,
     this.height = 180,
     this.warning = false,
     this.showWaitingPrompt = true,
     this.forceStaticPrompt,
     this.framed = true,
+    this.scrollController,
   });
 
   final List<String> lines;
+
+  /// When set, shown instead of [lines] inside the scrollable CRT body.
+  final Widget? body;
+
   final double height;
   final bool warning;
   final bool showWaitingPrompt;
@@ -138,6 +151,9 @@ class JfCrtMonitor extends StatefulWidget {
   /// When false, omits the outer machine frame (for embedding in [JfMonitorModule]).
   final bool framed;
 
+  /// Optional external controller so Scan Control can preserve scroll across routes.
+  final ScrollController? scrollController;
+
   static const double innerRadius = 14;
 
   @override
@@ -145,25 +161,30 @@ class JfCrtMonitor extends StatefulWidget {
 }
 
 class _JfCrtMonitorState extends State<JfCrtMonitor> {
-  late final ScrollController _controller;
+  ScrollController? _ownedController;
+
+  ScrollController get _controller =>
+      widget.scrollController ?? _ownedController!;
 
   @override
   void initState() {
     super.initState();
-    _controller = ScrollController();
+    if (widget.scrollController == null) {
+      _ownedController = ScrollController();
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ownedController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = widget.warning ? JfColors.amber : JfColors.white;
+    final borderColor = JfColors.white;
     final screenHeight = widget.framed ? widget.height - 20 : widget.height;
-    final itemCount = widget.lines.length + (widget.showWaitingPrompt ? 1 : 0);
+    final useBody = widget.body != null;
 
     final screen = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,46 +205,51 @@ class _JfCrtMonitorState extends State<JfCrtMonitor> {
                 borderRadius: BorderRadius.circular(
                   JfCrtMonitor.innerRadius - 1,
                 ),
-                child: ListView.builder(
-                  controller: _controller,
-                  padding: const EdgeInsets.all(JfSpacing.sm),
-                  itemCount: itemCount,
-                  itemBuilder: (context, index) {
-                    if (widget.showWaitingPrompt && index == 0) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: JfWaitingScanPrompt(
-                          warning: widget.warning,
-                          forceStatic: widget.forceStaticPrompt,
-                        ),
-                      );
-                    }
-                    final lineIndex =
-                        widget.showWaitingPrompt ? index - 1 : index;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        widget.lines[lineIndex],
-                        style: JfTypography.supporting.copyWith(
-                          color: widget.warning
-                              ? JfColors.amber
-                              : JfColors.white70,
-                          fontSize: 11,
-                          height: 1.3,
-                        ),
+                child: useBody
+                    ? SingleChildScrollView(
+                        key: const ValueKey('jf-crt-body-scroll'),
+                        controller: _controller,
+                        padding: const EdgeInsets.all(JfSpacing.sm),
+                        child: widget.body,
+                      )
+                    : ListView.builder(
+                        controller: _controller,
+                        padding: const EdgeInsets.all(JfSpacing.sm),
+                        itemCount:
+                            widget.lines.length +
+                            (widget.showWaitingPrompt ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (widget.showWaitingPrompt && index == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: JfWaitingScanPrompt(
+                                warning: widget.warning,
+                                forceStatic: widget.forceStaticPrompt,
+                              ),
+                            );
+                          }
+                          final lineIndex = widget.showWaitingPrompt
+                              ? index - 1
+                              : index;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              widget.lines[lineIndex],
+                              style: JfTypography.supporting.copyWith(
+                                color: JfColors.white70,
+                                fontSize: 11,
+                                height: 1.3,
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           ),
         ),
         const SizedBox(width: JfSpacing.sm),
-        JfMachineScrollbar(
-          controller: _controller,
-          trackHeight: screenHeight,
-        ),
+        JfMachineScrollbar(controller: _controller, trackHeight: screenHeight),
       ],
     );
 
@@ -236,8 +262,10 @@ class _JfCrtMonitorState extends State<JfCrtMonitor> {
             ? DecoratedBox(
                 decoration: BoxDecoration(
                   color: JfColors.black,
-                  border:
-                      Border.all(color: borderColor, width: JfBorders.primary),
+                  border: Border.all(
+                    color: borderColor,
+                    width: JfBorders.primary,
+                  ),
                   borderRadius: JfBorders.square,
                 ),
                 child: Padding(

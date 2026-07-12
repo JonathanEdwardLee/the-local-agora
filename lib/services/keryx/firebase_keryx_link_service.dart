@@ -9,8 +9,8 @@ class FirebaseKeryxLinkService implements KeryxLinkService {
   FirebaseKeryxLinkService({
     FirebaseFunctions? functions,
     this.timeout = const Duration(seconds: 20),
-  }) : _functions = functions ??
-            FirebaseFunctions.instanceFor(region: 'us-central1');
+  }) : _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   final FirebaseFunctions _functions;
   final Duration timeout;

@@ -56,7 +56,20 @@ enum KeryxScanErrorKind {
   noNetwork,
   noSupportedSignals,
   malformedResponse,
+  betaScanConsumed,
   unknown,
+}
+
+/// Honest result provenance for CRT / Open Record labeling.
+enum KeryxResultOrigin {
+  /// Fresh protected live callable response.
+  live,
+
+  /// Deterministic verified demonstration fixture.
+  verifiedDemo,
+
+  /// No completed discovery payload (errors / pre-scan failures).
+  none,
 }
 
 class KeryxScanResult {
@@ -67,7 +80,7 @@ class KeryxScanResult {
     this.errorKind,
     this.machineTitle = '',
     this.supportText = '',
-    this.demoProvenanceBanner,
+    this.origin = KeryxResultOrigin.none,
     this.lastCheckedAt,
     this.elapsedMs,
   });
@@ -78,18 +91,43 @@ class KeryxScanResult {
   final KeryxScanErrorKind? errorKind;
   final String machineTitle;
   final String supportText;
-
-  /// Honest demo label when results come from the verified fixture path.
-  final String? demoProvenanceBanner;
+  final KeryxResultOrigin origin;
   final DateTime? lastCheckedAt;
   final int? elapsedMs;
 
   int get signalCount => signals.length;
 
-  bool get isDemo => demoProvenanceBanner != null;
+  bool get isDemo => origin == KeryxResultOrigin.verifiedDemo;
+  bool get isLive => origin == KeryxResultOrigin.live;
+
+  /// Restrained CRT provenance lines (no internal architecture jargon).
+  List<String> get provenanceLines {
+    switch (origin) {
+      case KeryxResultOrigin.live:
+        return [
+          'LIVE KERYX SIGNALS',
+          if (lastCheckedAt != null) 'LAST CHECKED ${_fmt(lastCheckedAt!)}',
+        ];
+      case KeryxResultOrigin.verifiedDemo:
+        return [
+          'VERIFIED KERYX SIGNALS',
+          if (lastCheckedAt != null) 'LAST CHECKED ${_fmt(lastCheckedAt!)}',
+        ];
+      case KeryxResultOrigin.none:
+        return const [];
+    }
+  }
+
+  static String _fmt(DateTime d) {
+    final l = d.toUtc();
+    final y = l.year.toString().padLeft(4, '0');
+    final m = l.month.toString().padLeft(2, '0');
+    final day = l.day.toString().padLeft(2, '0');
+    return '$y.$m.$day';
+  }
 }
 
-/// Contest discovery service boundary (ADR-041).
+/// Contest discovery service boundary (ADR-041 / ADR-042).
 abstract interface class KeryxService {
   Future<KeryxScanResult> scan(KeryxScanRequest request);
 }

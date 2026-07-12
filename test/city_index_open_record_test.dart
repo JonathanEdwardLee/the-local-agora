@@ -9,7 +9,7 @@ import 'package:the_local_agora/services/keryx/keryx_service.dart';
 import 'package:the_local_agora/services/source_launch.dart';
 
 void main() {
-  final sample = AgoraEventSignal(
+  final withSource = AgoraEventSignal(
     id: 't1',
     title: 'Sample Signal',
     displayedDate: '2026-07-11',
@@ -18,11 +18,59 @@ void main() {
     city: 'Springfield, Missouri',
     category: 'MUSIC',
     summary: 'Demo summary',
-    sourceUrl: Uri.parse('https://example.com/agora-demo/sample'),
-    sourceLabel: 'Venue calendar (demo provenance)',
+    sourceUrl: Uri.parse('https://www.springfieldcomedyclub.com/events'),
+    sourceLabel: 'Springfield Comedy Club',
   );
 
-  testWidgets('City Index opens Open Record route', (tester) async {
+  final withoutSource = AgoraEventSignal(
+    id: 't2',
+    title: 'No Source Signal',
+    displayedDate: '2026-07-12',
+    category: 'MUSIC',
+    sourceUrl: null,
+    sourceLabel: 'SOURCE NOT AVAILABLE IN THIS RECORD',
+  );
+
+  testWidgets('Open Record hides raw URL and launches labeled source', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(400, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: OpenRecordScreen(signal: withSource),
+      ),
+    );
+    expect(find.text('OPEN ORIGINAL SOURCE'), findsOneWidget);
+    expect(find.textContaining('https://'), findsNothing);
+    expect(find.text('Springfield Comedy Club'), findsOneWidget);
+  });
+
+  testWidgets('missing source omits open action', (tester) async {
+    tester.view.physicalSize = const Size(400, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildJunkfeathersTheme(),
+        home: OpenRecordScreen(signal: withoutSource),
+      ),
+    );
+    expect(find.text('OPEN ORIGINAL SOURCE'), findsNothing);
+    expect(find.text('SOURCE NOT AVAILABLE IN THIS RECORD'), findsOneWidget);
+  });
+
+  testWidgets('legacy City Index still opens Open Record', (tester) async {
     tester.view.physicalSize = const Size(400, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -37,8 +85,8 @@ void main() {
         timeWindow: TimeWindow.nextSevenDays,
         category: EventCategory.music,
       ),
-      signals: [sample],
-      demoProvenanceBanner: 'VERIFIED KERYX SIGNALS // DEMO FIXTURE',
+      signals: [withSource],
+      origin: KeryxResultOrigin.verifiedDemo,
     );
 
     await tester.pumpWidget(
@@ -47,22 +95,9 @@ void main() {
         home: CityIndexScreen(result: result),
       ),
     );
-    expect(find.text('1 SIGNAL FOUND'), findsOneWidget);
-    expect(find.textContaining('vertexaisearch'), findsNothing);
-    expect(
-      find.text('SOURCE // Venue calendar (demo provenance)'),
-      findsOneWidget,
-    );
-
     await tester.tap(find.text('SAMPLE SIGNAL'));
     await tester.pumpAndSettle();
     expect(find.byType(OpenRecordScreen), findsOneWidget);
-    expect(find.text('OPEN ORIGINAL SOURCE'), findsOneWidget);
-    expect(find.textContaining('https://example.com'), findsNothing);
-
-    await tester.tap(find.byKey(const ValueKey('agora-record-back')));
-    await tester.pumpAndSettle();
-    expect(find.byType(CityIndexScreen), findsOneWidget);
   });
 
   test('invalid source URL is rejected without throwing', () async {

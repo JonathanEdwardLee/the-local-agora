@@ -26,8 +26,9 @@ void showJfOledToast(
   entry = OverlayEntry(
     builder: (ctx) {
       final top = MediaQuery.paddingOf(ctx).top + JfSpacing.sm;
-      final borderColor = warning ? JfColors.amber : JfColors.white;
-      final textColor = warning ? JfColors.amber : JfColors.white;
+      final borderColor = JfColors.white;
+      final textColor = JfColors.white;
+      final borderWidth = warning ? JfBorders.major : JfBorders.primary;
 
       return Positioned(
         top: top,
@@ -45,10 +46,7 @@ void showJfOledToast(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: JfColors.black,
-                    border: Border.all(
-                      color: borderColor,
-                      width: JfBorders.primary,
-                    ),
+                    border: Border.all(color: borderColor, width: borderWidth),
                     borderRadius: JfBorders.square,
                   ),
                   child: Padding(
@@ -76,7 +74,7 @@ void showJfOledToast(
                             detail,
                             textAlign: TextAlign.center,
                             style: JfTypography.supporting.copyWith(
-                              color: warning ? JfColors.amber : JfColors.white70,
+                              color: JfColors.white70,
                               fontSize: 10,
                             ),
                           ),

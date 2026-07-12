@@ -325,4 +325,25 @@ There is no Local Agora product splash, no intermediate tagline screen, and no m
 
 6. **Future work** — Shared Firestore cache-first (ADR-028) and async scan jobs remain deferred. Demo searching delay is short (~1.1 s), not a long fake wait.
 
-**Consequence:** Do not wire ordinary `SCAN THE AGORA` to the live paid callable in this contest slice. Do not invent unsupported event facts. Do not add maps, accounts, or social feeds.
+**Consequence:** Do not wire ordinary `SCAN THE AGORA` to the live paid callable without the Pass 03.1 one-scan beta gate. Do not invent unsupported event facts. Do not add maps, accounts, or social feeds.
+
+## ADR-042 — Pass 03.1 CRT results, green-only UI, one live beta scan
+
+**Status:** Accepted (implementation; awaiting physical/web re-review; do not merge yet)  
+**Date:** 2026-07-12  
+**Decision:**
+
+1. **CRT results** — Ordinary Scan keeps the user on Scan Control. Idle / searching / results / empty / error render inside the CRT monitor. Open Record remains a dedicated route. Do not push a City Index page merely to show the result list.
+
+2. **Color exception** — Local Agora UI is black, white, and occasional green only. No yellow/amber on product surfaces (warnings, uncertainty, borders, toasts, coils). Errors use white text with strong borders / `ERR //` prefixes. Legacy `JfColors.amber` remains as an unused token for historical company docs only.
+
+3. **Sources** — No `example.com` placeholders in the production fixture path. Fixture events omit `sourceUrl` when no verified publisher URL exists in-repo and show `SOURCE NOT AVAILABLE IN THIS RECORD`. Live callable responses preserve real source URLs; UI shows human-readable labels, not raw redirect URLs.
+
+4. **One-scan beta** — Android (Firebase + App Check ready) uses `OneScanBetaKeryxService` over `LiveCallableKeryxService`. Allowance key `hasUsedBetaKeryxScan` via `shared_preferences`. Consume only after a completed valid response (results or empty). Validation / network / timeout / malformed failures do not consume. Second attempt: `ERR // ONLY ONE SCAN ALLOWED FOR BETA`.
+
+5. **Web** — No reCAPTCHA App Check site key is configured in this repository. Web uses verified demo fixture mode with honest labeling. Do not disable App Check enforcement or embed Gemini keys in Flutter web.
+
+6. **Demo retention** — `DemoKeryxService` remains for tests, offline development, and web fallback.
+
+**Consequence:** Document Android live vs web demo honestly. Treat the local Boolean as a contest UX/cost guard, not production abuse prevention.
+

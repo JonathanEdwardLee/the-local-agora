@@ -96,10 +96,11 @@ class _JfDeviceButtonState extends State<JfDeviceButton> {
           : JfBorders.secondary;
     }
 
-    final labelStyle = (widget.variant == JfButtonVariant.primary
-            ? JfTypography.primaryButton
-            : JfTypography.controlLabel)
-        .copyWith(color: textColor);
+    final labelStyle =
+        (widget.variant == JfButtonVariant.primary
+                ? JfTypography.primaryButton
+                : JfTypography.controlLabel)
+            .copyWith(color: textColor);
 
     final child = AnimatedContainer(
       duration: JfMotion.press,
@@ -118,11 +119,7 @@ class _JfDeviceButtonState extends State<JfDeviceButton> {
         borderRadius: JfBorders.square,
       ),
       alignment: Alignment.center,
-      child: Text(
-        widget.label,
-        textAlign: TextAlign.center,
-        style: labelStyle,
-      ),
+      child: Text(widget.label, textAlign: TextAlign.center, style: labelStyle),
     );
 
     return Semantics(

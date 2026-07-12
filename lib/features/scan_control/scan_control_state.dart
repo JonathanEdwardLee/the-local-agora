@@ -1,9 +1,4 @@
-enum TimeWindow {
-  tonight,
-  tomorrow,
-  thisWeekend,
-  nextSevenDays,
-}
+enum TimeWindow { tonight, tomorrow, thisWeekend, nextSevenDays }
 
 extension TimeWindowLabel on TimeWindow {
   String get label {
@@ -20,14 +15,7 @@ extension TimeWindowLabel on TimeWindow {
   }
 }
 
-enum EventCategory {
-  allSignals,
-  music,
-  art,
-  stage,
-  comedy,
-  gatherings,
-}
+enum EventCategory { allSignals, music, art, stage, comedy, gatherings }
 
 /// Version 0.1 dial options — art / gatherings / all-signals deferred.
 const kV01EventCategories = <EventCategory>[
@@ -82,8 +70,9 @@ class ScanControlState {
       locationText: locationText ?? this.locationText,
       timeWindow: timeWindow ?? this.timeWindow,
       category: category ?? this.category,
-      locationError:
-          clearLocationError ? null : (locationError ?? this.locationError),
+      locationError: clearLocationError
+          ? null
+          : (locationError ?? this.locationError),
     );
   }
 }

@@ -70,7 +70,7 @@ class SignalRecordTile extends StatelessWidget {
                 if (signal.uncertainties.isNotEmpty)
                   Text(
                     signal.uncertainties.join(' // '),
-                    style: JfTypography.micro.copyWith(color: JfColors.amber),
+                    style: JfTypography.micro.copyWith(color: JfColors.white70),
                   ),
               ],
             ),

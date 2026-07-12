@@ -5,11 +5,7 @@ import 'junkfeathers_tokens.dart';
 enum JfStatusTone { normal, secondary, warning, error }
 
 class JfStatusLine extends StatelessWidget {
-  const JfStatusLine(
-    this.text, {
-    super.key,
-    this.tone = JfStatusTone.normal,
-  });
+  const JfStatusLine(this.text, {super.key, this.tone = JfStatusTone.normal});
 
   final String text;
   final JfStatusTone tone;
@@ -22,7 +18,7 @@ class JfStatusLine extends StatelessWidget {
         return JfColors.white54;
       case JfStatusTone.warning:
       case JfStatusTone.error:
-        return JfColors.amber;
+        return JfColors.white;
     }
   }
 

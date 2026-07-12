@@ -43,7 +43,8 @@ class _JfDialSelectorState<T> extends State<JfDialSelector<T>> {
     super.dispose();
   }
 
-  int get _index => widget.values.indexOf(widget.value).clamp(0, widget.values.length - 1);
+  int get _index =>
+      widget.values.indexOf(widget.value).clamp(0, widget.values.length - 1);
 
   void _step(int delta) {
     if (widget.values.isEmpty) return;
@@ -82,8 +83,9 @@ class _JfDialSelectorState<T> extends State<JfDialSelector<T>> {
         increasedValue: _index < widget.values.length - 1
             ? widget.labelOf(widget.values[_index + 1])
             : null,
-        decreasedValue:
-            _index > 0 ? widget.labelOf(widget.values[_index - 1]) : null,
+        decreasedValue: _index > 0
+            ? widget.labelOf(widget.values[_index - 1])
+            : null,
         onIncrease: _index < widget.values.length - 1 ? () => _step(1) : null,
         onDecrease: _index > 0 ? () => _step(-1) : null,
         child: Column(

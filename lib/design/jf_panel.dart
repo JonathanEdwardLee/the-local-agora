@@ -37,10 +37,7 @@ class JfPanel extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: JfColors.black,
-        border: Border.all(
-          color: borderColor ?? JfColors.white,
-          width: _width,
-        ),
+        border: Border.all(color: borderColor ?? JfColors.white, width: _width),
         borderRadius: JfBorders.square,
       ),
       child: child,
